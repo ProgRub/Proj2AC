@@ -8,9 +8,9 @@ CustoRapido 			EQU 3 		;custo do carregamento rápido
 ; BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
 ; BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
 ; BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
-EnderecoBateriaNormal   	EQU 3100H ;endereço onde é guardado o valor da bateria para o carregamento normal
-EnderecoBateriaSemiRapido   EQU 3102H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
-EnderecoBateriaRapido   	EQU 3104H ;endereço onde é guardado o valor da bateria para o carregamento rápido
+EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateria para o carregamento normal
+EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
+EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
 
 ;endereços de memória:
@@ -24,7 +24,7 @@ InputTempo 				EQU 1012H 	;endereço onde inserir o tempo desejado
 InputIncrementoBateria  EQU 1014H ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
-Base_Tabela_Dados EQU 3000H ;endereço do início da base de dados
+Base_Tabela_Dados EQU 1100H ;endereço do início da base de dados
 CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do aluno para ler o código de segurança
 Saldo EQU 04H ;aumento relativo ao inicio dos dados do aluno para ler o saldo
 Proximo EQU 06H ;salto a executar para ler os dados do próximo aluno
