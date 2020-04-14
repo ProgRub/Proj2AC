@@ -136,6 +136,7 @@ EscolhaTempo_VerificaOK:
 	
 VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
 	MUL R3, R4										;multiplica o registo 5 com o tempo escolhido pelo utilizador
+	JV Fim
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
     MOV R6,[R5+Saldo]
@@ -146,6 +147,7 @@ VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
 Debito:
 	MOV R0, [R5+Saldo] ;coloca no registo 0 o saldo do utilizador
 	SUB R0, R3 ;é subtraido o custo da operação, atualiza o saldo do utilizador
+	MOV R6, R4
 	JMP ForneceEnergia ;salta para o "tag" ForneceEnergia
 
 ForneceEnergia: ;FALTA FORNECER ENERGIA AO VEICULO
@@ -171,35 +173,29 @@ AtualizaValoresEnergia:
 	JEQ AtualizaPostoRapido	;salta para o "tag" AtualizaPostoRapido
 
 AtualizaPostoNormal:
-	MOV R0, InputTempo ;coloca no registo 0 o endereço de onde ler o tempo escolhido
-	MOV R1, [R0]  ;coloca no registo 1 o tempo escolhido
 	MOV R2, Normal ;coloca no registo 2 a energia do carregamento normal por hora
-	MUL R1, R2 ;coloca no registo 1 a energia do carregamento total
+	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
 	MOV R3, EnderecoBateriaNormal ;coloca no registo 3 o endereço de onde ler o valor da bateria normal
 	MOV R4, [R3] ;coloca no registo 4 o valor da bateria normal
-	SUB R4, R1 ;subtrai o valor da energia do carregamento total à bateria do posto normal
+	SUB R4, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
 	MOV [R3], R4 ;atualiza o valor de energia da bateria do posto normal
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 	
 AtualizaPostoSemiRapido:
-	MOV R0, InputTempo ;coloca no registo 0 o endereço de onde ler o tempo escolhido
-	MOV R1, [R0]  ;coloca no registo 1 o tempo escolhido
 	MOV R2, Semirapido ;coloca no registo 2 a energia do carregamento semi-rapido por hora
-	MUL R1, R2 ;coloca no registo 1 a energia do carregamento total
+	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
 	MOV R3, EnderecoBateriaSemiRapido ;coloca no registo 3 o endereço de onde ler o valor da bateria semi-rapida
 	MOV R4, [R3] ;coloca no registo 4 o valor da bateria semi-rapida
-	SUB R4, R1  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
+	SUB R4, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
 	MOV [R3], R4 ;atualiza o valor de energia da bateria do posto semi-rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 
 AtualizaPostoRapido:
-	MOV R0, InputTempo ;coloca no registo 0 o endereço de onde ler o tempo escolhido
-	MOV R1, [R0]  ;coloca no registo 1 o tempo escolhido
 	MOV R2, Rapido ;coloca no registo 2 a energia do carregamento rapido por hora
-	MUL R1, R2 ;coloca no registo 1 a energia do carregamento total
+	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
 	MOV R3, EnderecoBateriaRapido ;coloca no registo 3 o endereço de onde ler o valor da bateria rapida
 	MOV R4, [R3] ;coloca no registo 4 o valor da bateria rapida
-	SUB R4, R1  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
+	SUB R4, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 	MOV [R3], R4 ;atualiza o valor de energia da bateria do posto rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 	
