@@ -8,9 +8,9 @@ CustoRapido 			EQU 3 		;custo do carregamento rápido
 ; BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
 ; BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
 ; BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
-EnderecoBateriaNormal   EQU 3100H ;endereço onde é guardado o valor da bateria para o carregamento normal
+EnderecoBateriaNormal   	EQU 3100H ;endereço onde é guardado o valor da bateria para o carregamento normal
 EnderecoBateriaSemiRapido   EQU 3102H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
-EnderecoBateriaRapido   EQU 3104H ;endereço onde é guardado o valor da bateria para o carregamento rápido
+EnderecoBateriaRapido   	EQU 3104H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
 
 ;endereços de memória:
@@ -153,7 +153,45 @@ NaoForneceEnergia:
     JMP NaoForneceEnergia
 	
 AtualizaValoresEnergia:
+	MOV R0, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
+	MOV R1, [R0]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
+	CMP R1,1										;compara o registo 3 com o registo 0
+	JEQ	AtualizaPostoNormal								;verifica se a comparação anterior é verdadeira
+	CMP R3, 2										;compara o registo 3 com o registo 1
+	JEQ	AtualizaPostoSemiRapido								;verifica se a comparação anterior é verdadeira
+	CMP R3,3										;compara o registo 3 com o registo 2
+	JEQ AtualizaPostoRapido	
 	JMP AtualizaValoresEnergia
+
+AtualizaPostoNormal:
+	MOV R0, InputTempo
+	MOV R1, [R0]
+	MUL R1, 20
+	MOV R2, EnderecoBateriaNormal
+	MOV R3, [R2]
+	SUB R3, R1
+	
+	
+	
+AtualizaPostoSemiRapido:
+	MOV R0, InputTempo
+	MOV R1, [R0]
+	MUL R1, 60
+	MOV R2, EnderecoBateriaSemiRapido
+	MOV R3, [R2]
+	SUB R3, R1
+
+AtualizaPostoRapido:
+	MOV R0, InputTempo
+	MOV R1, [R0]
+	MUL R1, 10
+	MOV R2, EnderecoBateriaRapido
+	MOV R3, [R2]
+	SUB R3, R1
+	
+	
+	
+	
 	
 ; Fim:
 ;     JMP Fim
