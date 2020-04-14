@@ -77,8 +77,8 @@ VerificacaoFalhada:
     JEQ Fim ;chegou ao fim da base
     ADD R0,Proximo ;avanca a base para o proximo aluno a verificar
     JMP Ciclo_Verify_Aluno
+	
 Fim:
-    MOV R9,0; R9 indica que a verificação foi bem sucedida (0-false)
     JMP Fim
 	
 EscolhaCarregamento: 
@@ -99,6 +99,7 @@ VerificaOK2:
 	CMP R3, R2										;compara o registo 3 com o registo 2
 	JEQ EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
+	
 EscolhaTempo_VerificaOK:   
     MOV R7, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
     MOV R8, [R7] ;mete em R4 o valor lido do endereço R3
@@ -118,13 +119,26 @@ VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
     ADD R5,R10
     MOV R6,[R5+Saldo]
 	CMP R3, R6									;compara o custo do carregamento com o saldo do utilizador
-	JLE ForneceEnergia								;se a verificação for verdadeira, salta para o "tag" ForneceEnergia
+	JLE Debito								;se a verificação for verdadeira, salta para o "tag" ForneceEnergia
 	JMP NaoForneceEnergia							;salta para o "tag" NãoForneceEnergia
 	
+Debito:
+	MOV R0, [R5+Saldo]
+	SUB R0, R3
+	JMP ForneceEnergia
+
 ForneceEnergia:
+	SUB R4,1
+	CMP R4,0
+	JEQ AtualizaValoresEnergia
     JMP ForneceEnergia
+	
 NaoForneceEnergia:
     JMP NaoForneceEnergia
+	
+AtualizaValoresEnergia:
+	JMP AtualizaValoresEnergia
+	
 ; Fim:
 ;     JMP Fim
 ; Inicio:
