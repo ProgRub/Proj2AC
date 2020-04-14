@@ -1,22 +1,22 @@
-;constantes
-normal EQU 20 ;3.7 kWh
-semirapido EQU 60 ;22 kWh
-rapido EQU 100 ;50 kWh
-CustoNormal EQU 1 ;custo do carregamento normal
-CustoSemiRapido EQU 2 ;custo do carregamento semirápido
-CustoRapido EQU 3 ;custo do carregamento rápido
-BateriaNormal EQU 1000 ;valor de bateria para o carregamento normal no posto
-BateriaSemiRapido EQU 1000 ;valor de bateria para o carregamento semi rápido no posto
-BateriaRapido EQU 1000 ;valor de bateria para o carregamento rápido no posto
+;constantes:
+normal 					EQU 20 		;3.7 kWh
+semirapido 				EQU 60 		;22 kWh
+rapido 					EQU 100 	;50 kWh
+CustoNormal 			EQU 1		;custo do carregamento normal
+CustoSemiRapido 		EQU 2 		;custo do carregamento semirápido
+CustoRapido 			EQU 3 		;custo do carregamento rápido
+BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
+BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
+BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
 
-;endereços de memória
-OK EQU 1020H ;endereço do botão OK
-CANCEL EQU 1022H ;endereço do botão Cancel
-;Display EQU 2000H ;endereço do display
-InputID EQU 1000H ;endereço onde inserir o ID do aluno
-InputCodSeguranca EQU 1002H ;endereço onde inserir o código de segurança do aluno
-InputTipoCarregamento EQU 1010H ;endereço onde inserir o tipo de carregamento
-InputTempo EQU 1012H ;endereço onde inserir o tempo desejado
+;endereços de memória:
+OK 						EQU 1020H 	;endereço do botão OK
+CANCEL 					EQU 1022H 	;endereço do botão Cancel
+;Display 				EQU 2000H 	;endereço do display
+InputID 				EQU 1000H 	;endereço onde inserir o ID do aluno
+InputCodSeguranca 		EQU 1002H 	;endereço onde inserir o código de segurança do aluno
+InputTipoCarregamento	EQU 1010H 	;endereço onde inserir o tipo de carregamento
+InputTempo 				EQU 1012H 	;endereço onde inserir o tempo desejado
 
 ;endereços relativos à base de dados
 Base_Tabela_Dados EQU 3000H ;endereço do início da base de dados
@@ -84,18 +84,18 @@ VerificaOK2:
 	CMP R3, R2										;compara o registo 3 com o registo 2
 	JEQ EscolhaTempo_VerificaOK3								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
-EscolhaTempo_VerificaOK3:   
+EscolhaTempo_VerificaOK:   
     MOV R7, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
     MOV R8, [R7] ;mete em R4 o valor lido do endereço R3
     CMP R8,0
-    JEQ EscolhaTempo_VerificaOK3 ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    JEQ EscolhaTempo_VerificaOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
     MOV R0,0
     MOV [R7],R0
     MOV R6, InputTempo      ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R6]							;coloca no registo 0 o tempo escolhido pelo utilizador
 	CMP R4, 0										;se o valor do registo 0 for superior a 0, verifica o saldo do utilizador 
 	JGT VerificaSaldo
-	JMP EscolhaTempo_VerificaOK3								;volta para o menu inicial
+	JMP EscolhaTempo_VerificaOK								;volta para o menu inicial
 	
 VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
 	MUL R3, R4										;multiplica o registo 5 com o tempo escolhido pelo utilizador
