@@ -1,13 +1,17 @@
 ;constantes:
-normal 					EQU 20 		;3.7 kWh
-semirapido 				EQU 60 		;22 kWh
-rapido 					EQU 100 	;50 kWh
+Normal 					EQU 20 		;3.7 kWh
+Semirapido 				EQU 60 		;22 kWh
+Rapido 					EQU 100 	;50 kWh
 CustoNormal 			EQU 1		;custo do carregamento normal
 CustoSemiRapido 		EQU 2 		;custo do carregamento semirápido
 CustoRapido 			EQU 3 		;custo do carregamento rápido
-BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
-BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
-BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
+; BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
+; BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
+; BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
+EnderecoBateriaNormal   EQU 3100H ;endereço onde é guardado o valor da bateria para o carregamento normal
+EnderecoBateriaSemiRapido   EQU 3102H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
+EnderecoBateriaRapido   EQU 3104H ;endereço onde é guardado o valor da bateria para o carregamento rápido
+
 
 ;endereços de memória:
 OK 						EQU 1020H 	;endereço do botão OK
@@ -29,7 +33,18 @@ Tamanho EQU 1 ;número de alunos na base de dados
     ;CALL Display_EstadoServico
     ;CALL LimpaDisplay
     ;CALL Display_Verificacao
-	
+
+NiveisDeEnergia:
+    MOV R0,EnderecoBateriaNormal ;R0 guarda o endereço onde está o valor da bateria normal
+    MOV R1,EnderecoBateriaSemiRapido ;R1 guarda o endereço onde está o valor da bateria semirápida
+    MOV R2,EnderecoBateriaRapido ;R2 guarda o endereço onde está o valor da bateria rápida
+	MOV R3,[R0] ;R3 tem o valor da bateria do carregamento normal
+    MOV R4,[R1] ;R4 tem o valor da bateria do carregamento semirapido
+    MOV R5,[R2] ;R5 tem o valor da bateria do carregamento rápido 
+    MOV R6,0 ;R6 contará quantas bateria estiverem abaixo do nivel minimo
+    CMP R3,Normal
+    JLE InserirEnergia
+    CMP 
 Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
@@ -78,11 +93,11 @@ VerificaOK2:
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
 	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
 	CMP R3,R0										;compara o registo 3 com o registo 0
-	JEQ	EscolhaTempo_VerificaOK3								;verifica se a comparação anterior é verdadeira
+	JEQ	EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
 	CMP R3, R1										;compara o registo 3 com o registo 1
-	JEQ	EscolhaTempo_VerificaOK3								;verifica se a comparação anterior é verdadeira
+	JEQ	EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
 	CMP R3, R2										;compara o registo 3 com o registo 2
-	JEQ EscolhaTempo_VerificaOK3								;verifica se a comparação anterior é verdadeira
+	JEQ EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
 EscolhaTempo_VerificaOK:   
     MOV R7, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
