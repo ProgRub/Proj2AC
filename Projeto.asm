@@ -21,6 +21,7 @@ InputID 				EQU 1000H 	;endereço onde inserir o ID do aluno
 InputCodSeguranca 		EQU 1002H 	;endereço onde inserir o código de segurança do aluno
 InputTipoCarregamento	EQU 1010H 	;endereço onde inserir o tipo de carregamento
 InputTempo 				EQU 1012H 	;endereço onde inserir o tempo desejado
+InputIncrementoBateria  EQU 1014H ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
 Base_Tabela_Dados EQU 3000H ;endereço do início da base de dados
@@ -34,8 +35,54 @@ Tamanho EQU 1 ;número de alunos na base de dados
     ;CALL LimpaDisplay
     ;CALL Display_Verificacao
 
-;InsereEnergia:
-    ;JMP InsereEnergia
+InsereEnergia:
+    MOV R0, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
+    MOV R1, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
+VerificaOK4:    
+    MOV R3, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
+    MOV R4, [R3] ;mete em R4 o valor lido do endereço R3
+    CMP R4,0
+    JEQ VerificaOK4 ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    MOV R4,0 ;reset do valor lido do endereço de OK
+    MOV R2, [R1] ;R2 contém a seleção de qual bateria carregar, por parte do utilizador
+    MOV R3, [R0] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+    MOV R5,CustoNormal
+    CMP R2, R5
+    JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
+    MOV R4, EnderecoBateriaNormal ;R4 contém o endereço onde se guarda o valor armazenado na bateria normal
+    MOV R5, [R4] ;R5 contém o valor de bateria armazenada
+    ADD R5, R3 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    JV OverflowBateria ;se ocorrer overflow informar
+    MOV [R4],R5 ;se não ocorrer overflow, atualizar a variável na memória que guarda o valor da bateria
+    JMP NiveisDeEnergia ;se não ocorrer overflow, avançar para o display dos niveis de energia
+IncrementaSemiRapido:
+    MOV R5,CustoSemiRapido
+    CMP R2,R5
+    JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
+    MOV R4, EnderecoBateriaSemiRapido ;R4 contém o endereço onde se guarda o valor da bateria semirapida
+    MOV R5,[R4] ;R5 contém o valor da bateria armazenada
+    ADD R5,R3 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    JV OverflowBateria; se ocorrer overflow informar
+    MOV [R4],R5 ;se não ocorrer overflow, atualizar a variável na memória que guarda o valor da bateria
+    JMP NiveisDeEnergia ;avançar para o display dos niveis de energia
+IncrementaRapido:
+    MOV R5, CustoRapido
+    CMP R2, R5
+    JNE NiveisDeEnergia ;verificar se escolheu carregar a bateria rapida, se não avançar
+    MOV R4, EnderecoBateriaRapido ;R4 contém o endereço onde se guarda o valor da bateria rapida
+    MOV R5,[R4] ;R5 contém o valor da bateria armazenada
+    ADD R5,R3 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    JV OverflowBateria ;se ocorrer overflow informar
+    MOV [R4],R5 ;se não ocorrer overflow, atualizar a variável na memória que guarda o valor da bateria
+    JMP NiveisDeEnergia ;avançar para o display dos niveis de energia
+OverflowBateria:
+    MOV R9,0
+    MOV [R4],R9
+    JMP Fim
+    ; PLACE 0900H
+    ; String "OVERFLOW"
+    ; PLACE 0056H
+
 
 NiveisDeEnergia:
     MOV R0,EnderecoBateriaNormal ;R0 guarda o endereço onde está o valor da bateria normal
@@ -59,7 +106,8 @@ VerificaRapido:
     CMP R5, R9
     JGT Verificacao_Aluno
     ADD R6,1
-    CMP R6,3
+    MOV R10,3
+    CMP R6,R10
     JEQ Fim
 Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
