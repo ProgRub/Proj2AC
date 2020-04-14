@@ -34,6 +34,9 @@ Tamanho EQU 1 ;número de alunos na base de dados
     ;CALL LimpaDisplay
     ;CALL Display_Verificacao
 
+InsereEnergia:
+    JMP InsereEnergia
+
 NiveisDeEnergia:
     MOV R0,EnderecoBateriaNormal ;R0 guarda o endereço onde está o valor da bateria normal
     MOV R1,EnderecoBateriaSemiRapido ;R1 guarda o endereço onde está o valor da bateria semirápida
@@ -42,9 +45,22 @@ NiveisDeEnergia:
     MOV R4,[R1] ;R4 tem o valor da bateria do carregamento semirapido
     MOV R5,[R2] ;R5 tem o valor da bateria do carregamento rápido 
     MOV R6,0 ;R6 contará quantas bateria estiverem abaixo do nivel minimo
-    CMP R3,Normal
-    JLE InserirEnergia
-    CMP 
+    MOV R7,Normal
+    MOV R8,Semirapido
+    MOV R9,Rapido
+    CMP R3,R7
+    JGE VerificaSemiRapido
+    ADD R6,1
+VerificaSemiRapido:
+    CMP R4,R8
+    JGE VerificaRapido
+    ADD R6,1
+VerificaRapido:
+    CMP R5, R9
+    JGT Verificacao_Aluno
+    ADD R6,1
+    CMP R6,3
+    JEQ InsereEnergia
 Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
