@@ -10,19 +10,20 @@ BateriaSemiRapido EQU 1000 ;valor de bateria para o carregamento semi rápido no
 BateriaRapido EQU 1000 ;valor de bateria para o carregamento rápido no posto
 
 ;endereços de memória
-OK EQU 3300H ;endereço do botão OK
-CANCEL EQU 3301H ;endereço do botão Cancel
+OK EQU 1020H ;endereço do botão OK
+CANCEL EQU 1022H ;endereço do botão Cancel
 ;Display EQU 2000H ;endereço do display
-InputID EQU 1500H ;endereço onde inserir o ID do aluno
-InputCodSeguranca EQU 1502H ;endereço onde inserir o código de segurança do aluno
-InputTipoCarregamento EQU 1600H ;endereço onde inserir o tipo de carregamento
-InputTempo EQU 1602H ;endereço onde inserir o tempo desejado
+InputID EQU 1000H ;endereço onde inserir o ID do aluno
+InputCodSeguranca EQU 1002H ;endereço onde inserir o código de segurança do aluno
+InputTipoCarregamento EQU 1010H ;endereço onde inserir o tipo de carregamento
+InputTempo EQU 1012H ;endereço onde inserir o tempo desejado
 
 ;endereços relativos à base de dados
-Dados EQU 1000H ;endereço do início da base de dados
+Base_Tabela_Dados EQU 1000H ;endereço do início da base de dados
 CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do aluno para ler o código de segurança
 Saldo EQU 04H ;aumento relativo ao inicio dos dados do aluno para ler o saldo
 Proximo EQU 06H ;salto a executar para ler os dados do próximo aluno
+Tamanho EQU 1 ;número de alunos na base de dados
 
 
     ;CALL Display_EstadoServico
@@ -34,7 +35,8 @@ EscolhaCarregamento:
 	MOV R0, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
 	MOV R1, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
 	MOV R2, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
-	MOV R3, InputTipoCarregamento					;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
+    MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
+	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
 	CMP R3,R0										;compara o registo 3 com o registo 0
 	JEQ	EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R1										;compara o registo 3 com o registo 1
@@ -43,7 +45,8 @@ EscolhaCarregamento:
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
 EscolhaTempo:
-	MOV R4, InputTempo								;coloca no registo 0 o tempo escolhido pelo utilizador
+    MOV R6, InputTempo ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
+	MOV R4, [R6]							;coloca no registo 0 o tempo escolhido pelo utilizador
 	CMP R4, 0										;se o valor do registo 0 for superior a 0, verifica o saldo do utilizador 
 	JGT Fim
 	JMP EscolhaTempo								;volta para o menu inicial
@@ -53,14 +56,19 @@ VerificaSaldo:
 	MUL R5, R4										;multiplica o registo 5 com o tempo escolhido pelo utilizador
 	CMP R5, Saldo									;compara o custo do carregamento com o saldo do utilizador
 	JLE ForneceEnergia								;se a verificação for verdadeira, salta para o "tag" ForneceEnergia
-	JMP NãoForneceEnergia							;salta para o "tag" NãoForneceEnergia
+	JMP NaoForneceEnergia							;salta para o "tag" NãoForneceEnergia
 	
 ForneceEnergia:
 
-NãoForneceEnergia:
+NaoForneceEnergia:
 	
 Fim:
     JMP Fim
+; Inicio:
+;     ;CALL Display_EstadoServico
+;     CALL LimpaDisplay
+;     CALL Display_Verificacao
+;     JMP Fim
 ; Display_EstadoServico:
 ;     PLACE 0100H
 ;     String "  ESTADO POSTO  "
@@ -112,3 +120,38 @@ Fim:
   ;  String "  INTRODUZA ID  "
   ;  String " E CODIGO SEG.  "
   ;  PLACE 0000H
+; Display_Verificacao:
+;     PLACE 0100H
+;     String "  VERIFICACAO   "
+;     String "  INTRODUZA ID  "
+;     String " E CODIGO SEG.  "
+;     PLACE 0000H
+
+; Verificacao_Aluno:
+;     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
+;     MOV R1, 0 ;R1 será o índice
+;     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do aluno
+;     MOV R3, InputID ;R5 é o endereço de onde se lê o ID do utilizador
+;     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
+;     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
+;     MOV R6, [R4] ;R8 é o código de segurança que o utilizador inseriu
+; Ciclo_Verify_Aluno:
+;     MOV R3, [R0] ;R3 tem o valor do ID da tabela de base de dados a verificar
+;     MOV R4, [R0+R2] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
+;     CMP R5,R3 
+;     JNE VerificacaoFalhada ;se R7(ID do utilizador) for diferente de R3(ID a ser verificado na tabela), avançar para o próximo, se possivel
+;     CMP R6,R4
+;     JNE VerificacaoFalhada ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
+;     JMP Fim ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
+; VerificacaoFalhada:
+;     ADD R1,2
+;     MOV R7,R1 ;R7 serve para verificar se o indice é igual ao tamanho
+;     MOV R8,Tamanho ;R8 é o número de alunos na base de dados
+;     SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
+;     CMP R7,R8 
+;     JEQ Fim ;chegou ao fim da base
+;     ADD R0,Proximo ;avanca a base para o proximo aluno a verificar
+;     JMP Ciclo_Verify_Aluno
+; Fim:
+;     MOV R9,1
+;     JMP Fim
