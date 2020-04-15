@@ -311,7 +311,6 @@ FimFunc1:
     POP R3
     RET
 
-
 NiveisDeEnergia:
     PUSH R3
     PUSH R4
