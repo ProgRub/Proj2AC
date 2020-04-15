@@ -34,211 +34,221 @@ StackPointer EQU 8000H ;endereço da pilha
 
 PLACE 2000H
 Display_InputVerifyAluno:
-   String "  VERIFICACAO   "
-   String "                "
-   String "  INTRODUZA ID  "
-   String "                "
-   String " E CODIGO SEG.  "
-   String "   Carregue OK  "
-   String "quando terminado"
+    String "  VERIFICACAO   "
+    String "                "
+    String "  INTRODUZA ID  "
+    String "                "
+    String " E CODIGO SEG.  "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2080H
 Display_VerificacaoSucesso:
-   String "                "
-   String "                "
-   String "                "
-   String "   AUTORIZADO   "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String "                "
+    String "                "
+    String "                "
+    String "   AUTORIZADO   "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2100H
 Display_VerificacaoFalhada:
-   String "                "
-   String "                "
-   String "                "
-   String " NAO AUTORIZADO "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String "                "
+    String "                "
+    String "                "
+    String " NAO AUTORIZADO "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2180H
 Display_InsereEnergia:
-   String " CARREGAR POSTO "
-   String "Escolha bateria:"
-   String "1)- Normal      "
-   String "2)- Semi-Rapido "
-   String "3)- Rapido      "
-   String "4)- Fechar Posto"
-   String "   Carregue OK  "
+    String " CARREGAR POSTO "
+    String "Escolha bateria:"
+    String "1)- Normal      "
+    String "2)- Semi-Rapido "
+    String "3)- Rapido      "
+    String "4)- Fechar Posto"
+	String " OK - continuar "
 
 PLACE 2200H
 Display_InsereEnergiaQuanta:
-   String " CARREGAR POSTO "
-   String "  Quanto quer   "
-   String "   carregar?    "
-   String "                "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " CARREGAR POSTO "
+    String "  Quanto quer   "
+    String "   carregar?    "
+    String "                "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2280H
 Display_NiveisDeEnergia_Caso1:
-   String " ESTADO DO POSTO"
-   String "Normal: Func    "
-   String "SemiRapido: Func"
-   String "Rapido: Func    "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Func    "
+    String "SemiRapido: Func"
+    String "Rapido: Func    "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2300H
 Display_NiveisDeEnergia_Caso2:
-   String " ESTADO DO POSTO"
-   String "Normal: Vazio   "
-   String "SemiRapido: Func"
-   String "Rapido: Func    "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Vazio   "
+    String "SemiRapido: Func"
+    String "Rapido: Func    "
+    String "                "
+    String "                "
+	String " OK - continuar "
    
 PLACE 2380H
 Display_NiveisDeEnergia_Caso3:
-   String " ESTADO DO POSTO"
-   String "Normal: Vazio   "
-   String "SemiRapido:Vazio"
-   String "Rapido: Func    "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Vazio   "
+    String "SemiRapido:Vazio"
+    String "Rapido: Func    "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2400H
 Display_NiveisDeEnergia_Caso4:
-   String " ESTADO DO POSTO"
-   String "Normal: Vazio   "
-   String "SemiRapido:Vazio"
-   String "Rapido: Vazio   "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Vazio   "
+    String "SemiRapido:Vazio"
+    String "Rapido: Vazio   "
+    String "                "
+    String "                "
+	String " OK - continuar "
    
 PLACE 2480H
 Display_NiveisDeEnergia_Caso5:
-   String " ESTADO DO POSTO"
-   String "Normal: Func    "
-   String "SemiRapido:Vazio"
-   String "Rapido: Func    "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Func    "
+    String "SemiRapido:Vazio"
+    String "Rapido: Func    "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2500H
 Display_NiveisDeEnergia_Caso6:
-   String " ESTADO DO POSTO"
-   String "Normal: Func    "
-   String "SemiRapido:Vazio"
-   String "Rapido: Vazio   "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Func    "
+    String "SemiRapido:Vazio"
+    String "Rapido: Vazio   "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2580H
 Display_NiveisDeEnergia_Caso7:
-   String " ESTADO DO POSTO"
-   String "Normal: Func    "
-   String "SemiRapido: Func"
-   String "Rapido: Vazio   "
-   String "                "
-   String "   Carregue OK  "
-   String " para continuar "
+    String " ESTADO DO POSTO"
+    String "Normal: Func    "
+    String "SemiRapido: Func"
+    String "Rapido: Vazio   "
+    String "                "
+    String "                "
+	String " OK - continuar "
 
 PLACE 2600H
 MenuEscolheCarregamento:
-	String " ESCOLHA O TIPO	 "
-	String "DE CARREGAMENTO: "
-	String "                 "
-	String "   1- Normal     "
-	String "   2- Semi-Rápido"
-	String "   3- Rápido     " 
-	String "                 "
-	String "OK para continuar"
+	String " ESCOLHA O TIPO	"
+	String "DE CARREGAMENTO:"
+	String "                "
+	String "  1- Normal     "
+	String "  2- Semi-Rápido"
+	String "  3- Rápido     " 
+	String "                "
+	String " OK - continuar "
 
 PLACE 2680H
 MenuOpcaoInvalida:
-	String "                 "
-	String "                 "
-	String "     OPÇÃO       "
-	String "    INVÁLIDA     "
-	String "                 "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String "                "
+	String "                "
+	String "     OPÇÃO      "
+	String "    INVÁLIDA    "
+	String "                "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2700H
 MenuEscolherTempo:
-	String " ESCOLHA O TEMPO "
-	String "DE CARREGAMENTO: "
-	String "                 "
-	String "                 "
-	String "    Tempo:       "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String " ESCOLHA O TEMPO"
+	String "DE CARREGAMENTO:"
+	String "                "
+	String "                "
+	String "    Tempo:      "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2780H
 MenuTempoInvalido:
-	String "                 "
-	String "     OPÇÃO       "
-	String "    INVÁLIDA     "
-	String "                 "
-	String " tempo tem de ser"
-	String "   superior a 0  "
-	String "                 "
-	String "OK para continuar"
+	String "                "
+	String "     OPÇÃO      "
+	String "    INVÁLIDA    "
+	String "                "
+	String "tempo tem de ser"
+	String "   superior a 0 "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2800H
 MenuDebito:
-	String "  CARREGAMENTO   "
-	String "                 "
-	String "   Saldo:        "
-	String "                 "
-	String "   Custo:        "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String "  CARREGAMENTO  "
+	String "                "
+	String "   Saldo:       "
+	String "                "
+	String "   Custo:       "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2880H
 MenuSaldoInsuficiente:
-	String "                 "
-	String "                 "
-	String "     SALDO       "
-	String "  INSUFICIENTE   "
-	String "                 "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String "                "
+	String "                "
+	String "     SALDO      "
+	String "  INSUFICIENTE  "
+	String "                "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2900H
 MenuInfoCarregamento:
-	String "  CARREGAMENTO   "
-	String "                 "
-	String "   Tipo:         "
-	String "                 "
-	String "   Duração:      "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String "  CARREGAMENTO  "
+	String "                "
+	String "   Tipo:        "
+	String "                "
+	String "   Duração:     "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 2980H
 MenuCarregamentoConcluido:
-	String "                 "
-	String "                 "
-	String "   CARREGAMENTO  "
-	String "    CONCLUÍDO    "
-	String "                 "
-	String "                 "
-	String "                 "
-	String "OK para continuar"
+	String "                "
+	String "                "
+	String "  CARREGAMENTO  "
+	String "    CONCLUÍDO   "
+	String "                "
+	String "                "
+	String "                "
+	String " OK - continuar "
+PLACE 2A00H
+Display_Overflow:
+	String "                "
+	String "                "
+	String "     OCORREU    "
+	String "    OVERFLOW    "
+	String "                "
+	String "                "
+	String "                "
+	String " OK - continuar "
 
 PLACE 0000H
 Inicio:
@@ -270,7 +280,7 @@ InsereEnergia:
     PUSH R4
     PUSH R5
     PUSH R6
-    MOV R3, Display_InsereEnergia
+    MOV R9, Display_InsereEnergia
     CALL RefreshDisplay
     MOV R5, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
@@ -299,6 +309,8 @@ IncrementaRapido:
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o display dos niveis de energia
 OverflowBateria:
+    MOV R9, Display_Overflow
+    CALL RefreshDisplay
     MOV R6,0
     MOV [R4],R6
 FimFunc1:
