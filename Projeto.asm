@@ -9,6 +9,8 @@ EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateri
 EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
 EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
+InicioDisplay EQU 4000H
+FimDisplay EQU 406FH
 
 ;endereços de memória:
 OK 						EQU 1020H 	;endereço do botão OK
@@ -30,12 +32,127 @@ Tamanho EQU 1 ;número de alunos na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
 
+PLACE 2000H
+Display_InputVerifyAluno:
+   String "  VERIFICACAO   "
+   String "                "
+   String "  INTRODUZA ID  "
+   String "                "
+   String " E CODIGO SEG.  "
+   String "   Carregue OK  "
+   String "quando terminado"
 
-    ;CALL Display_EstadoServico
-    ;CALL LimpaDisplay
-    ;CALL Display_Verificacao
-	
-PLACE 2600H
+PLACE 2080H
+Display_VerificacaoSucesso:
+   String "                "
+   String "                "
+   String "                "
+   String "   AUTORIZADO   "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2100H
+Display_VerificacaoFalhada:
+   String "                "
+   String "                "
+   String "                "
+   String " NAO AUTORIZADO "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2180H
+Display_InsereEnergia:
+   String " CARREGAR POSTO "
+   String "Escolha bateria:"
+   String "1)- Normal      "
+   String "2)- Semi-Rapido "
+   String "3)- Rapido      "
+   String "4)- Fechar Posto"
+   String "   Carregue OK  "
+
+PLACE 2200H
+Display_InsereEnergiaQuanta:
+   String " CARREGAR POSTO "
+   String "  Quanto quer   "
+   String "   carregar?    "
+   String "                "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2280H
+Display_NiveisDeEnergia_Caso1:
+   String " ESTADO DO POSTO"
+   String "Normal: Func    "
+   String "SemiRapido: Func"
+   String "Rapido: Func    "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2300H
+Display_NiveisDeEnergia_Caso2:
+   String " ESTADO DO POSTO"
+   String "Normal: Vazio   "
+   String "SemiRapido: Func"
+   String "Rapido: Func    "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+   
+PLACE 2380H
+Display_NiveisDeEnergia_Caso3:
+   String " ESTADO DO POSTO"
+   String "Normal: Vazio   "
+   String "SemiRapido:Vazio"
+   String "Rapido: Func    "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2400H
+Display_NiveisDeEnergia_Caso4:
+   String " ESTADO DO POSTO"
+   String "Normal: Vazio   "
+   String "SemiRapido:Vazio"
+   String "Rapido: Vazio   "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+   
+PLACE 2480H
+Display_NiveisDeEnergia_Caso5:
+   String " ESTADO DO POSTO"
+   String "Normal: Func    "
+   String "SemiRapido:Vazio"
+   String "Rapido: Func    "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2500H
+Display_NiveisDeEnergia_Caso6:
+   String " ESTADO DO POSTO"
+   String "Normal: Func    "
+   String "SemiRapido:Vazio"
+   String "Rapido: Vazio   "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+PLACE 2580H
+Display_NiveisDeEnergia_Caso6:
+   String " ESTADO DO POSTO"
+   String "Normal: Func    "
+   String "SemiRapido: Func"
+   String "Rapido: Vazio   "
+   String "                "
+   String "   Carregue OK  "
+   String " para continuar "
+
+   PLACE 2600H
 MenuEscolheCarregamento:
 	String " ESCOLHA O TIPO	 "
 	String "DE CARREGAMENTO: "
@@ -78,8 +195,6 @@ MenuDebito:
 	String "   superior a 0  "
 	String "                 "
 	String "OK para continuar"
-
-
 
 PLACE 2800H
 MenuDebito:
@@ -125,8 +240,7 @@ MenuDebito:
 	String "                 "
 	String "OK para continuar"
 
-	
-
+PLACE 0000H
 Main:
     MOV SP, StackPointer
     MOV R3, EnderecoBateriaNormal
@@ -286,6 +400,8 @@ CicloVerOK:
     MOV R1, [R0] ;mete em R1 o valor lido do endereço R0
     CMP R1,0
     JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    MOV R1,0
+    MOV [R0],R1
     POP R1
     POP R0
     RET
@@ -412,46 +528,6 @@ AtualizaPostoRapido:
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 	
-	
-; Inicio:
-;     ;CALL Display_EstadoServico
-;     CALL LimpaDisplay
-;     CALL Display_Verificacao
-;     JMP Fim
-; Display_EstadoServico:
-;     PLACE 0100H
-;     String "  ESTADO POSTO  "
-;     String "NORMAL:         "
-;     ; MOV R0, BateriaNormal
-;     ; MOV R3, 0
-;     ; CMP R0,R3
-;     ; JZ 3
-;     String "FUNCIONAL       "
-;     ; JMP 2
-;     ; CALL Display_NFuncional
-;     String "SEMIRAPIDO:     "
-;     ; MOV R1, BateriaSemiRapido
-;     ; CMP R1,R3
-;     ; JZ 3
-;     String "FUNCIONAL       "
-;     ; JMP 2
-;     ; CALL Display_NFuncional
-;     String "RAPIDO:         "
-;     ; MOV R2, BateriaRapido
-;     ; CMP R2,R3
-;     ; JZ 3
-;     String "FUNCIONAL       "
-;     ; JMP 2
-;     ; CALL Display_NFuncional
-;     PLACE 0000H
-
-; Display_Funcional:
-;     String "FUNCIONAL       "
-; Display_NFuncional:
-;     String "NÃO FUNCIONAL   "
-
-
-
 ;LimpaDisplay:
  ;   PLACE 0100H
   ;  String "                "
@@ -463,17 +539,20 @@ AtualizaPostoRapido:
   ;  String "                "
   ;  PLACE 0000H
 
-;Display_Verificacao:
-  ;  PLACE 0100H
-  ;  String "  VERIFICACAO   "
-  ;  String "  INTRODUZA ID  "
-  ;  String " E CODIGO SEG.  "
-  ;  PLACE 0000H
-; Display_Verificacao:
-;     PLACE 0100H
-;     String "  VERIFICACAO   "
-;     String "  INTRODUZA ID  "
-;     String " E CODIGO SEG.  "
-;     PLACE 0000H
-
-
+RefreshDisplay:
+    PUSH R0
+    PUSH R1
+    PUSH R2
+    MOV R0,InicioDisplay
+    MOV R1,FimDisplay
+Ciclo_RefreshDisplay:
+    MOV R2,[R3]
+    MOV [R0],R2
+    ADD R0,2
+    ADD R2,2
+    CMP R0,R1
+    JLE Ciclo_RefreshDisplay
+    POP R2
+    POP R1
+    POP R0
+    RET
