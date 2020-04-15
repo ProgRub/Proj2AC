@@ -28,19 +28,22 @@ BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do aluno para ler qua
 Proximo EQU 08H ;salto a executar para ler os dados do próximo aluno
 Tamanho EQU 1 ;número de alunos na base de dados
 
+StackPointer EQU 6600H ;endereço da pilha
+
 
     ;CALL Display_EstadoServico
     ;CALL LimpaDisplay
     ;CALL Display_Verificacao
 
+Main:
+    MOV SP, StackPointer
+    CALL VerificaOK
+    JMP Fim
+
 InsereEnergia:
     MOV R0, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R1, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
-VerificaOK4:    
-    MOV R3, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
-    MOV R4, [R3] ;mete em R4 o valor lido do endereço R3
-    CMP R4,0
-    JEQ VerificaOK4 ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    CALL VerificaOK
     MOV R4,0 ;reset do valor lido do endereço de OK
     MOV R2, [R1] ;R2 contém a seleção de qual bateria carregar, por parte do utilizador
     MOV R3, [R0] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
@@ -111,11 +114,7 @@ Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do aluno
-VerificaOK1:    
-    MOV R3, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
-    MOV R4, [R3] ;mete em R4 o valor lido do endereço R3
-    CMP R4,0
-    JEQ VerificaOK1 ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    CALL VerificaOK
     MOV R3, InputID ;R5 é o endereço de onde se lê o ID do utilizador
     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
@@ -137,29 +136,37 @@ VerificacaoFalhada:
     SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
     CMP R7,R8 
     JEQ Fim ;chegou ao fim da base
-    ADD R0,Proximo ;avanca a base para o proximo aluno a verificar
+    MOV R3,Proximo
+    ADD R0,R3 ;avanca a base para o proximo aluno a verificar
     JMP Ciclo_Verify_Aluno
 	
 Fim:
     JMP Fim
 	
+VerificaOK:
+    PUSH R0
+    PUSH R1
+CicloVerOK:
+    MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
+    MOV R1, [R0] ;mete em R1 o valor lido do endereço R0
+    CMP R1,0
+    JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    POP R1
+    POP R0
+    RET
 EscolhaCarregamento: 
 	MOV R0, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
 	MOV R1, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
 	MOV R2, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
-VerificaOK2:    
-    MOV R3, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
-    MOV R4, [R3] ;mete em R4 o valor lido do endereço R3
-    CMP R4,0
-    JEQ VerificaOK2 ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    CALL VerificaOK
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
 	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
 	CMP R3,R0										;compara o registo 3 com o registo 0
-	JEQ	EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
+	JEQ	EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R1										;compara o registo 3 com o registo 1
-	JEQ	EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
+	JEQ	EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R2										;compara o registo 3 com o registo 2
-	JEQ EscolhaTempo_VerificaOK								;verifica se a comparação anterior é verdadeira
+	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
 	
 CarregamentoRapidoValido:
@@ -167,11 +174,8 @@ CarregamentoRapidoValido:
 	
 	
 	
-EscolhaTempo_VerificaOK:   
-    MOV R7, OK ;mete em R3 o endereço de onde ver se o utilizador "carregou" OK
-    MOV R8, [R7] ;mete em R4 o valor lido do endereço R3
-    CMP R8,0
-    JEQ EscolhaTempo_VerificaOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+EscolhaTempo: 
+    CALL VerificaOK
     MOV R0,0
     MOV [R7],R0
     MOV R6, InputTempo      ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
@@ -207,6 +211,7 @@ NaoForneceEnergia:
 	
 AtualizaValoresEnergia:
 	MOV R0, InputTipoCarregamento ;coloca no registo 0 o endereço de onde ler o tipo de carregamento
+    CALL VerificaOK
 	MOV R1, [R0] ;coloca no registo 1 o tipo de carregamento escolhido pelo utilizador
 	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
