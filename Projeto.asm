@@ -152,7 +152,7 @@ Display_NiveisDeEnergia_Caso7:
    String "   Carregue OK  "
    String " para continuar "
 
-   PLACE 2600H
+PLACE 2600H
 MenuEscolheCarregamento:
 	String " ESCOLHA O TIPO	 "
 	String "DE CARREGAMENTO: "
@@ -422,89 +422,87 @@ EscolhaCarregamento:
     CALL VerificaOK
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
 	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
-	CMP R3,R0										;compara o registo 3 com o registo 0
+	JEQ R3,R0										;compara o registo 3 com o registo 0
 	CALL EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R1										;compara o registo 3 com o registo 1
-	CALL EscolhaTempo								;verifica se a comparação anterior é verdadeira
+	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R2										;compara o registo 3 com o registo 2
-	CALL EscolhaTempo								;verifica se a comparação anterior é verdadeira
+	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	JMP EscolhaCarregamento							;volta para o menu inicial
-	
-CarregamentoRapidoValido:
-		
-	
-	
-	
+
 EscolhaTempo: 
-    CALL VerificaOK
-    MOV R0,0
-    MOV [R7],R0
-    MOV R6, InputTempo      ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
-	MOV R4, [R6]							;coloca no registo 0 o tempo escolhido pelo utilizador
-	CMP R4, 0										;se o valor do registo 0 for superior a 0, verifica o saldo do utilizador
+    CALL VerificaOK 
+    MOV R6, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
+	MOV R4, [R6]	;coloca no registo 4 o tempo escolhido pelo utilizador
+	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
 	JLE EscolhaTempo
-	CALL VerificaSaldo
-    RET
-VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
-	MUL R3, R4										;multiplica o registo 5 com o tempo escolhido pelo utilizador
+
+VerificaSaldo:
+	MUL R4, R3	
 	JV Fim
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
     MOV R6,[R5+Saldo]
-	CMP R3, R6									;compara o custo do carregamento com o saldo do utilizador
-	JLE Debito								;se a verificação for verdadeira, salta para o "tag" Debito
-	JMP NaoForneceEnergia							;salta para o "tag" NãoForneceEnergia
+	CMP R4, R6	;compara o custo do carregamento com o saldo do utilizador
+	JLE Debito ;se a comparação for verdadeira, salta para o "tag" Debito
+	JMP NaoForneceEnergia	;salta para o "tag" NãoForneceEnergia
 	
 Debito:
 	MOV R0, [R5+Saldo] ;coloca no registo 0 o saldo do utilizador
 	SUB R0, R3 ;é subtraido o custo da operação, atualiza o saldo do utilizador
-	MOV R6, R4
-	JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergia
+	MOV R6, R4 ;coloca no registo 6 o valor do registo 4
 
-
+ForneceEnergia:
+	MOV R1, R3 ;coloca no registo 1 o valor do registo 3
+	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
+	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
+	MOV R4, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
+	CMP R1, R2	;verifica se o carregamento pretendido é o normal									
+	JEQ	ForneceEnergiaNormal	;salta para o "tag" AtualizaPostoNormal
+	CMP R1, R3	;verifica se o carregamento pretendido é o semi-rapido
+	JEQ	ForneceEnergiaSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
+	CMP R1,	R4		;verifica se o carregamento pretendido é o rapido
+	JEQ ForneceEnergiaRapido	;salta para o "tag" AtualizaPostoRapido
 
 ForneceEnergiaNormal:
 	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
-	MOV R1, Normal
-	ADD R0, R1
-	MOV R5, 100
-	CMP R0, R5
-	JGE BateriaCarregada
-	MOV [R5+BateriaCarro], R0
-	SUB R4,1 ;subtrai ao tempo
+	MOV R1, Normal ;coloca no registo 1 o valor do carregamento normal
+	ADD R0, R1 ;soma o carregamento à bateria do vehiculo
+	MOV R5, 100 ;coloca no registo 5 a constante 100
+	CMP R0, R5 ;compara o registo 0 com o registo 5
+	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
+	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
+	SUB R4,1 ;subtrai ao tempo 
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
-	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
-    JMP ForneceEnergiaNormal 
+	JEQ AtualizaPostoNormal ;salta para o "tag" AtualizaPostoNormal
+    JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergiaNormal
 
 ForneceEnergiaSemiRapido:
 	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
-	MOV R1, Semirapido
-	ADD R0, R1
-	MOV R5, 100
-	CMP R0, R5
-	JGE BateriaCarregada
-	MOV [R5+BateriaCarro], R0
+	MOV R1, Semirapido ;coloca no registo 1 o valor do carregamento sermi-rapido
+	ADD R0, R1 ;soma o carregamento à bateria do vehiculo
+	MOV R5, 100 ;coloca no registo 5 a constante 100
+	CMP R0, R5 ;compara o registo 0 com o registo 5
+	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
+	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
-	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
-    JMP ForneceEnergiaSemiRapido 
+	JEQ AtualizaPostoSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
+    JMP ForneceEnergiaSemiRapido ;salta para o "tag" ForneceEnergiaSemiRapido
 
 ForneceEnergiaRapido:
-	JMP BateriaCarregada
+	JMP BateriaCarregada ;salta para o "tag" BateriaCarregada
 
 
 BateriaCarregada:
-	MOV R0, 100
-	MOV [R5+BateriaCarro], R0
-	JMP AtualizaValoresEnergia
+	MOV R0, 100 ;coloca no registo 0 a constante 100
+	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
+	JMP AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
 	
 NaoForneceEnergia:
-    JMP NaoForneceEnergia
+    JMP NaoForneceEnergia ;salta para o "tag" NaoForneceEnergia
 	
 AtualizaValoresEnergia:
-	MOV R0, InputTipoCarregamento ;coloca no registo 0 o endereço de onde ler o tipo de carregamento
-    CALL VerificaOK
-	MOV R1, [R0] ;coloca no registo 1 o tipo de carregamento escolhido pelo utilizador
 	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
 	MOV R4, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
@@ -516,21 +514,20 @@ AtualizaValoresEnergia:
 	JEQ AtualizaPostoRapido	;salta para o "tag" AtualizaPostoRapido
 
 AtualizaPostoNormal:
-	MOV R2, Normal ;coloca no registo 2 a energia do carregamento normal por hora
-	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
+	MOV R4, Normal ;coloca no registo 4 a energia do carregamento normal por hora
+	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R0, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 	
 AtualizaPostoSemiRapido:
-	MOV R2, Semirapido ;coloca no registo 2 a energia do carregamento semi-rapido por hora
-	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
+	MOV R4, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
+	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R1, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 
 AtualizaPostoRapido:
-	MOV R2, Rapido ;coloca no registo 2 a energia do carregamento rapido por hora
-	MUL R6, R2 ;coloca no registo 1 a energia do carregamento total
-	MOV R3, EnderecoBateriaRapido ;coloca no registo 3 o endereço de onde ler o valor da bateria rapida
+	MOV R4, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
+	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
 	
