@@ -9,8 +9,8 @@ EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateri
 EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
 EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
-InicioDisplay EQU 4000H
-FimDisplay EQU 406FH
+InicioDisplay EQU 0030H
+FimDisplay EQU 00AFH
 
 ;endereços de memória:
 OK 						EQU 1020H 	;endereço do botão OK
@@ -143,7 +143,7 @@ Display_NiveisDeEnergia_Caso6:
    String " para continuar "
 
 PLACE 2580H
-Display_NiveisDeEnergia_Caso6:
+Display_NiveisDeEnergia_Caso7:
    String " ESTADO DO POSTO"
    String "Normal: Func    "
    String "SemiRapido: Func"
@@ -164,7 +164,7 @@ MenuEscolheCarregamento:
 	String "OK para continuar"
 
 PLACE 2680H
-MenuDebito:
+MenuOpcaoInvalida:
 	String "                 "
 	String "                 "
 	String "     OPÇÃO       "
@@ -186,7 +186,7 @@ MenuEscolherTempo:
 	String "OK para continuar"
 
 PLACE 2780H
-MenuDebito:
+MenuTempoInvalido:
 	String "                 "
 	String "     OPÇÃO       "
 	String "    INVÁLIDA     "
@@ -230,7 +230,7 @@ MenuInfoCarregamento:
 	String "OK para continuar"
 
 PLACE 2980H
-MenuDebito:
+MenuCarregamentoConcluido:
 	String "                 "
 	String "                 "
 	String "   CARREGAMENTO  "
@@ -241,6 +241,10 @@ MenuDebito:
 	String "OK para continuar"
 
 PLACE 0000H
+Inicio:
+    MOV R0,Main
+    JMP R0
+PLACE 6000H
 Main:
     MOV SP, StackPointer
     MOV R3, EnderecoBateriaNormal
@@ -266,6 +270,8 @@ InsereEnergia:
     PUSH R4
     PUSH R5
     PUSH R6
+    MOV R3, Display_InsereEnergia
+    CALL RefreshDisplay
     MOV R5, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
     CALL VerificaOK
@@ -549,7 +555,7 @@ Ciclo_RefreshDisplay:
     MOV R2,[R3]
     MOV [R0],R2
     ADD R0,2
-    ADD R2,2
+    ADD R3,2
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
     POP R2
