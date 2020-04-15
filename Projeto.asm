@@ -5,9 +5,6 @@ Rapido 					EQU 100 	;50 kWh
 CustoNormal 			EQU 1		;custo do carregamento normal
 CustoSemiRapido 		EQU 2 		;custo do carregamento semirápido
 CustoRapido 			EQU 3 		;custo do carregamento rápido
-; BateriaNormal 			EQU 1000 	;valor de bateria para o carregamento normal no posto
-; BateriaSemiRapido 		EQU 1000 	;valor de bateria para o carregamento semi rápido no posto
-; BateriaRapido 			EQU 1000 	;valor de bateria para o carregamento rápido no posto
 EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateria para o carregamento normal
 EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
 EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
@@ -27,7 +24,8 @@ InputIncrementoBateria  EQU 1014H ;endereço onde inserir a bateria a adicionar 
 Base_Tabela_Dados EQU 1100H ;endereço do início da base de dados
 CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do aluno para ler o código de segurança
 Saldo EQU 04H ;aumento relativo ao inicio dos dados do aluno para ler o saldo
-Proximo EQU 06H ;salto a executar para ler os dados do próximo aluno
+BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do aluno para ler quanta bateria o carro do aluno tem
+Proximo EQU 08H ;salto a executar para ler os dados do próximo aluno
 Tamanho EQU 1 ;número de alunos na base de dados
 
 
@@ -92,23 +90,23 @@ NiveisDeEnergia:
     MOV R4,[R1] ;R4 tem o valor da bateria do carregamento semirapido
     MOV R5,[R2] ;R5 tem o valor da bateria do carregamento rápido 
     MOV R6,0 ;R6 contará quantas bateria estiverem abaixo do nivel minimo
-    MOV R7,Normal
-    MOV R8,Semirapido
-    MOV R9,Rapido
+    MOV R7,Normal ;R7 contém o nivel minimo que a bateria normal deve ter para ser considerada funcional
+    MOV R8,Semirapido ;R8 contém o nivel minimo que a bateria semirapida deve ter para ser considerada funcional
+    MOV R9,Rapido ;R9 contém o nivel minimo que a bateria rapida deve ter para ser considerada funcional
     CMP R3,R7
-    JGE VerificaSemiRapido
-    ADD R6,1
+    JGE VerificaSemiRapido ;se verificarmos que a bateria normal tem o nivel minimo, verificamos as restantes
+    ADD R6,1 ;caso contrario, adicionamos 1 ao contador
 VerificaSemiRapido:
     CMP R4,R8
-    JGE VerificaRapido
-    ADD R6,1
+    JGE VerificaRapido ;se verificarmos que a bateria semirapida tem o nivel minimo, verificamos a bateria rapida
+    ADD R6,1 ;caso contrario, adicionamos 1 ao contador
 VerificaRapido:
     CMP R5, R9
-    JGT Verificacao_Aluno
-    ADD R6,1
-    MOV R10,3
+    JGT Verificacao_Aluno ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
+    ADD R6,1 ;caso contrario, adicionamos 1 ao contador
+    MOV R10,3 ;R10 guarda o valor 3 para comparar ao contador
     CMP R6,R10
-    JEQ Fim
+    JEQ Fim ;se o contador for igual a 3, o posto esta inoperacional
 Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice

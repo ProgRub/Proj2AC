@@ -1,13 +1,18 @@
 from random import seed
 from random import randint
-seed(1)
-baseNumerica ="0123456789ABCDEF"
+seed()
+base ="0123456789ABCDEF"
 tamanho = (int)(input("Quantos alunos?\n"))
-base = open("DadosAlunos.dat","w")
-inicio = 3000
+ficheiro = open("DadosAlunos.dat","w")
+inicio = "11"
+j=0
 i=0
-while i<tamanho:
-    base.write("%d %c%c\n" %(inicio,"0" if inicio+2%6==0 else baseNumerica[randint(0,len(baseNumerica)-1)],baseNumerica[randint(0,len(baseNumerica)-1)]))
-    inicio+=1
-    if(inicio%6==0):
+while i<tamanho:    
+    ficheiro.write("%s %c%c\n" %(inicio + base[j//16] + base[j%16],"0" if (j+4)%8==0 or (j+2)%8==0 or (j+1)%8==0 else base[randint(0,len(base)-1)],"0" if (j+2)%8==0 or (j+1)%8==0 else base[randint(0,len(base)-1)]))
+    j+=1
+    if(j%8==0):
         i+=1
+j=0
+while j<6:
+    ficheiro.write("%s %c%c\n" %("12"+ base[j//16] + base[j%16], "0" if j%2==0 else base[randint(0,len(base)-1)],base[randint(0,len(base)-1)]))
+    j+=1
