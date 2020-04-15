@@ -34,6 +34,98 @@ StackPointer EQU 8000H ;endereço da pilha
     ;CALL Display_EstadoServico
     ;CALL LimpaDisplay
     ;CALL Display_Verificacao
+	
+PLACE 2600H
+MenuEscolheCarregamento:
+	String " ESCOLHA O TIPO	 "
+	String "DE CARREGAMENTO: "
+	String "                 "
+	String "   1- Normal     "
+	String "   2- Semi-Rápido"
+	String "   3- Rápido     " 
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2680H
+MenuDebito:
+	String "                 "
+	String "                 "
+	String "     OPÇÃO       "
+	String "    INVÁLIDA     "
+	String "                 "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2700H
+MenuEscolherTempo:
+	String " ESCOLHA O TEMPO "
+	String "DE CARREGAMENTO: "
+	String "                 "
+	String "                 "
+	String "    Tempo:       "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2780H
+MenuDebito:
+	String "                 "
+	String "     OPÇÃO       "
+	String "    INVÁLIDA     "
+	String "                 "
+	String " tempo tem de ser"
+	String "   superior a 0  "
+	String "                 "
+	String "OK para continuar"
+
+
+
+PLACE 2800H
+MenuDebito:
+	String "  CARREGAMENTO   "
+	String "                 "
+	String "   Saldo:        "
+	String "                 "
+	String "   Custo:        "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2880H
+MenuSaldoInsuficiente:
+	String "                 "
+	String "                 "
+	String "     SALDO       "
+	String "  INSUFICIENTE   "
+	String "                 "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2900H
+MenuInfoCarregamento:
+	String "  CARREGAMENTO   "
+	String "                 "
+	String "   Tipo:         "
+	String "                 "
+	String "   Duração:      "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+PLACE 2980H
+MenuDebito:
+	String "                 "
+	String "                 "
+	String "   CARREGAMENTO  "
+	String "    CONCLUÍDO    "
+	String "                 "
+	String "                 "
+	String "                 "
+	String "OK para continuar"
+
+	
 
 Main:
     MOV SP, StackPointer
