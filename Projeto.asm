@@ -227,11 +227,10 @@ EscolhaTempo:
     MOV [R7],R0
     MOV R6, InputTempo      ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R6]							;coloca no registo 0 o tempo escolhido pelo utilizador
-	CMP R4, 0										;se o valor do registo 0 for superior a 0, verifica o saldo do utilizador 
+	CMP R4, 0										;se o valor do registo 0 for superior a 0, verifica o saldo do utilizador
 	JLE EscolhaTempo
 	CALL VerificaSaldo
     RET
-	
 VerificaSaldo:									;coloca no registo 5 o custo do tipo de carregamento
 	MUL R3, R4										;multiplica o registo 5 com o tempo escolhido pelo utilizador
 	JV Fim
@@ -246,13 +245,44 @@ Debito:
 	MOV R0, [R5+Saldo] ;coloca no registo 0 o saldo do utilizador
 	SUB R0, R3 ;é subtraido o custo da operação, atualiza o saldo do utilizador
 	MOV R6, R4
-	JMP ForneceEnergia ;salta para o "tag" ForneceEnergia
+	JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergia
 
-ForneceEnergia: ;FALTA FORNECER ENERGIA AO VEICULO
+
+
+ForneceEnergiaNormal:
+	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
+	MOV R1, Normal
+	ADD R0, R1
+	MOV R5, 100
+	CMP R0, R5
+	JGE BateriaCarregada
+	MOV [R5+BateriaCarro], R0
 	SUB R4,1 ;subtrai ao tempo
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
 	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
-    JMP ForneceEnergia 
+    JMP ForneceEnergiaNormal 
+
+ForneceEnergiaSemiRapido:
+	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
+	MOV R1, Semirapido
+	ADD R0, R1
+	MOV R5, 100
+	CMP R0, R5
+	JGE BateriaCarregada
+	MOV [R5+BateriaCarro], R0
+	SUB R4,1 ;subtrai ao tempo
+	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
+	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
+    JMP ForneceEnergiaSemiRapido 
+
+ForneceEnergiaRapido:
+	JMP BateriaCarregada
+
+
+BateriaCarregada:
+	MOV R0, 100
+	MOV [R5+BateriaCarro], R0
+	JMP AtualizaValoresEnergia
 	
 NaoForneceEnergia:
     JMP NaoForneceEnergia
