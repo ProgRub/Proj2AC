@@ -156,7 +156,6 @@ PLACE 2600H
 MenuEscolheCarregamento:
 	String " ESCOLHA O TIPO	"
 	String "DE CARREGAMENTO:"
-	String "                "
 	String "  1- Normal     "
 	String "  2- Semi-Rápido"
 	String "  3- Rápido     " 
@@ -171,7 +170,6 @@ MenuOpcaoInvalida:
 	String "    INVÁLIDA    "
 	String "                "
 	String "                "
-	String "                "
 	String " OK - continuar "
 
 PLACE 2700H
@@ -182,12 +180,10 @@ MenuEscolherTempo:
 	String "                "
 	String "    Tempo:      "
 	String "                "
-	String "                "
 	String " OK - continuar "
 
 PLACE 2780H
 MenuTempoInvalido:
-	String "                "
 	String "     OPÇÃO      "
 	String "    INVÁLIDA    "
 	String "                "
@@ -204,7 +200,6 @@ MenuDebito:
 	String "                "
 	String "   Custo:       "
 	String "                "
-	String "                "
 	String " OK - continuar "
 
 PLACE 2880H
@@ -213,7 +208,6 @@ MenuSaldoInsuficiente:
 	String "                "
 	String "     SALDO      "
 	String "  INSUFICIENTE  "
-	String "                "
 	String "                "
 	String "                "
 	String " OK - continuar "
@@ -226,7 +220,6 @@ MenuInfoCarregamento:
 	String "                "
 	String "   Duração:     "
 	String "                "
-	String "                "
 	String " OK - continuar "
 
 PLACE 2980H
@@ -237,7 +230,6 @@ MenuCarregamentoConcluido:
 	String "    CONCLUÍDO   "
 	String "                "
 	String "                "
-	String "                "
 	String " OK - continuar "
 PLACE 2A00H
 Display_Overflow:
@@ -245,7 +237,6 @@ Display_Overflow:
 	String "                "
 	String "     OCORREU    "
 	String "    OVERFLOW    "
-	String "                "
 	String "                "
 	String "                "
 	String " OK - continuar "
@@ -319,9 +310,6 @@ FimFunc1:
     POP R4
     POP R3
     RET
-    ; PLACE 0900H
-    ; String "OVERFLOW"
-    ; PLACE 0056H
 
 
 NiveisDeEnergia:
@@ -367,6 +355,8 @@ Verificacao_Aluno:
     PUSH R6
     PUSH R7
     PUSH R8
+    MOV R9, Display_InputVerifyAluno
+    CALL RefreshDisplay
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do aluno
@@ -391,11 +381,18 @@ VerificacaoFalhada:
     MOV R8,Tamanho ;R8 é o número de alunos na base de dados
     SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
     CMP R7,R8 
-    JEQ FimFunc2 ;chegou ao fim da base
+    JEQ NaoVerificado ;chegou ao fim da base
     MOV R3,Proximo
     ADD R0,R3 ;avanca a base para o proximo aluno a verificar
     JMP Ciclo_Verify_Aluno
+NaoVerificado:
+    MOV R9, Display_VerificacaoFalhada
+    CALL RefreshDisplay
+    CALL VerificaOK
 FimFunc2:
+    MOV R9, Display_VerificacaoSucesso
+    CALL RefreshDisplay
+    CALL VerificaOK
     POP R8
     POP R7
     POP R6
