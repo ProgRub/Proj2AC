@@ -13,14 +13,13 @@ InicioDisplay EQU 0030H
 FimDisplay EQU 00AFH
 
 ;endereços de memória:
-OK 						EQU 0100H 	;endereço do botão OK
-CANCEL 					EQU 1022H 	;endereço do botão Cancel
-;Display 				EQU 2000H 	;endereço do display
-InputID 				EQU 1000H 	;endereço onde inserir o ID do aluno
-InputCodSeguranca 		EQU 1002H 	;endereço onde inserir o código de segurança do aluno
-InputTipoCarregamento	EQU 1010H 	;endereço onde inserir o tipo de carregamento
-InputTempo 				EQU 1012H 	;endereço onde inserir o tempo desejado
-InputIncrementoBateria  EQU 1014H ;endereço onde inserir a bateria a adicionar à bateria selecionada
+OK                         EQU 00B0H     ;endereço do botão OK
+CANCEL                     EQU 00B2H     ;endereço do botão Cancel
+InputID                 EQU 00D0H     ;endereço onde inserir o ID do aluno
+InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do aluno
+InputTipoCarregamento    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
+InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
+InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
 Base_Tabela_Dados EQU 1100H ;endereço do início da base de dados
@@ -28,7 +27,7 @@ CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do aluno para ler o c
 Saldo EQU 04H ;aumento relativo ao inicio dos dados do aluno para ler o saldo
 BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do aluno para ler quanta bateria o carro do aluno tem
 Proximo EQU 08H ;salto a executar para ler os dados do próximo aluno
-Tamanho EQU 1 ;número de alunos na base de dados
+Tamanho EQU 3 ;número de alunos na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
 
@@ -215,13 +214,12 @@ InsereEnergia:
     PUSH R5
     PUSH R6
     MOV R9, Display_InsereEnergia
-    CALL RefreshDisplay
     MOV R5, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
-    CALL VerificaOK
+    CALL RefreshDisplay
     MOV R4,0 ;reset do valor lido do endereço de OK
     MOV R3, [R5] ;R2 contém a seleção de qual bateria carregar, por parte do utilizador
-    MOV R4, [R6] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+    MOVB R4, [R6] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     MOV R5,CustoNormal
     CMP R3, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
@@ -286,7 +284,6 @@ FimFunc:
     CALL Display_NiveisDeEnergia_InserirInformacao
     MOV R9,Display_NiveisDeEnergia
     CALL RefreshDisplay
-TESTE:
     POP R7
     POP R6
     POP R5
@@ -309,7 +306,6 @@ Verificacao_Aluno:
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do aluno
-    CALL VerificaOK
     MOV R3, InputID ;R5 é o endereço de onde se lê o ID do utilizador
     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
@@ -324,7 +320,6 @@ Ciclo_Verify_Aluno:
     MOV R10,R1 ;mete no registo 10 o indice do aluno verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
 	MOV R9, Display_VerificacaoSucesso
     CALL RefreshDisplay
-	CALL VerificaOK 
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
 VerificacaoFalhada:
     MOV R10,-1
@@ -340,7 +335,6 @@ VerificacaoFalhada:
 NaoVerificado:
     MOV R9, Display_VerificacaoFalhada
     CALL RefreshDisplay
-    CALL VerificaOK
 	
 FimFunc2:
     POP R8
@@ -376,13 +370,12 @@ EscolhaCarregamento:
     PUSH R1
     PUSH R2
 	MOV R9, MenuEscolheCarregamento
-    CALL RefreshDisplay
 	MOV R0, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
 	MOV R1, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
 	MOV R2, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
-    CALL VerificaOK
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
-	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
+    CALL RefreshDisplay
+	MOVB R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
 	CMP R3, R0										;compara o registo 3 com o registo 0
 	JEQ EscolhaTempo
 	CMP R3, R1										;compara o registo 3 com o registo 1
@@ -391,13 +384,11 @@ EscolhaCarregamento:
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	MOV R9, MenuOpcaoInvalida
     CALL RefreshDisplay
-    CALL VerificaOK 
 	JMP EscolhaCarregamento							;volta para o menu inicial
 
 EscolhaTempo: 
 	MOV R9, MenuEscolherTempo
     CALL RefreshDisplay
-    CALL VerificaOK 
     MOV R6, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R6]	;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALL VerificaEscolhaTempoSuperior
@@ -405,7 +396,6 @@ EscolhaTempo:
 	JGT VerificaSaldo
 	MOV R9, MenuTempoInvalido
     CALL RefreshDisplay
-    CALL VerificaOK 
 
 VerificaEscolhaTempoSuperior:
 	CMP R3,R0										;compara o registo 3 com o registo 0
@@ -423,6 +413,7 @@ VerificaEscolhaTempoSuperiorNormal:
 	MOV R7, [R6]
 	CMP R5, R7
 	JGE EscolhaTempo ;volta a escolher o tempo
+	RET
 
 VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R5, R4
@@ -432,6 +423,7 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R7, [R6]
 	CMP R5, R7
 	JGE EscolhaTempo ;volta a escolher o tempo
+	RET
 	
 VerificaEscolhaTempoSuperiorRapido:
 	MOV R5, R4
@@ -441,6 +433,7 @@ VerificaEscolhaTempoSuperiorRapido:
 	MOV R7, [R6]
 	CMP R5, R7
 	JGE EscolhaTempo ;volta a escolher o tempo
+	RET
 		
 
 VerificaSaldo:
@@ -453,13 +446,11 @@ VerificaSaldo:
 	JLE Debito ;se a comparação for verdadeira, salta para o "tag" Debito
 	MOV R9, MenuSaldoInsuficiente
     CALL RefreshDisplay
-    CALL VerificaOK 
 	JMP NaoForneceEnergia	;salta para o "tag" NãoForneceEnergia
 	
 Debito:
 	MOV R9, MenuDebito
     CALL RefreshDisplay
-    CALL VerificaOK 
 	MOV R0, [R5+Saldo] ;coloca no registo 0 o saldo do utilizador
 	SUB R0, R3 ;é subtraido o custo da operação, atualiza o saldo do utilizador
 	MOV R6, R4 ;coloca no registo 6 o valor do registo 4
@@ -467,7 +458,6 @@ Debito:
 ForneceEnergia:
 	MOV R9, MenuInfoCarregamento
     CALL RefreshDisplay
-    CALL VerificaOK 
 	MOV R1, R3 ;coloca no registo 1 o valor do registo 3
 	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
@@ -531,7 +521,6 @@ AtualizaValoresEnergia:
 AtualizaPostoNormal:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-    CALL VerificaOK 
 	MOV R4, Normal ;coloca no registo 4 a energia do carregamento normal por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R0, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
@@ -540,7 +529,6 @@ AtualizaPostoNormal:
 AtualizaPostoSemiRapido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-    CALL VerificaOK 
 	MOV R4, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R1, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
@@ -549,7 +537,6 @@ AtualizaPostoSemiRapido:
 AtualizaPostoRapido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-    CALL VerificaOK 
 	MOV R4, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
@@ -568,6 +555,7 @@ Ciclo_RefreshDisplay:
     ADD R9,2
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
+	CALL VerificaOK
     POP R2
     POP R1
     POP R0
