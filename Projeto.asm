@@ -413,11 +413,11 @@ VerificaOK:
     PUSH R1
 CicloVerOK:
     MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
-    MOV R1, [R0] ;mete em R1 o valor lido do endereço R0
+    MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
     CMP R1,0
     JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
     MOV R1,0
-    MOV [R0],R1
+    MOVB [R0],R1
     POP R1
     POP R0
     RET
@@ -587,10 +587,10 @@ RefreshDisplay:
     MOV R0,InicioDisplay
     MOV R1,FimDisplay
 Ciclo_RefreshDisplay:
-    MOV R2,[R3]
+    MOV R2,[R9]
     MOV [R0],R2
     ADD R0,2
-    ADD R3,2
+    ADD R9,2
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
     POP R2
