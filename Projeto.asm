@@ -442,7 +442,7 @@ EscolhaCarregamento:
     CALL VerificaOK
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
 	MOV R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
-	CMP R3,R0										;compara o registo 3 com o registo 0
+	CMP R3, R0										;compara o registo 3 com o registo 0
 	JEQ EscolhaTempo
 	CMP R3, R1										;compara o registo 3 com o registo 1
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
@@ -459,11 +459,48 @@ EscolhaTempo:
     CALL VerificaOK 
     MOV R6, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R6]	;coloca no registo 4 o tempo escolhido pelo utilizador
+	CALL VerificaEscolhaTempoSuperior
 	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
 	JGT VerificaSaldo
 	MOV R9, MenuTempoInvalido
     CALL RefreshDisplay
     CALL VerificaOK 
+
+VerificaEscolhaTempoSuperior:
+	CMP R3,R0										;compara o registo 3 com o registo 0
+	JEQ VerificaEscolhaTempoSuperiorNormal
+	CMP R3, R1										;compara o registo 3 com o registo 1
+	JEQ VerificaEscolhaTempoSuperiorSemiRapido
+	CMP R3, R2	
+	JEQ VerificaEscolhaTempoSuperiorRapido
+
+VerificaEscolhaTempoSuperiorNormal:
+	MOV R5, R4
+	MOV R6, Normal
+	MUL R5, R6
+	MOV R6, EnderecoBateriaNormal
+	MOV R7, [R6]
+	CMP R5, R7
+	JGE EscolhaTempo ;volta a escolher o tempo
+
+VerificaEscolhaTempoSuperiorSemiRapido:
+	MOV R5, R4
+	MOV R6, Semirapido
+	MUL R5, R6
+	MOV R6, EnderecoBateriaSemiRapido
+	MOV R7, [R6]
+	CMP R5, R7
+	JGE EscolhaTempo ;volta a escolher o tempo
+	
+VerificaEscolhaTempoSuperiorRapido:
+	MOV R5, R4
+	MOV R6, Rapido
+	MUL R5, R6
+	MOV R6, EnderecoBateriaRapido
+	MOV R7, [R6]
+	CMP R5, R7
+	JGE EscolhaTempo ;volta a escolher o tempo
+		
 
 VerificaSaldo:
 	MUL R4, R3	
