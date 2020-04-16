@@ -13,7 +13,7 @@ InicioDisplay EQU 0030H
 FimDisplay EQU 00AFH
 
 ;endereços de memória:
-OK 						EQU 1020H 	;endereço do botão OK
+OK 						EQU 0100H 	;endereço do botão OK
 CANCEL 					EQU 1022H 	;endereço do botão Cancel
 ;Display 				EQU 2000H 	;endereço do display
 InputID 				EQU 1000H 	;endereço onde inserir o ID do aluno
@@ -83,12 +83,12 @@ Display_InsereEnergiaQuanta:
 	String " OK - continuar "
 
 PLACE 2280H
-Display_NiveisDeEnergia_Caso1:
+Display_NiveisDeEnergia:
     String " ESTADO DO POSTO"
-    String "Normal: Func    "
-    String "SemiRapido: Func"
-    String "Rapido: Func    "
+    String "Normal:         "
+    String "SemiRapido:     "
     String "                "
+    String "Rapido:         "
     String "                "
 	String " OK - continuar "
 
@@ -324,19 +324,27 @@ NiveisDeEnergia:
     CMP R0,R4
     JGE VerificaSemiRapido ;se verificarmos que a bateria normal tem o nivel minimo, verificamos as restantes
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
+    MOV R4,1
 VerificaSemiRapido:
     CMP R1,R5
     JGE VerificaRapido ;se verificarmos que a bateria semirapida tem o nivel minimo, verificamos a bateria rapida
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
+    MOV R5,1
 VerificaRapido:
     CMP R2, R6
     JGT FimFunc ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
+    MOV R6,1
     MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
     CMP R3,R7
     JNE FimFunc
     CALL InsereEnergia
 FimFunc:
+    CALL Display_NiveisDeEnergia_InserirInformacao
+    MOV R9,Display_NiveisDeEnergia
+    CALL RefreshDisplay
+TESTE:
+    JMP TESTE
     POP R7
     POP R6
     POP R5
@@ -452,7 +460,7 @@ EscolhaTempo:
     MOV R6, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R6]	;coloca no registo 4 o tempo escolhido pelo utilizador
 	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
-	JG VerificaSaldo
+	JGT VerificaSaldo
 	MOV R9, MenuTempoInvalido
     CALL RefreshDisplay
     CALL VerificaOK 
@@ -568,17 +576,6 @@ AtualizaPostoRapido:
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
-	
-;LimpaDisplay:
- ;   PLACE 0100H
-  ;  String "                "
-  ;  String "                "
-  ;  String "                "
-  ;  String "                "
-  ;  String "                "
-  ;  String "                "
-  ;  String "                "
-  ;  PLACE 0000H
 
 RefreshDisplay:
     PUSH R0
@@ -596,4 +593,105 @@ Ciclo_RefreshDisplay:
     POP R2
     POP R1
     POP R0
+    RET
+
+Display_NiveisDeEnergia_InserirInformacao:
+    PUSH R0
+    PUSH R1
+    PUSH R2
+    PUSH R3
+    PUSH R4
+    MOV R0, Display_NiveisDeEnergia
+    MOV R1,1
+    CMP R4,R1
+    JEQ NaoFuncionalNormal
+    MOV R1,22
+    MOV R2,[R0+R1]
+    CALL EscreveFuncional
+    JMP InfoSemiRapido
+NaoFuncionalNormal:
+    ; MOV R1,24
+    ; MOV R2,[R0+R1]
+    ; PLACE 2298H
+    ; STRING "Nao Funcional"
+    ; PLACE 6000H
+InfoSemiRapido:
+    MOV R1,1
+    CMP R5,R1
+    JEQ NaoFuncionalSemiRapido
+    MOV R1,47
+    CALL EscreveFuncional
+    JMP InfoRapido
+NaoFuncionalSemiRapido:
+    ; MOV R1,48
+    ; MOV R2,[R0+R1]
+    ; PLACE 22B0H
+    ; STRING "Nao Funcional"
+    ; PLACE 6000H
+InfoRapido:
+    MOV R1,1
+    CMP R6,R1
+    JEQ NaoFuncionalRapido
+    MOV R1,79
+    CALL EscreveFuncional
+    ; PLACE 6000H
+NaoFuncionalRapido:
+    JMP FimF
+    ; MOV R1,64
+    ; MOV R2,[R0+R1]
+    ; PLACE 22C0H
+    ; STRING "Nao Funcional"
+    ; PLACE 6000H
+FimF:
+    POP R4
+    POP R3
+    POP R2
+    POP R1
+    POP R0
+    RET
+
+EscreveNao:
+    MOV R2,78
+    ADD R1,R0
+    ADD R1,1
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,97
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,111
+    MOVB [R1],R2
+    
+    RET
+
+EscreveFuncional:
+    MOV R2,70
+    ADD R1,R0
+    ADD R1,1
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,117
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,110
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,99
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,105
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,111
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,110
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,97
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,108
+    MOVB [R1],R2
+    ADD R1,1
     RET
