@@ -93,76 +93,16 @@ Display_NiveisDeEnergia:
 	String " OK - continuar "
 
 PLACE 2300H
-Display_NiveisDeEnergia_Caso2:
-    String " ESTADO DO POSTO"
-    String "Normal: Vazio   "
-    String "SemiRapido: Func"
-    String "Rapido: Func    "
-    String "                "
-    String "                "
-	String " OK - continuar "
-   
-PLACE 2380H
-Display_NiveisDeEnergia_Caso3:
-    String " ESTADO DO POSTO"
-    String "Normal: Vazio   "
-    String "SemiRapido:Vazio"
-    String "Rapido: Func    "
-    String "                "
-    String "                "
-	String " OK - continuar "
-
-PLACE 2400H
-Display_NiveisDeEnergia_Caso4:
-    String " ESTADO DO POSTO"
-    String "Normal: Vazio   "
-    String "SemiRapido:Vazio"
-    String "Rapido: Vazio   "
-    String "                "
-    String "                "
-	String " OK - continuar "
-   
-PLACE 2480H
-Display_NiveisDeEnergia_Caso5:
-    String " ESTADO DO POSTO"
-    String "Normal: Func    "
-    String "SemiRapido:Vazio"
-    String "Rapido: Func    "
-    String "                "
-    String "                "
-	String " OK - continuar "
-
-PLACE 2500H
-Display_NiveisDeEnergia_Caso6:
-    String " ESTADO DO POSTO"
-    String "Normal: Func    "
-    String "SemiRapido:Vazio"
-    String "Rapido: Vazio   "
-    String "                "
-    String "                "
-	String " OK - continuar "
-
-PLACE 2580H
-Display_NiveisDeEnergia_Caso7:
-    String " ESTADO DO POSTO"
-    String "Normal: Func    "
-    String "SemiRapido: Func"
-    String "Rapido: Vazio   "
-    String "                "
-    String "                "
-	String " OK - continuar "
-
-PLACE 2600H
 MenuEscolheCarregamento:
 	String " ESCOLHA O TIPO	"
 	String "DE CARREGAMENTO:"
 	String "  1- Normal     "
-	String "  2- Semi-Rápido"
-	String "  3- Rápido     " 
+	String "  2- Semi-Rapido"
+	String "  3- Rapido     " 
 	String "                "
 	String " OK - continuar "
 
-PLACE 2680H
+PLACE 2380H
 MenuOpcaoInvalida:
 	String "                "
 	String "                "
@@ -172,7 +112,7 @@ MenuOpcaoInvalida:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2700H
+PLACE 2400H
 MenuEscolherTempo:
 	String " ESCOLHA O TEMPO"
 	String "DE CARREGAMENTO:"
@@ -182,7 +122,7 @@ MenuEscolherTempo:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2780H
+PLACE 2480H
 MenuTempoInvalido:
 	String "     OPÇÃO      "
 	String "    INVÁLIDA    "
@@ -192,7 +132,7 @@ MenuTempoInvalido:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2800H
+PLACE 2500H
 MenuDebito:
 	String "  CARREGAMENTO  "
 	String "                "
@@ -202,7 +142,7 @@ MenuDebito:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2880H
+PLACE 2580H
 MenuSaldoInsuficiente:
 	String "                "
 	String "                "
@@ -212,7 +152,7 @@ MenuSaldoInsuficiente:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2900H
+PLACE 2600H
 MenuInfoCarregamento:
 	String "  CARREGAMENTO  "
 	String "                "
@@ -222,7 +162,7 @@ MenuInfoCarregamento:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2980H
+PLACE 2680H
 MenuCarregamentoConcluido:
 	String "                "
 	String "                "
@@ -231,7 +171,7 @@ MenuCarregamentoConcluido:
 	String "                "
 	String "                "
 	String " OK - continuar "
-PLACE 2A00H
+PLACE 2700H
 Display_Overflow:
 	String "                "
 	String "                "
@@ -399,9 +339,6 @@ NaoVerificado:
     CALL RefreshDisplay
     CALL VerificaOK
 FimFunc2:
-    MOV R9, Display_VerificacaoSucesso
-    CALL RefreshDisplay
-    CALL VerificaOK
     POP R8
     POP R7
     POP R6
@@ -637,50 +574,47 @@ Display_NiveisDeEnergia_InserirInformacao:
     PUSH R1
     PUSH R2
     PUSH R3
-    PUSH R4
     MOV R0, Display_NiveisDeEnergia
     MOV R1,1
     CMP R4,R1
     JEQ NaoFuncionalNormal
     MOV R1,22
-    MOV R2,[R0+R1]
+    ADD R1,R0
     CALL EscreveFuncional
     JMP InfoSemiRapido
 NaoFuncionalNormal:
-    ; MOV R1,24
-    ; MOV R2,[R0+R1]
-    ; PLACE 2298H
-    ; STRING "Nao Funcional"
-    ; PLACE 6000H
+    MOV R1,22
+    ADD R1,R0
+    CALL EscreveNao_Func
 InfoSemiRapido:
     MOV R1,1
     CMP R5,R1
     JEQ NaoFuncionalSemiRapido
     MOV R1,47
+    ADD R1,R0
     CALL EscreveFuncional
     JMP InfoRapido
 NaoFuncionalSemiRapido:
-    ; MOV R1,48
-    ; MOV R2,[R0+R1]
-    ; PLACE 22B0H
-    ; STRING "Nao Funcional"
-    ; PLACE 6000H
+    MOV R1,42
+    ADD R1,R0
+    MOV R3,1
+    CALL EscreveNao
+    CALL EscreveFuncional
 InfoRapido:
     MOV R1,1
     CMP R6,R1
     JEQ NaoFuncionalRapido
     MOV R1,79
+    ADD R1,R0
     CALL EscreveFuncional
-    ; PLACE 6000H
-NaoFuncionalRapido:
     JMP FimF
-    ; MOV R1,64
-    ; MOV R2,[R0+R1]
-    ; PLACE 22C0H
-    ; STRING "Nao Funcional"
-    ; PLACE 6000H
+NaoFuncionalRapido:
+    MOV R1,72
+    ADD R1,R0
+    MOV R3,4
+    CALL EscreveNao
+    CALL EscreveFuncional
 FimF:
-    POP R4
     POP R3
     POP R2
     POP R1
@@ -689,7 +623,6 @@ FimF:
 
 EscreveNao:
     MOV R2,78
-    ADD R1,R0
     ADD R1,1
     MOVB [R1],R2
     ADD R1,1
@@ -698,12 +631,18 @@ EscreveNao:
     ADD R1,1
     MOV R2,111
     MOVB [R1],R2
-    
+    ADD R1,1
+CicloEspacos:
+    MOV R2,32
+    MOVB[R1],R2
+    ADD R1,1
+    SUB R3,1
+    CMP R3,0
+    JNE CicloEspacos
     RET
 
 EscreveFuncional:
     MOV R2,70
-    ADD R1,R0
     ADD R1,1
     MOVB [R1],R2
     ADD R1,1
@@ -731,4 +670,34 @@ EscreveFuncional:
     MOV R2,108
     MOVB [R1],R2
     ADD R1,1
+    RET
+
+EscreveNao_Func:
+    MOV R2,78
+    ADD R1,1
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,97
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,111
+    MOVB [R1],R2
+    MOV R2,32
+    ADD R1,1
+    MOVB [R1],R2
+    MOV R2,70
+    ADD R1,1
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,117
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,110
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,99
+    MOVB [R1],R2
+    ADD R1,1
+    MOV R2,46
+    MOVB [R1],R2
     RET
