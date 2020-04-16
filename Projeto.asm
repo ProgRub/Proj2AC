@@ -106,8 +106,8 @@ PLACE 2380H
 MenuOpcaoInvalida:
 	String "                "
 	String "                "
-	String "     OPÇÃO      "
-	String "    INVÁLIDA    "
+	String "     OPCAO      "
+	String "    INVALIDA    "
 	String "                "
 	String "                "
 	String " OK - continuar "
@@ -124,8 +124,8 @@ MenuEscolherTempo:
 
 PLACE 2480H
 MenuTempoInvalido:
-	String "     OPÇÃO      "
-	String "    INVÁLIDA    "
+	String "     OPCAO      "
+	String "    INVALIDA    "
 	String "                "
 	String "tempo tem de ser"
 	String "   superior a 0 "
@@ -158,7 +158,7 @@ MenuInfoCarregamento:
 	String "                "
 	String "   Tipo:        "
 	String "                "
-	String "   Duração:     "
+	String "   Duracao:     "
 	String "                "
 	String " OK - continuar "
 
@@ -167,7 +167,7 @@ MenuCarregamentoConcluido:
 	String "                "
 	String "                "
 	String "  CARREGAMENTO  "
-	String "    CONCLUÍDO   "
+	String "    CONCLUIDO   "
 	String "                "
 	String "                "
 	String " OK - continuar "
@@ -204,6 +204,9 @@ Programa:
     CALL InsereEnergia
     CALL NiveisDeEnergia
     CALL Verificacao_Aluno
+	MOV R4, -1
+	CMP R10, R4
+	JEQ Programa
     CALL EscolhaCarregamento
     RET
 InsereEnergia:
@@ -284,7 +287,6 @@ FimFunc:
     MOV R9,Display_NiveisDeEnergia
     CALL RefreshDisplay
 TESTE:
-    JMP TESTE
     POP R7
     POP R6
     POP R5
@@ -322,6 +324,7 @@ Ciclo_Verify_Aluno:
     MOV R10,R1 ;mete no registo 10 o indice do aluno verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
 	MOV R9, Display_VerificacaoSucesso
     CALL RefreshDisplay
+	CALL VerificaOK 
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
 VerificacaoFalhada:
     MOV R10,-1
@@ -338,6 +341,7 @@ NaoVerificado:
     MOV R9, Display_VerificacaoFalhada
     CALL RefreshDisplay
     CALL VerificaOK
+	
 FimFunc2:
     POP R8
     POP R7
