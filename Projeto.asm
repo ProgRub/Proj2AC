@@ -225,10 +225,15 @@ InsereEnergia:
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
     MOV R9, Display_InsereEnergia
     CALL RefreshDisplay
-	MOV R9, Display_InsereEnergiaQuanta
-    CALL RefreshDisplay
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
+    MOV R5,4
+    CMP R4,R5
+    JNE IncrementaNormal
+    JMP FimFunc1
+IncrementaNormal:
+	MOV R9, Display_InsereEnergiaQuanta
+    CALL RefreshDisplay
     MOV R5, CustoNormal
     CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
@@ -245,15 +250,10 @@ IncrementaSemiRapido:
 IncrementaRapido:
     MOV R5, CustoRapido
     CMP R4, R5
-    JNE NaoAcrescentar ;verificar se escolheu carregar a bateria rapida, se não avançar
+    JNE OpcaoInvalida ;verificar se escolheu carregar a bateria rapida, se não avançar
     ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o fim da função
-NaoAcrescentar:
-    MOV R5,4
-    CMP R4,R5
-    JNE OpcaoInvalida
-    JMP FimFunc1
 OverflowBateria:
     MOV R9, Display_Overflow
     CALL RefreshDisplay
