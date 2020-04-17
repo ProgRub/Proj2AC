@@ -366,21 +366,24 @@ CicloVerOK:
     RET
 
 EscolhaCarregamento: 
-    PUSH R0
-    PUSH R1
-    PUSH R2
+    PUSH R3
+    PUSH R4
+    PUSH R5
+    PUSH R6
+    PUSH R7
+    PUSH R8
+	MOV R6, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
+	MOV R7, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
+	MOV R8, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
 	MOV R9, MenuEscolheCarregamento
-	MOV R0, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
-	MOV R1, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
-	MOV R2, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
     CALL RefreshDisplay
 	MOVB R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
-	CMP R3, R0										;compara o registo 3 com o registo 0
+	CMP R3, R6										;compara o registo 3 com o registo 0
 	JEQ EscolhaTempo
-	CMP R3, R1										;compara o registo 3 com o registo 1
+	CMP R3, R7										;compara o registo 3 com o registo 1
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
-	CMP R3, R2										;compara o registo 3 com o registo 2
+	CMP R3, R8										;compara o registo 3 com o registo 2
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	MOV R9, MenuOpcaoInvalida
     CALL RefreshDisplay
@@ -389,8 +392,8 @@ EscolhaCarregamento:
 EscolhaTempo: 
 	MOV R9, MenuEscolherTempo
     CALL RefreshDisplay
-    MOV R6, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
-	MOV R4, [R6]	;coloca no registo 4 o tempo escolhido pelo utilizador
+    MOV R5, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
+	MOV R4, [R5]	;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALL VerificaEscolhaTempoSuperior
 	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
 	JGT VerificaSaldo
@@ -398,46 +401,42 @@ EscolhaTempo:
     CALL RefreshDisplay
 
 VerificaEscolhaTempoSuperior:
-	CMP R3,R0										;compara o registo 3 com o registo 0
+	CMP R3,R6										;compara o registo 3 com o registo 0
 	JEQ VerificaEscolhaTempoSuperiorNormal
-	CMP R3, R1										;compara o registo 3 com o registo 1
+	CMP R3, R7										;compara o registo 3 com o registo 1
 	JEQ VerificaEscolhaTempoSuperiorSemiRapido
-	CMP R3, R2	
+	CMP R3, R8	
 	JEQ VerificaEscolhaTempoSuperiorRapido
+    RET
 
 VerificaEscolhaTempoSuperiorNormal:
 	MOV R5, R4
-	MOV R6, Normal
-	MUL R5, R6
-	MOV R6, EnderecoBateriaNormal
-	MOV R7, [R6]
-	CMP R5, R7
+	MOV R9, Normal
+	MUL R5, R9
+	CMP R5, R0
 	JGE EscolhaTempo ;volta a escolher o tempo
 	RET
 
 VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R5, R4
-	MOV R6, Semirapido
-	MUL R5, R6
-	MOV R6, EnderecoBateriaSemiRapido
-	MOV R7, [R6]
-	CMP R5, R7
+	MOV R9, Semirapido
+	MUL R5, R9
+	CMP R5, R1
 	JGE EscolhaTempo ;volta a escolher o tempo
 	RET
 	
 VerificaEscolhaTempoSuperiorRapido:
 	MOV R5, R4
-	MOV R6, Rapido
-	MUL R5, R6
-	MOV R6, EnderecoBateriaRapido
-	MOV R7, [R6]
-	CMP R5, R7
+	MOV R9, Rapido
+	MUL R5, R9
+	CMP R5, R2
 	JGE EscolhaTempo ;volta a escolher o tempo
 	RET
 		
 
 VerificaSaldo:
-	MUL R4, R3	
+    MOV R7,R4
+	MUL R4, R3	;R4 contém o custo da operação de carregamento agora
 	JV Fim
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
@@ -451,43 +450,46 @@ VerificaSaldo:
 Debito:
 	MOV R9, MenuDebito
     CALL RefreshDisplay
-	MOV R0, [R5+Saldo] ;coloca no registo 0 o saldo do utilizador
-	SUB R0, R3 ;é subtraido o custo da operação, atualiza o saldo do utilizador
-	MOV R6, R4 ;coloca no registo 6 o valor do registo 4
+	SUB R6, R4 ;é subtraido o custo da operação
+	MOV [R5+Saldo],R6 ;atualiza o saldo do utilizador 
 
 ForneceEnergia:
 	MOV R9, MenuInfoCarregamento
     CALL RefreshDisplay
-	MOV R1, R3 ;coloca no registo 1 o valor do registo 3
-	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
-	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
-	MOV R4, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
-	CMP R1, R2	;verifica se o carregamento pretendido é o normal									
+    MOV R4,R7
+	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
+	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
+	MOV R8, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
+	CMP R3, R6	;verifica se o carregamento pretendido é o normal									
 	JEQ	ForneceEnergiaNormal	;salta para o "tag" AtualizaPostoNormal
-	CMP R1, R3	;verifica se o carregamento pretendido é o semi-rapido
+	CMP R3, R7	;verifica se o carregamento pretendido é o semi-rapido
 	JEQ	ForneceEnergiaSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
-	CMP R1,	R4		;verifica se o carregamento pretendido é o rapido
+	CMP R3,	R8		;verifica se o carregamento pretendido é o rapido
 	JEQ ForneceEnergiaRapido	;salta para o "tag" AtualizaPostoRapido
 
 ForneceEnergiaNormal:
-	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
-	MOV R1, Normal ;coloca no registo 1 o valor do carregamento normal
-	ADD R0, R1 ;soma o carregamento à bateria do vehiculo
-	MOV R5, 100 ;coloca no registo 5 a constante 100
-	CMP R0, R5 ;compara o registo 0 com o registo 5
+    MOV R5, Base_Tabela_Dados
+    ADD R5,R10
+	MOV R6, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
+	MOV R7, Normal ;coloca no registo 1 o valor do carregamento normal
+	ADD R6, R7 ;soma o carregamento à bateria do vehiculo
+	MOV R8, 100 ;coloca no registo 5 a constante 100
+	CMP R6, R8 ;compara o registo 0 com o registo 5
 	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
-	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
+	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo 
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
 	JEQ AtualizaPostoNormal ;salta para o "tag" AtualizaPostoNormal
     JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergiaNormal
 
 ForneceEnergiaSemiRapido:
-	MOV R0, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
-	MOV R1, Semirapido ;coloca no registo 1 o valor do carregamento sermi-rapido
-	ADD R0, R1 ;soma o carregamento à bateria do vehiculo
-	MOV R5, 100 ;coloca no registo 5 a constante 100
-	CMP R0, R5 ;compara o registo 0 com o registo 5
+    MOV R5, Base_Tabela_Dados
+    ADD R5,R10
+	MOV R6, [R5+BateriaCarro] ;coloca no registo 0 o valor da bateria do vehiculo do utilizador
+	MOV R7, Semirapido ;coloca no registo 1 o valor do carregamento sermi-rapido
+	ADD R6, R7 ;soma o carregamento à bateria do vehiculo
+	MOV R8, 100 ;coloca no registo 5 a constante 100
+	CMP R6, R8 ;compara o registo 0 com o registo 5
 	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
 	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo
@@ -500,47 +502,54 @@ ForneceEnergiaRapido:
 
 
 BateriaCarregada:
-	MOV R0, 100 ;coloca no registo 0 a constante 100
-	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
+	MOV R6, 100 ;coloca no registo 0 a constante 100
+	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	JMP AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
 	
 NaoForneceEnergia:
-    JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
+    RET
 	
 AtualizaValoresEnergia:
-	MOV R2, CustoNormal ;coloca no registo 2 o custo do carregamento normal
-	MOV R3, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
-	MOV R4, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
-	CMP R1, R2	;verifica se o carregamento pretendido é o normal									
+	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
+	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
+	MOV R8, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
+	CMP R3, R6	;verifica se o carregamento pretendido é o normal									
 	JEQ	AtualizaPostoNormal	;salta para o "tag" AtualizaPostoNormal
-	CMP R1, R3	;verifica se o carregamento pretendido é o semi-rapido
+	CMP R3, R7	;verifica se o carregamento pretendido é o semi-rapido
 	JEQ	AtualizaPostoSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
-	CMP R1,	R4		;verifica se o carregamento pretendido é o rapido
+	CMP R3,	R8		;verifica se o carregamento pretendido é o rapido
 	JEQ AtualizaPostoRapido	;salta para o "tag" AtualizaPostoRapido
 
 AtualizaPostoNormal:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-	MOV R4, Normal ;coloca no registo 4 a energia do carregamento normal por hora
+	MOV R6, Normal ;coloca no registo 4 a energia do carregamento normal por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R0, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
-	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
+	JMP FimFunc3
 	
 AtualizaPostoSemiRapido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-	MOV R4, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
+	MOV R6, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R1, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
-	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
+	JMP FimFunc3
 
 AtualizaPostoRapido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
-	MOV R4, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
+	MOV R6, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
-	JMP NiveisDeEnergia ;salta para o "tag" NiveisDeEnergia
+FimFunc3:
+    POP R8
+    POP R7
+    POP R6
+    POP R5
+    POP R4
+    POP R3
+	RET
 
 RefreshDisplay:
     PUSH R0
