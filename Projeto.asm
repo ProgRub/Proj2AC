@@ -621,7 +621,7 @@ LimpaDisplay:
 Ciclo_LimpaDisplay:
     MOV R2,32
     MOV [R0],R2
-    ADD R0,2
+    ADD R0,1
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
 	CALL VerificaOK
