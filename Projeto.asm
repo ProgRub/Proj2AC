@@ -31,6 +31,12 @@ Tamanho EQU 3 ;número de alunos na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
 
+; ********************IMPORTANTE*******************************
+; R0 - Valor da bateria do posto normal
+; R1 - Valor da bateria do posto semirapido
+; R2 - Valor da bateria do posto rapido
+; *************************************************************
+
 PLACE 2000H
 Display_InputVerifyAluno:
     String "  VERIFICACAO   "
@@ -187,15 +193,15 @@ Inicio:
 PLACE 6000H
 Main:
     MOV SP, StackPointer
-    MOV R3, EnderecoBateriaNormal
-    MOV R4, EnderecoBateriaSemiRapido
-    MOV R5, EnderecoBateriaRapido
-    MOV R0,[R3]
-    MOV R1, [R4]
-    MOV R2,[R5]
-    MOV R3,0
-    MOV R4,0
-    MOV R5,0
+    MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
+    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
+    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa
+    MOV R3,0 ; -----------------------------
+    MOV R4,0 ; limpa os registos
+    MOV R5,0 ; -----------------------------
     CALL Programa
     JMP Fim
 
@@ -203,9 +209,9 @@ Programa:
     CALL InsereEnergia
     CALL NiveisDeEnergia
     CALL Verificacao_Aluno
-	MOV R4, -1
-	CMP R10, R4
-	JEQ Programa
+	MOV R4, -1 ;mete em R4 o valor -1 para comparar com R10, o indice do aluno verificado (possivelmente)
+	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o aluno não está na base de dados e a verificação falhou
+	JEQ Programa ;se tal acontecer, volta-se ao inicio do programa
     CALL EscolhaCarregamento
     RET
 InsereEnergia:
@@ -213,38 +219,47 @@ InsereEnergia:
     PUSH R4
     PUSH R5
     PUSH R6
+    MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
+    MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
     MOV R9, Display_InsereEnergia
-    MOV R5, InputIncrementoBateria ;R0 contém o endereço de onde se lê o input de quanto carregar a bateria
-    MOV R6, InputTipoCarregamento ;R1 contém o endereço de onde se lê o input de qual bateria carregar
     CALL RefreshDisplay
-    MOV R4,0 ;reset do valor lido do endereço de OK
-    MOV R3, [R5] ;R2 contém a seleção de qual bateria carregar, por parte do utilizador
-    MOVB R4, [R6] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
-    MOV R5,CustoNormal
-    CMP R3, R5
+    MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+    MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
+    MOV R5, CustoNormal
+    CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
-    ADD R0, R4 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    ADD R0, R3 ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;se não ocorrer overflow, avançar para o display dos niveis de energia
 IncrementaSemiRapido:
     MOV R5,CustoSemiRapido
-    CMP R3,R5
+    CMP R4,R5
     JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
-    ADD R1,R4 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    ADD R1,R3 ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
     JV OverflowBateria; se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o display dos niveis de energia
 IncrementaRapido:
     MOV R5, CustoRapido
-    CMP R3, R5
-    JNE FimFunc1 ;verificar se escolheu carregar a bateria rapida, se não avançar
-    ADD R2,R4 ;adicionamos a R5 (bateria) o valor que o utilizador inseriu
+    CMP R4, R5
+    JNE NaoAcrescentar ;verificar se escolheu carregar a bateria rapida, se não avançar
+    ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
-    JMP FimFunc1 ;avançar para o display dos niveis de energia
+    JMP FimFunc1 ;avançar para o fim da função
+NaoAcrescentar:
+    MOV R5,4
+    CMP R4,R5
+    JNE OpcaoInvalida
+    JMP FimFunc1
 OverflowBateria:
     MOV R9, Display_Overflow
     CALL RefreshDisplay
     MOV R6,0
     MOV [R4],R6
+    JMP FimFunc1
+OpcaoInvalida:
+    MOV R9,MenuOpcaoInvalida
+    CALL RefreshDisplay
+    JMP InsereEnergia
 FimFunc1:
     POP R6
     POP R5
