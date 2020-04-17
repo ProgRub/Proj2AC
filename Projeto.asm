@@ -619,7 +619,7 @@ LimpaDisplay:
     MOV R0,InicioDisplay
     MOV R1,FimDisplay
 Ciclo_LimpaDisplay:
-    MOV R2,20
+    MOV R2,32
     MOV [R0],R2
     ADD R0,2
     CMP R0,R1
