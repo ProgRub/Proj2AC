@@ -618,7 +618,7 @@ LimpaDisplay:
     PUSH R2
     MOV R0,InicioDisplay
     MOV R1,FimDisplay
-Ciclo_RefreshDisplay:
+Ciclo_LimpaDisplay:
     MOV R2,0
     MOV [R0],R2
     ADD R0,2
