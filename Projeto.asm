@@ -206,7 +206,6 @@ Main:
     JMP Fim
 
 Programa:
-    CALL LimpaPerifericosEntrada
     CALL LimpaDisplay
     CALL InsereEnergia
     CALL NiveisDeEnergia
@@ -215,6 +214,7 @@ Programa:
 	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o aluno não está na base de dados e a verificação falhou
 	JEQ Programa ;se tal acontecer, volta-se ao inicio do programa
     CALL EscolhaCarregamento
+	JMP Programa
     RET
 InsereEnergia:
     PUSH R3
@@ -224,6 +224,8 @@ InsereEnergia:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
     MOV R9, Display_InsereEnergia
+    CALL RefreshDisplay
+	MOV R9, Display_InsereEnergiaQuanta
     CALL RefreshDisplay
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
@@ -334,7 +336,9 @@ Ciclo_Verify_Aluno:
     JNE VerificacaoFalhada ;se R7(ID do utilizador) for diferente de R3(ID a ser verificado na tabela), avançar para o próximo, se possivel
     CMP R6,R4
     JNE VerificacaoFalhada ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
-    MOV R10,R1 ;mete no registo 10 o indice do aluno verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
+	MOV R10, Proximo
+	SHR R1,1
+    MUL R10,R1 ;mete no registo 10 o indice do aluno verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
 	MOV R9, Display_VerificacaoSucesso
     CALL RefreshDisplay
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
@@ -474,6 +478,7 @@ ForneceEnergia:
 	MOV R9, MenuInfoCarregamento
     CALL RefreshDisplay
     MOV R4,R7
+	MOV R9,R7
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
 	MOV R8, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
@@ -496,7 +501,7 @@ ForneceEnergiaNormal:
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo 
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
-	JEQ AtualizaPostoNormal ;salta para o "tag" AtualizaPostoNormal
+	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaPostoNormal
     JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergiaNormal
 
 ForneceEnergiaSemiRapido:
@@ -527,6 +532,7 @@ NaoForneceEnergia:
     RET
 	
 AtualizaValoresEnergia:
+	MOV R4, R9
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
 	MOV R8, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
@@ -538,28 +544,24 @@ AtualizaValoresEnergia:
 	JEQ AtualizaPostoRapido	;salta para o "tag" AtualizaPostoRapido
 
 AtualizaPostoNormal:
-	MOV R9, MenuCarregamentoConcluido
-    CALL RefreshDisplay
 	MOV R6, Normal ;coloca no registo 4 a energia do carregamento normal por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R0, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
 	JMP FimFunc3
 	
 AtualizaPostoSemiRapido:
-	MOV R9, MenuCarregamentoConcluido
-    CALL RefreshDisplay
 	MOV R6, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R1, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
 	JMP FimFunc3
 
 AtualizaPostoRapido:
-	MOV R9, MenuCarregamentoConcluido
-    CALL RefreshDisplay
 	MOV R6, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 FimFunc3:
+	MOV R9, MenuCarregamentoConcluido
+    CALL RefreshDisplay
     POP R8
     POP R7
     POP R6
@@ -582,6 +584,7 @@ Ciclo_RefreshDisplay:
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
 	CALL VerificaOK
+	CALL LimpaPerifericosEntrada
     POP R2
     POP R1
     POP R0
@@ -623,7 +626,7 @@ Ciclo_LimpaDisplay:
     MOVB [R0],R2
     ADD R0,1
     CMP R0,R1
-    JLE Ciclo_RefreshDisplay
+    JLE Ciclo_LimpaDisplay
     POP R2
     POP R1
     POP R0
