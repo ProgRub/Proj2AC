@@ -624,7 +624,6 @@ Ciclo_LimpaDisplay:
     ADD R0,1
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
-	CALL VerificaOK
     POP R2
     POP R1
     POP R0
