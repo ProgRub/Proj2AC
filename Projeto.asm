@@ -225,8 +225,8 @@ InsereEnergia:
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
     MOV R9, Display_InsereEnergia
     CALL RefreshDisplay
-    MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
+	CALL LimpaPerifericosEntrada
     MOV R5,4
     CMP R4,R5
     JNE IncrementaNormal
@@ -234,6 +234,8 @@ InsereEnergia:
 IncrementaNormal:
 	MOV R9, Display_InsereEnergiaQuanta
     CALL RefreshDisplay
+    MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+	CALL LimpaPerifericosEntrada
     MOV R5, CustoNormal
     CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
@@ -263,6 +265,7 @@ OverflowBateria:
 OpcaoInvalida:
     MOV R9,MenuOpcaoInvalida
     CALL RefreshDisplay
+	CALL LimpaPerifericosEntrada
     JMP InsereEnergia
 FimFunc1:
     POP R6
@@ -329,6 +332,7 @@ Verificacao_Aluno:
     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
     MOV R6, [R4] ;R8 é o código de segurança que o utilizador inseriu
+	CALL LimpaPerifericosEntrada
 Ciclo_Verify_Aluno:
     MOV R3, [R0] ;R3 tem o valor do ID da tabela de base de dados a verificar
     MOV R4, [R0+R2] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
@@ -400,6 +404,7 @@ EscolhaCarregamento:
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
     CALL RefreshDisplay
 	MOVB R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
+	CALL LimpaPerifericosEntrada
 	CMP R3, R6										;compara o registo 3 com o registo 0
 	JEQ EscolhaTempo
 	CMP R3, R7										;compara o registo 3 com o registo 1
@@ -415,6 +420,7 @@ EscolhaTempo:
     CALL RefreshDisplay
     MOV R5, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]	;coloca no registo 4 o tempo escolhido pelo utilizador
+	CALL LimpaPerifericosEntrada
 	CALL VerificaEscolhaTempoSuperior
 	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
 	JGT VerificaSaldo
@@ -584,7 +590,6 @@ Ciclo_RefreshDisplay:
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
 	CALL VerificaOK
-	CALL LimpaPerifericosEntrada
     POP R2
     POP R1
     POP R0
