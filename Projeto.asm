@@ -206,6 +206,8 @@ Main:
     JMP Fim
 
 Programa:
+    CALL LimpaPerifericosEntrada
+    CALL LimpaDisplay
     CALL InsereEnergia
     CALL NiveisDeEnergia
     CALL Verificacao_Aluno
@@ -577,6 +579,49 @@ Ciclo_RefreshDisplay:
     MOV [R0],R2
     ADD R0,2
     ADD R9,2
+    CMP R0,R1
+    JLE Ciclo_RefreshDisplay
+	CALL VerificaOK
+    POP R2
+    POP R1
+    POP R0
+    RET
+
+LimpaPerifericosEntrada:
+    PUSH R0
+    PUSH R1
+    PUSH R2
+    PUSH R3
+    PUSH R4
+    PUSH R5
+    MOV R0, InputCodSeguranca
+    MOV R1, InputID
+    MOV R2, InputIncrementoBateria
+    MOV R3, InputTempo
+    MOV R4, InputTipoCarregamento
+    MOV R5,0
+    MOV [R0],R5
+    MOV [R1],R5
+    MOV [R2],R5
+    MOV [R3],R5
+    MOV [R4],R5
+    POP R5
+    POP R4
+    POP R3
+    POP R2
+    POP R1
+    POP R0
+    
+LimpaDisplay:
+    PUSH R0
+    PUSH R1
+    PUSH R2
+    MOV R0,InicioDisplay
+    MOV R1,FimDisplay
+Ciclo_RefreshDisplay:
+    MOV R2,0
+    MOV [R0],R2
+    ADD R0,2
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
 	CALL VerificaOK
