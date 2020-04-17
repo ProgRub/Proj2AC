@@ -491,7 +491,7 @@ ForneceEnergiaSemiRapido:
 	MOV R8, 100 ;coloca no registo 5 a constante 100
 	CMP R6, R8 ;compara o registo 0 com o registo 5
 	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
-	MOV [R5+BateriaCarro], R0 ;atualiza o valor da bateria do vehiculo
+	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
 	JEQ AtualizaPostoSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
