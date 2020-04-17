@@ -186,6 +186,26 @@ Display_Overflow:
 	String "                "
 	String " OK - continuar "
 
+PLACE 2780H
+Display_UltrapassaCargaMaxima:
+	String "                "
+	String " O CARREGAMENTO "
+	String "IRA ULTRAPASSAR "
+	String " A CARGA MAXIMA "
+	String "   DA BATERIA   "
+	String "                "
+	String " OK - continuar "
+	
+PLACE 2800H
+Display_TempoUltrapassa:
+	String "                "
+	String " NAO HA ENERGIA "
+	String " SUFICIENTE PARA"
+	String " O CARREGAMENTO "
+	String "   PRETENDIDO   "
+	String "                "
+	String " OK - continuar "
+	
 PLACE 0000H
 Inicio:
     MOV R0,Main
@@ -441,7 +461,7 @@ VerificaEscolhaTempoSuperiorNormal:
 	MOV R9, Normal
 	MUL R5, R9
 	CMP R5, R0
-	JGE EscolhaTempo ;volta a escolher o tempo
+	JV FimFunc3
 	RET
 
 VerificaEscolhaTempoSuperiorSemiRapido:
@@ -449,7 +469,7 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R9, Semirapido
 	MUL R5, R9
 	CMP R5, R1
-	JGE EscolhaTempo ;volta a escolher o tempo
+	JV FimFunc3
 	RET
 	
 VerificaEscolhaTempoSuperiorRapido:
@@ -457,14 +477,17 @@ VerificaEscolhaTempoSuperiorRapido:
 	MOV R9, Rapido
 	MUL R5, R9
 	CMP R5, R2
-	JGE EscolhaTempo ;volta a escolher o tempo
+	JV FimFunc4
 	RET
-		
+
+FimFunc4:
+	MOV R9, Display_UltrapassaCargaMaxima
+    CALL RefreshDisplay
+	JMP EscolhaTempo
 
 VerificaSaldo:
     MOV R7,R4
 	MUL R4, R3	;R4 contém o custo da operação de carregamento agora
-	JV Fim
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
     MOV R6,[R5+Saldo]
@@ -503,7 +526,7 @@ ForneceEnergiaNormal:
 	ADD R6, R7 ;soma o carregamento à bateria do vehiculo
 	MOV R8, 100 ;coloca no registo 5 a constante 100
 	CMP R6, R8 ;compara o registo 0 com o registo 5
-	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
+	JGT BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo 
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
@@ -518,11 +541,11 @@ ForneceEnergiaSemiRapido:
 	ADD R6, R7 ;soma o carregamento à bateria do vehiculo
 	MOV R8, 100 ;coloca no registo 5 a constante 100
 	CMP R6, R8 ;compara o registo 0 com o registo 5
-	JGE BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
+	JGT BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
 	SUB R4,1 ;subtrai ao tempo
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
-	JEQ AtualizaPostoSemiRapido ;salta para o "tag" AtualizaPostoSemiRapido
+	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaPostoSemiRapido
     JMP ForneceEnergiaSemiRapido ;salta para o "tag" ForneceEnergiaSemiRapido
 
 ForneceEnergiaRapido:
@@ -532,6 +555,8 @@ ForneceEnergiaRapido:
 BateriaCarregada:
 	MOV R6, 100 ;coloca no registo 0 a constante 100
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
+	MOV R9, Display_UltrapassaCargaMaxima
+    CALL RefreshDisplay
 	JMP AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
 	
 NaoForneceEnergia:
@@ -619,7 +644,7 @@ LimpaPerifericosEntrada:
     POP R2
     POP R1
     POP R0
-    
+    RET
 LimpaDisplay:
     PUSH R0
     PUSH R1
