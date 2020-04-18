@@ -781,84 +781,84 @@ FimF:
     RET
 
 EscreveNao:
-    MOV R2,78
-    ADD R1,1
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,97
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,111
-    MOVB [R1],R2
-    ADD R1,1
+    MOV R4,78
+    ADD R6,1
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    ADD R6,1
 CicloEspacos:
-    MOV R2,32
-    MOVB[R1],R2
-    ADD R1,1
+    MOV R4,32
+    MOVB[R6],R4
+    ADD R6,1
     SUB R3,1
     CMP R3,0
     JNE CicloEspacos
     RET
 
 EscreveFuncional:
-    MOV R2,70
-    ADD R1,1
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,117
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,110
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,99
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,105
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,111
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,110
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,97
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,108
-    MOVB [R1],R2
-    ADD R1,1
+    MOV R4,70
+    ADD R6,1
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,117
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,110
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,99
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,105
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,110
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,108
+    MOVB [R6],R4
+    ADD R6,1
     RET
 
 EscreveNao_Func:
-    MOV R2,78
-    ADD R1,1
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,97
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,111
-    MOVB [R1],R2
-    MOV R2,32
-    ADD R1,1
-    MOVB [R1],R2
-    MOV R2,70
-    ADD R1,1
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,117
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,110
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,99
-    MOVB [R1],R2
-    ADD R1,1
-    MOV R2,46
-    MOVB [R1],R2
+    MOV R4,78
+    ADD R6,1
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    MOV R4,32
+    ADD R6,1
+    MOVB [R6],R4
+    MOV R4,70
+    ADD R6,1
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,117
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,110
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,99
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,46
+    MOVB [R6],R4
     RET
 	
 Fim:
