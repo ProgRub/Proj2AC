@@ -236,6 +236,7 @@ Programa:
     CALL EscolhaCarregamento
 	JMP Programa
     RET
+
 InsereEnergia:
     PUSH R3
     PUSH R4
@@ -253,13 +254,13 @@ InicioInsereEnergia:
     JNE IncrementaNormal
     JMP FimFunc1
 IncrementaNormal:
-	MOV R9, Display_InsereEnergiaQuanta
-    CALL RefreshDisplay
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
 	CALL LimpaPerifericosEntrada
     MOV R5, CustoNormal
     CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
+	MOV R9, Display_InsereEnergiaQuanta
+    CALL RefreshDisplay
     ADD R0, R3 ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;se não ocorrer overflow, avançar para o display dos niveis de energia
@@ -267,6 +268,8 @@ IncrementaSemiRapido:
     MOV R5,CustoSemiRapido
     CMP R4,R5
     JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
+	MOV R9, Display_InsereEnergiaQuanta
+    CALL RefreshDisplay
     ADD R1,R3 ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
     JV OverflowBateria; se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o display dos niveis de energia
@@ -274,6 +277,8 @@ IncrementaRapido:
     MOV R5, CustoRapido
     CMP R4, R5
     JNE OpcaoInvalida ;verificar se escolheu carregar a bateria rapida, se não avançar
+	MOV R9, Display_InsereEnergiaQuanta
+    CALL RefreshDisplay
     ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o fim da função
