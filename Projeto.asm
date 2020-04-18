@@ -729,55 +729,55 @@ Ciclo_LimpaDisplay:
     RET
 
 Display_NiveisDeEnergia_InserirInformacao:
-    PUSH R0
-    PUSH R1
-    PUSH R2
     PUSH R3
-    MOV R0, Display_NiveisDeEnergia
-    MOV R1,Normal
-    CMP R0,R1
+    PUSH R4
+    PUSH R5
+    PUSH R6
+    MOV R5, Display_NiveisDeEnergia
+    MOV R6,Normal
+    CMP R0,R6
     JEQ NaoFuncionalNormal
-    MOV R1,22
-    ADD R1,R0
+    MOV R6,22
+    ADD R6,R5
     CALL EscreveFuncional
     JMP InfoSemiRapido
 NaoFuncionalNormal:
-    MOV R1,22
-    ADD R1,R0
+    MOV R6,22
+    ADD R6,R5
     CALL EscreveNao_Func
 InfoSemiRapido:
-    MOV R1,Semirapido
-    CMP R1,R1
+    MOV R6,Semirapido
+    CMP R1,R6
     JEQ NaoFuncionalSemiRapido
-    MOV R1,47
-    ADD R1,R0
+    MOV R6,47
+    ADD R6,R5
     CALL EscreveFuncional
     JMP InfoRapido
 NaoFuncionalSemiRapido:
-    MOV R1,42
-    ADD R1,R0
+    MOV R6,42
+    ADD R6,R5
     MOV R3,1
     CALL EscreveNao
     CALL EscreveFuncional
 InfoRapido:
-    MOV R1,Rapido
+    MOV R6,Rapido
     CMP R2,R1
     JEQ NaoFuncionalRapido
-    MOV R1,79
-    ADD R1,R0
+    MOV R6,79
+    ADD R6,R5
     CALL EscreveFuncional
     JMP FimF
 NaoFuncionalRapido:
-    MOV R1,72
-    ADD R1,R0
+    MOV R6,72
+    ADD R6,R5
     MOV R3,4
     CALL EscreveNao
     CALL EscreveFuncional
 FimF:
+    POP R6
+    POP R5
+    POP R4
     POP R3
-    POP R2
-    POP R1
-    POP R0
     RET
 
 EscreveNao:
