@@ -570,15 +570,17 @@ ForneceEnergiaSemiRapido:
 	MOV R7, Semirapido ;coloca no registo 1 o valor do carregamento sermi-rapido
 	ADD R6, R7 ;soma o carregamento à bateria do vehiculo
 	MOV R8, 100 ;coloca no registo 5 a constante 100
+	SUB R4,1 ;subtrai ao tempo
 	CMP R6, R8 ;compara o registo 0 com o registo 5
 	JGT BateriaCarregada ;se o valor do registo 0 for superior ou igual a 100, salta para o "tag" BateriaCarregada
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
-	SUB R4,1 ;subtrai ao tempo
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
 	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaPostoSemiRapido
     JMP ForneceEnergiaSemiRapido ;salta para o "tag" ForneceEnergiaSemiRapido
 
 ForneceEnergiaRapido:
+	MOV R9,1
+	MOV R4,0
 	JMP BateriaCarregada ;salta para o "tag" BateriaCarregada
 
 
@@ -600,9 +602,9 @@ Debito:
 	
 AtualizaValoresEnergia:
 	SUB R9, R4
+	MOV R4, R9
 	MUL R9,R3
 	CALL Debito
-	MOV R4, R9
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
 	MOV R8, CustoRapido ;coloca no registo 4 o custo do carregamento rapido
