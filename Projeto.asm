@@ -10,24 +10,24 @@ EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bat
 EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
 InicioDisplay EQU 0030H
-FimDisplay EQU 00AFH
+FimDisplay EQU 009FH
 
-;endereços de memória:
+;endereços de memória relativos aos inputs:
 OK                         EQU 00B0H     ;endereço do botão OK
 CANCEL                     EQU 00B2H     ;endereço do botão Cancel
-InputID                 EQU 00D0H     ;endereço onde inserir o ID do aluno
-InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do aluno
+InputID                 EQU 00D0H     ;endereço onde inserir o ID do cliente
+InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
 InputTipoCarregamento    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
 InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
 InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
 Base_Tabela_Dados EQU 1100H ;endereço do início da base de dados
-CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do aluno para ler o código de segurança
-Saldo EQU 04H ;aumento relativo ao inicio dos dados do aluno para ler o saldo
-BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do aluno para ler quanta bateria o carro do aluno tem
-Proximo EQU 08H ;salto a executar para ler os dados do próximo aluno
-Tamanho EQU 3 ;número de alunos na base de dados
+CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do cliente para ler o código de segurança
+Saldo EQU 04H ;aumento relativo ao inicio dos dados do cliente para ler o saldo
+BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
+Proximo EQU 08H ;salto a executar para ler os dados do próximo cliente
+Tamanho EQU 3 ;número de clientes na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
 
@@ -38,7 +38,7 @@ StackPointer EQU 8000H ;endereço da pilha
 ; *************************************************************
 
 PLACE 2000H
-Display_InputVerifyAluno:
+Display_InputVerifyCliente:
     String "  VERIFICACAO   "
     String "                "
     String "  INTRODUZA ID  "
@@ -229,9 +229,9 @@ Programa:
     CALL LimpaDisplay
     CALL InsereEnergia
     CALL NiveisDeEnergia
-    CALL Verificacao_Aluno
-	MOV R4, -1 ;mete em R4 o valor -1 para comparar com R10, o indice do aluno verificado (possivelmente)
-	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o aluno não está na base de dados e a verificação falhou
+    CALL Verificacao_Cliente
+	MOV R4, -1 ;mete em R4 o valor -1 para comparar com R10, o indice do cliente verificado (possivelmente)
+	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o cliente não está na base de dados e a verificação falhou
 	JEQ Programa ;se tal acontecer, volta-se ao inicio do programa
     CALL EscolhaCarregamento
 	JMP Programa
@@ -241,6 +241,7 @@ InsereEnergia:
     PUSH R4
     PUSH R5
     PUSH R6
+InicioInsereEnergia:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
     MOV R9, Display_InsereEnergia
@@ -286,7 +287,7 @@ OpcaoInvalida:
     MOV R9,MenuOpcaoInvalida
     CALL RefreshDisplay
 	CALL LimpaPerifericosEntrada
-    JMP InsereEnergia
+    JMP InicioInsereEnergia
 FimFunc1:
     POP R6
     POP R5
@@ -321,7 +322,6 @@ VerificaRapido:
     MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
     CMP R3,R7
     JNE FimFunc
-    CALL InsereEnergia
 FimFunc:
     CALL Display_NiveisDeEnergia_InserirInformacao
     MOV R9,Display_NiveisDeEnergia
@@ -333,7 +333,7 @@ FimFunc:
     POP R3
     RET
 
-Verificacao_Aluno:
+Verificacao_Cliente:
     PUSH R0
     PUSH R1
     PUSH R2
@@ -343,17 +343,17 @@ Verificacao_Aluno:
     PUSH R6
     PUSH R7
     PUSH R8
-    MOV R9, Display_InputVerifyAluno
+    MOV R9, Display_InputVerifyCliente
     CALL RefreshDisplay
-    MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do aluno que estamos a verifica e contém o ID deste
+    MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do cliente que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
-    MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do aluno
+    MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do cliente
     MOV R3, InputID ;R5 é o endereço de onde se lê o ID do utilizador
     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
     MOV R6, [R4] ;R8 é o código de segurança que o utilizador inseriu
 	CALL LimpaPerifericosEntrada
-Ciclo_Verify_Aluno:
+Ciclo_Verify_Cliente:
     MOV R3, [R0] ;R3 tem o valor do ID da tabela de base de dados a verificar
     MOV R4, [R0+R2] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
     CMP R5,R3 
@@ -362,7 +362,7 @@ Ciclo_Verify_Aluno:
     JNE VerificacaoFalhada ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
 	MOV R10, Proximo
 	SHR R1,1
-    MUL R10,R1 ;mete no registo 10 o indice do aluno verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
+    MUL R10,R1 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
 	MOV R9, Display_VerificacaoSucesso
     CALL RefreshDisplay
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
@@ -370,17 +370,16 @@ VerificacaoFalhada:
     MOV R10,-1
     ADD R1,2
     MOV R7,R1 ;R7 serve para verificar se o indice é igual ao tamanho
-    MOV R8,Tamanho ;R8 é o número de alunos na base de dados
+    MOV R8,Tamanho ;R8 é o número de clientes na base de dados
     SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
     CMP R7,R8 
     JEQ NaoVerificado ;chegou ao fim da base
     MOV R3,Proximo
-    ADD R0,R3 ;avanca a base para o proximo aluno a verificar
-    JMP Ciclo_Verify_Aluno
+    ADD R0,R3 ;avanca a base para o proximo cliente a verificar
+    JMP Ciclo_Verify_Cliente
 NaoVerificado:
     MOV R9, Display_VerificacaoFalhada
-    CALL RefreshDisplay
-	
+    CALL RefreshDispla	
 FimFunc2:
     POP R8
     POP R7
@@ -393,22 +392,6 @@ FimFunc2:
     POP R0
     RET
 	
-Fim:
-    JMP Fim
-	
-VerificaOK:
-    PUSH R0
-    PUSH R1
-CicloVerOK:
-    MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
-    MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
-    CMP R1,0
-    JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
-    MOV R1,0
-    MOVB [R0],R1
-    POP R1
-    POP R0
-    RET
 
 EscolhaCarregamento: 
     PUSH R3
@@ -446,6 +429,7 @@ EscolhaTempo:
 	JGT VerificaSaldo
 	MOV R9, MenuTempoInvalido
     CALL RefreshDisplay
+    JMP EscolhaTempo
 
 VerificaEscolhaTempoSuperior:
 	CMP R3,R6										;compara o registo 3 com o registo 0
@@ -461,7 +445,7 @@ VerificaEscolhaTempoSuperiorNormal:
 	MOV R9, Normal
 	MUL R5, R9
 	CMP R5, R0
-	JV FimFunc3
+	JV OverlowTempo
 	RET
 
 VerificaEscolhaTempoSuperiorSemiRapido:
@@ -469,7 +453,7 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R9, Semirapido
 	MUL R5, R9
 	CMP R5, R1
-	JV FimFunc3
+	JV OverlowTempo
 	RET
 	
 VerificaEscolhaTempoSuperiorRapido:
@@ -477,10 +461,10 @@ VerificaEscolhaTempoSuperiorRapido:
 	MOV R9, Rapido
 	MUL R5, R9
 	CMP R5, R2
-	JV FimFunc4
+	JV OverlowTempo
 	RET
 
-FimFunc4:
+OverlowTempo:
 	MOV R9, Display_UltrapassaCargaMaxima
     CALL RefreshDisplay
 	JMP EscolhaTempo
@@ -560,7 +544,7 @@ BateriaCarregada:
 	JMP AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
 	
 NaoForneceEnergia:
-    RET
+    JMP FimFunc3
 	
 AtualizaValoresEnergia:
 	MOV R4, R9
@@ -578,21 +562,22 @@ AtualizaPostoNormal:
 	MOV R6, Normal ;coloca no registo 4 a energia do carregamento normal por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R0, R6 ;subtrai o valor da energia do carregamento total à bateria do posto normal
-	JMP FimFunc3
+	JMP CarregamentoConcluido
 	
 AtualizaPostoSemiRapido:
 	MOV R6, Semirapido ;coloca no registo 4 a energia do carregamento semi-rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R1, R6  ;subtrai o valor da energia do carregamento total à bateria do posto semi-rapido
-	JMP FimFunc3
+	JMP CarregamentoConcluido
 
 AtualizaPostoRapido:
 	MOV R6, Rapido ;coloca no registo 4 a energia do carregamento rapido por hora
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
-FimFunc3:
+CarregamentoConcluido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
+FimFunc3:
     POP R8
     POP R7
     POP R6
@@ -600,6 +585,20 @@ FimFunc3:
     POP R4
     POP R3
 	RET
+    
+VerificaOK:
+    PUSH R0
+    PUSH R1
+CicloVerOK:
+    MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
+    MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
+    CMP R1,0
+    JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    MOV R1,0
+    MOVB [R0],R1
+    POP R1
+    POP R0
+    RET
 
 RefreshDisplay:
     PUSH R0
@@ -645,6 +644,7 @@ LimpaPerifericosEntrada:
     POP R1
     POP R0
     RET
+    
 LimpaDisplay:
     PUSH R0
     PUSH R1
@@ -794,3 +794,6 @@ EscreveNao_Func:
     MOV R2,46
     MOVB [R1],R2
     RET
+	
+Fim:
+    JMP Fim
