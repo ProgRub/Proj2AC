@@ -213,15 +213,6 @@ Inicio:
 PLACE 6000H
 Main:
     MOV SP, StackPointer
-    MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
-    MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
-    MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
-    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
-    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa
-    MOV R3,0 ; -----------------------------
-    MOV R4,0 ; limpa os registos
-    MOV R5,0 ; -----------------------------
     CALL Programa
     JMP Fim
 
@@ -238,10 +229,15 @@ Programa:
     RET
 
 InsereEnergia:
+    PUSH R0
+    PUSH R1
+    PUSH R2
     PUSH R3
     PUSH R4
     PUSH R5
     PUSH R6
+    PUSH R7
+    PUSH R8
 InicioInsereEnergia:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
@@ -249,6 +245,12 @@ InicioInsereEnergia:
     CALL RefreshDisplay
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
 	CALL LimpaPerifericosEntrada
+    MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV R0,[R6] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
+    MOV R1, [R7] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
+    MOV R2,[R8] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa
     MOV R5,4
     CMP R4,R5
     JNE IncrementaNormal
@@ -294,18 +296,38 @@ OpcaoInvalida:
 	CALL LimpaPerifericosEntrada
     JMP InicioInsereEnergia
 FimFunc1:
+    MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV [R6], R0
+    MOV [R7], R1
+    MOV [R8], R2
+    POP R8
+    POP R7
     POP R6
     POP R5
     POP R4
     POP R3
+    POP R2
+    POP R1
+    POP R0
     RET
 
 NiveisDeEnergia:
+    PUSH R0
+    PUSH R1
+    PUSH R2
     PUSH R3
     PUSH R4
     PUSH R5
     PUSH R6
-    PUSH R7    
+    PUSH R7   
+    MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
+    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
+    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa 
     MOV R3,0 ;R6 contará quantas bateria estiverem abaixo do nivel minimo
     MOV R4,Normal ;R7 contém o nivel minimo que a bateria normal deve ter para ser considerada funcional
     MOV R5,Semirapido ;R8 contém o nivel minimo que a bateria semirapida deve ter para ser considerada funcional
@@ -336,6 +358,9 @@ FimFunc:
     POP R5
     POP R4
     POP R3
+    POP R2
+    POP R1
+    POP R0
     RET
 
 Verificacao_Cliente:
@@ -384,7 +409,7 @@ VerificacaoFalhada:
     JMP Ciclo_Verify_Cliente
 NaoVerificado:
     MOV R9, Display_VerificacaoFalhada
-    CALL RefreshDispla	
+    CALL RefreshDisplay
 FimFunc2:
     POP R8
     POP R7
@@ -399,12 +424,21 @@ FimFunc2:
 	
 
 EscolhaCarregamento: 
+    PUSH R0
+    PUSH R1
+    PUSH R2
     PUSH R3
     PUSH R4
     PUSH R5
     PUSH R6
     PUSH R7
     PUSH R8
+    MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
+    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
+    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa 
 	MOV R6, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
 	MOV R7, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
 	MOV R8, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
@@ -582,6 +616,12 @@ AtualizaPostoRapido:
 CarregamentoConcluido:
 	MOV R9, MenuCarregamentoConcluido
     CALL RefreshDisplay
+    MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV [R6], R0
+    MOV [R7], R1
+    MOV [R8], R2
 FimFunc3:
     POP R8
     POP R7
@@ -589,6 +629,9 @@ FimFunc3:
     POP R5
     POP R4
     POP R3
+    POP R2
+    POP R1
+    POP R0
 	RET
     
 VerificaOK:
