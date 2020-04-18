@@ -328,7 +328,8 @@ NiveisDeEnergia:
     PUSH R4
     PUSH R5
     PUSH R6
-    PUSH R7   
+    PUSH R7
+	MOV R10,0	
     MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -350,7 +351,7 @@ VerificaSemiRapido:
     MOV R5,1
 VerificaRapido:
     CMP R2, R6
-    JGT FimFunc ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
+    JGE FimFunc ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
     MOV R6,1
     MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
@@ -471,50 +472,41 @@ EscolhaTempo:
     MOV R5, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]	;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALL LimpaPerifericosEntrada
-	CALL VerificaEscolhaTempoSuperior
-	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
-	JGT VerificaSaldo
-	MOV R9, MenuTempoInvalido
-    CALL RefreshDisplay
-    JMP EscolhaTempo
-
-VerificaEscolhaTempoSuperior:
 	CMP R3,R6										;compara o registo 3 com o registo 0
-	JEQ VerificaEscolhaTempoSuperiorNormal
-	CMP R3, R7										;compara o registo 3 com o registo 1
-	JEQ VerificaEscolhaTempoSuperiorSemiRapido
-	CMP R3, R8	
-	JEQ VerificaEscolhaTempoSuperiorRapido
-    RET
-
-VerificaEscolhaTempoSuperiorNormal:
+	JNE VerificaEscolhaTempoSuperiorSemiRapido
 	MOV R5, R4
 	MOV R9, Normal
 	MUL R5, R9
 	CMP R5, R0
 	JGT OverflowTempo
-	RET
-
+	JMP FimVerificacoes
 VerificaEscolhaTempoSuperiorSemiRapido:
+	CMP R3, R7										;compara o registo 3 com o registo 1
+	JNE VerificaEscolhaTempoSuperiorRapido
 	MOV R5, R4
 	MOV R9, Semirapido
 	MUL R5, R9
 	CMP R5, R1
 	JGT OverflowTempo
-	RET
-	
+	JMP FimVerificacoes
 VerificaEscolhaTempoSuperiorRapido:
 	MOV R5, R4
 	MOV R9, Rapido
 	MUL R5, R9
 	CMP R5, R2
 	JGT OverflowTempo
-	RET
+FimVerificacoes:
+	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
+	JGT VerificaSaldo
+	MOV R9, MenuTempoInvalido
+    CALL RefreshDisplay
+    JMP EscolhaTempo
+
 
 OverflowTempo:
 	MOV R9, Display_TempoUltrapassa
     CALL RefreshDisplay
-	JMP EscolhaTempo
+	JMP FimFunc3
 
 VerificaSaldo:
     MOV R7,R4
@@ -594,16 +586,26 @@ NaoForneceEnergia:
 	
 Debito:
 	MOV R6, [R5+Saldo]
-	SUB R6, R9
+	SUB R6, R7
 	MOV [R5+Saldo],R6 ;atualiza o saldo do utilizador 
 	MOV R9, MenuDebito
     CALL RefreshDisplay
 	RET	
 	
 AtualizaValoresEnergia:
-	SUB R9, R4
-	MOV R4, R9
-	MUL R9,R3
+	MOV R7,R9
+	CMP R4,0
+	JEQ Excedeu
+	JMP NaoExcedeu 
+	
+Excedeu:
+	MOV R9, Display_UltrapassaCargaMaxima
+    CALL RefreshDisplay
+
+NaoExcedeu:
+	SUB R7, R4
+	MOV R4, R7
+	MUL R7,R3
 	CALL Debito
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
@@ -770,7 +772,7 @@ InfoRapido:
 NaoFuncionalRapido:
     MOV R6,72
     ADD R6,R5
-    MOV R3,4
+    MOV R3,3
     CALL EscreveNao
     CALL EscreveFuncional
 FimF:
