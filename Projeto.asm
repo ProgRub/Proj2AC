@@ -488,7 +488,7 @@ VerificaEscolhaTempoSuperiorNormal:
 	MOV R9, Normal
 	MUL R5, R9
 	CMP R5, R0
-	JV OverlowTempo
+	JGT OverflowTempo
 	RET
 
 VerificaEscolhaTempoSuperiorSemiRapido:
@@ -496,7 +496,7 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R9, Semirapido
 	MUL R5, R9
 	CMP R5, R1
-	JV OverlowTempo
+	JGT OverflowTempo
 	RET
 	
 VerificaEscolhaTempoSuperiorRapido:
@@ -504,11 +504,11 @@ VerificaEscolhaTempoSuperiorRapido:
 	MOV R9, Rapido
 	MUL R5, R9
 	CMP R5, R2
-	JV OverlowTempo
+	JGT OverflowTempo
 	RET
 
-OverlowTempo:
-	MOV R9, Display_UltrapassaCargaMaxima
+OverflowTempo:
+	MOV R9, Display_TempoUltrapassa
     CALL RefreshDisplay
 	JMP EscolhaTempo
 
@@ -519,16 +519,13 @@ VerificaSaldo:
     ADD R5,R10
     MOV R6,[R5+Saldo]
 	CMP R4, R6	;compara o custo do carregamento com o saldo do utilizador
-	JLE Debito ;se a comparação for verdadeira, salta para o "tag" Debito
+	JLE ForneceEnergia ;se a comparação for verdadeira, salta para o "tag" Debito
 	MOV R9, MenuSaldoInsuficiente
     CALL RefreshDisplay
 	JMP NaoForneceEnergia	;salta para o "tag" NãoForneceEnergia
 	
-Debito:
-	MOV R9, MenuDebito
-    CALL RefreshDisplay
-	SUB R6, R4 ;é subtraido o custo da operação
-	MOV [R5+Saldo],R6 ;atualiza o saldo do utilizador 
+
+
 
 ForneceEnergia:
 	MOV R9, MenuInfoCarregamento
@@ -559,7 +556,9 @@ ForneceEnergiaNormal:
 	CMP R4,0 ;se o valor do registo 4 chegar a 0, atualiza os valores de energia do posto
 	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaPostoNormal
     JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergiaNormal
+	
 
+	
 ForneceEnergiaSemiRapido:
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
@@ -582,14 +581,23 @@ ForneceEnergiaRapido:
 BateriaCarregada:
 	MOV R6, 100 ;coloca no registo 0 a constante 100
 	MOV [R5+BateriaCarro], R6 ;atualiza o valor da bateria do vehiculo
-	MOV R9, Display_UltrapassaCargaMaxima
-    CALL RefreshDisplay
 	JMP AtualizaValoresEnergia ;salta para o "tag" AtualizaValoresEnergia
 	
 NaoForneceEnergia:
     JMP FimFunc3
 	
+Debito:
+	MOV R6, [R5+Saldo]
+	SUB R6, R9
+	MOV [R5+Saldo],R6 ;atualiza o saldo do utilizador 
+	MOV R9, MenuDebito
+    CALL RefreshDisplay
+	RET	
+	
 AtualizaValoresEnergia:
+	SUB R9, R4
+	MUL R9,R3
+	CALL Debito
 	MOV R4, R9
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
 	MOV R7, CustoSemiRapido ;coloca no registo 3 o custo do carregamento semi-rapido
