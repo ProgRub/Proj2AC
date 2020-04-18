@@ -220,6 +220,9 @@ Programa:
     CALL LimpaDisplay
     CALL InsereEnergia
     CALL NiveisDeEnergia
+    MOV R4,-1
+    CMP R10,R4
+    JEQ Programa    
     CALL Verificacao_Cliente
 	MOV R4, -1 ;mete em R4 o valor -1 para comparar com R10, o indice do cliente verificado (possivelmente)
 	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o cliente não está na base de dados e a verificação falhou
@@ -349,6 +352,7 @@ VerificaRapido:
     MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
     CMP R3,R7
     JNE FimFunc
+    MOV R10,-1
 FimFunc:
     CALL Display_NiveisDeEnergia_InserirInformacao
     MOV R9,Display_NiveisDeEnergia
