@@ -734,8 +734,8 @@ Display_NiveisDeEnergia_InserirInformacao:
     PUSH R2
     PUSH R3
     MOV R0, Display_NiveisDeEnergia
-    MOV R1,1
-    CMP R4,R1
+    MOV R1,Normal
+    CMP R0,R1
     JEQ NaoFuncionalNormal
     MOV R1,22
     ADD R1,R0
@@ -746,8 +746,8 @@ NaoFuncionalNormal:
     ADD R1,R0
     CALL EscreveNao_Func
 InfoSemiRapido:
-    MOV R1,1
-    CMP R5,R1
+    MOV R1,Semirapido
+    CMP R1,R1
     JEQ NaoFuncionalSemiRapido
     MOV R1,47
     ADD R1,R0
@@ -760,8 +760,8 @@ NaoFuncionalSemiRapido:
     CALL EscreveNao
     CALL EscreveFuncional
 InfoRapido:
-    MOV R1,1
-    CMP R6,R1
+    MOV R1,Rapido
+    CMP R2,R1
     JEQ NaoFuncionalRapido
     MOV R1,79
     ADD R1,R0
