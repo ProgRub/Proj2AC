@@ -17,6 +17,8 @@ OK                         EQU 00B0H     ;endereço do botão OK
 CANCEL                     EQU 00B2H     ;endereço do botão Cancel
 InputID                 EQU 00D0H     ;endereço onde inserir o ID do cliente
 InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
+InputSaldo                 EQU 00D4H     ;endereço onde inserir o ID do cliente
+InputBateria         EQU 00D5H     ;endereço onde inserir o código de segurança do cliente
 InputTipoCarregamento    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
 InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
 InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
@@ -27,7 +29,7 @@ CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do cliente para ler o
 Saldo EQU 04H ;aumento relativo ao inicio dos dados do cliente para ler o saldo
 BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
 Proximo EQU 08H ;salto a executar para ler os dados do próximo cliente
-Tamanho EQU 3 ;número de clientes na base de dados
+EnderecoTamanho EQU 10FEH ;endereço que contém o número de clientes na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
 PLACE 2000H
@@ -198,7 +200,106 @@ Display_TempoUltrapassa:
 	String "   PRETENDIDO   "
 	String "                "
 	String " OK - continuar "
-	
+
+PLACE 2880H
+Display_AlterarBaseDeDados:
+	String " BASE DE DADOS  "
+	String "Pretende fazer  "
+	String "alteracoes na   "
+	String "base de dados?  "
+	String "1- Sim          "
+	String "2- Nao          "
+	String " OK - continuar "
+
+PLACE 2900H
+Display_CriarOuAlterar:
+	String " BASE DE DADOS  "
+	String "Pretende criar  "
+	String "um cliente ou   "
+	String "alterar um?     "
+	String "1- Criar        "
+	String "2- Alterar Dados"
+	String " OK - continuar "
+
+PLACE 2980H
+Display_QualCliente:
+	String " BASE DE DADOS  "
+	String "Insira o ID e   "
+	String "codigo de seg.  "
+	String "do cliente que  "
+	String "pretende alterar"
+	String "                "
+	String " OK - continuar "
+
+PLACE 2A00H
+Display_InserirDadosParaAlterar:
+	String " BASE DE DADOS  "
+	String "Insira o ID,    "
+	String "codigo de seg., "
+	String "saldo e bateria "
+	String "do carro novos  "
+	String "para alterar    "
+	String " OK - continuar "
+
+PLACE 2A80H
+Display_DadosAlterados:
+	String " BASE DE DADOS  "
+	String "                "
+	String " DADOS ALTERADOS"
+	String "  COM SUCESSO!  "
+	String "                "
+	String "                "
+	String " OK - continuar "
+
+PLACE 2B00H
+Display_ClienteNaoEstaNaDatabase:
+	String " BASE DE DADOS  "
+	String "                "
+	String "   Cliente nao  "
+	String "  esta na base  "
+	String "    de dados    "
+	String "                "
+	String " OK - continuar "
+
+PLACE 2B80H
+Display_InserirDadosNovos:
+	String " BASE DE DADOS  "
+	String "Insira o ID,    "
+	String "codigo de seg., "
+	String "saldo e bateria "
+	String "do carro do novo"
+	String "    cliente     "
+	String " OK - continuar "
+
+PLACE 2C00H
+Display_SaldoInvalido:
+	String " BASE DE DADOS  "
+	String "                "
+	String " SALDO INVALIDO "
+	String "   (tem de ser  "
+	String "    positivo)   "
+	String "                "
+	String " OK - continuar "
+
+PLACE 2C80H
+Display_BateriaInvalida:
+	String " BASE DE DADOS  "
+	String "BATERIA DO CARRO" 
+	String "    INVALIDA    "
+	String "   (tem de ser  "
+	String "positiva e menor"
+	String "     que 100)   "
+	String " OK - continuar "
+
+PLACE 2D00H
+Display_NovoClienteCriado:
+	String " BASE DE DADOS  "
+	String "                "
+	String "  NOVO CLIENTE  "
+	String "     CRIADO!    "
+	String "                "
+	String "                "
+	String " OK - continuar "
 PLACE 0000H
 Inicio:
     MOV R0,Main
@@ -211,6 +312,7 @@ Main:
 
 Programa:
     CALL LimpaDisplay
+    CALL AlteraBaseDeDados
     CALL InsereEnergia
     CALL NiveisDeEnergia
     MOV R4,-1
@@ -224,9 +326,173 @@ Programa:
 	JMP Programa
     RET
 
+;*************************************************************************************************************************************
+;                                       ROTINA AlteraBaseDeDados
+;                       Responsável por inserir novos clientes ou alterar dados de clientes
+;                       na base de dados
+;**************************************************************************************************************************************
+
+AlteraBaseDeDados:
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ;
+    PUSH R3 ;
+    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;
+    PUSH R8 ;*********************************************************************************************************************
+AlterarOuNao:
+    MOV R2, InputTipoCarregamento
+    MOV R9, Display_AlterarBaseDeDados
+    CALL RefreshDisplay
+    MOVB R0,[R2]
+    CMP R0,1
+    JEQ CriarOuAlterar
+    CMP R0,2
+    JNE OpcaoInvalidaDatabase
+    JMP FimFunc4
+OpcaoInvalidaDatabase:
+    MOV R9, MenuOpcaoInvalida
+    CALL RefreshDisplay
+    JMP AlterarOuNao
+CriarOuAlterar:
+    CALL LimpaPerifericosEntrada
+    MOV R9, Display_CriarOuAlterar
+    CALL RefreshDisplay
+    MOVB R0,[R2]
+    CMP R0,1
+    JNE AlterarDados
+    MOV R8,Base_Tabela_Dados
+    MOV R9,EnderecoTamanho
+    MOV R10,[R9]
+    MOV R7,Proximo
+    MUL R10,R7
+    ADD R8,R10
+    MOV R5, InputID
+    MOV R6, InputCodSeguranca
+    MOV R7, InputSaldo
+    MOV R4, InputBateria
+    MOV R9, Display_InserirDadosNovos
+    CALL RefreshDisplay
+    MOV R0,[R5]
+    MOV R1,[R6]
+    MOV R2,[R7]
+    MOV R3,[R4]
+    CMP R2,0
+    JN SaldoInvalido
+    CMP R3,0
+    JN BateriaInvalida
+    MOV R7,100
+    CMP R3,R7
+    JGT BateriaInvalida
+    MOV R5,CodSeguranca
+    MOV R6,Saldo
+    MOV R7,BateriaCarro
+    MOV [R8],R0
+    MOV [R8+R5],R1
+    MOV [R8+R6],R2
+    MOV [R8+R7],R3
+    MOV R1,EnderecoTamanho
+    MOV R0,[R1]
+    ADD R0,1
+    MOV [R1],R0
+    MOV R9, Display_NovoClienteCriado
+    CALL RefreshDisplay
+    JMP FimFunc4
+AlterarDados:
+    CMP R0,2
+    JNE OpcaoInvalidaDatabase
+    CALL LimpaPerifericosEntrada
+    MOV R5,InputID
+    MOV R6, InputCodSeguranca
+    MOV R8, Base_Tabela_Dados
+    MOV R3,0
+    MOV R4,CodSeguranca
+    MOV R9, Display_QualCliente
+    CALL RefreshDisplay
+    MOV R0,[R5]
+    MOV R1,[R6]
+Ciclo_AlterarDados:
+    MOV R5, [R8] ;R3 tem o valor do ID da tabela de base de dados a verificar
+    MOV R6, [R8+R4] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
+    CMP R0,R5 
+    JNE ContinuarTabela ;se R7(ID do utilizador) for diferente de R3(ID a ser verificado na tabela), avançar para o próximo, se possivel
+    CMP R1,R6
+    JNE ContinuarTabela ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
+	MOV R10, Proximo
+	SHR R3,1
+    MUL R10,R3 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
+    JMP AlterarDadosCliente ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
+ContinuarTabela:
+    MOV R10,-1
+    ADD R3,2
+    MOV R2,R3 ;R7 serve para verificar se o indice é igual ao tamanho
+    MOV R9,EnderecoTamanho
+    MOV R7,[R9] ;R8 é o número de clientes na base de dados
+    SHR R2,1 ;dividir por 2, para a verificação do índice com o tamanho
+    CMP R2,R7
+    JEQ ClienteNaoPresente ;chegou ao fim da base
+    MOV R2,Proximo
+    ADD R8,R2 ;avanca a base para o proximo cliente a verificar
+    JMP Ciclo_AlterarDados
+ClienteNaoPresente:
+    MOV R9, Display_ClienteNaoEstaNaDatabase ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP FimFunc4
+AlterarDadosCliente:
+    MOV R5, InputID
+    MOV R6, InputCodSeguranca
+    MOV R7, InputSaldo
+    MOV R4, InputBateria
+    MOV R9, Display_InserirDadosParaAlterar
+    CALL RefreshDisplay
+    CALL LimpaPerifericosEntrada
+    MOV R0,[R5]
+    MOV R1,[R6]
+    MOV R2,[R7]
+    MOV R3,[R4]
+    CMP R2,0
+    JN SaldoInvalido
+    CMP R3,0
+    JN BateriaInvalida
+    MOV R7,100
+    CMP R3,R7
+    JGT BateriaInvalida
+    ADD R8,R10
+    MOV R6,CodSeguranca
+    MOV R4,BateriaCarro
+    MOV R7,Saldo
+    MOV [R8],R0
+    MOV [R8+R6],R1
+    MOV [R8+R7],R2
+    MOV [R8+R4],R3
+    MOV R9,Display_DadosAlterados
+    CALL RefreshDisplay
+    JMP FimFunc4
+SaldoInvalido:
+    MOV R9, Display_SaldoInvalido
+    CALL RefreshDisplay
+    JMP AlterarOuNao
+BateriaInvalida:
+    MOV R9, Display_BateriaInvalida
+    CALL RefreshDisplay
+    JMP AlterarOuNao
+FimFunc4:
+    POP R8 ;*********************************************************************************************************************
+    POP R7 ;
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;
+    POP R2 ;
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
+    RET
+
 ;***********************************************************************************************************************************
-;           ROTINA InsereEnergia
-;   Responsável por recarregar as baterias dos postos, se o utilizador assim desejar
+;                                   ROTINA InsereEnergia
+;                   Responsável por recarregar as baterias dos postos, se o utilizador assim desejar
 ;***********************************************************************************************************************************
 
 InsereEnergia:
@@ -411,7 +677,8 @@ VerificacaoFalhada:
     MOV R10,-1
     ADD R1,2
     MOV R7,R1 ;R7 serve para verificar se o indice é igual ao tamanho
-    MOV R8,Tamanho ;R8 é o número de clientes na base de dados
+    MOV R9,EnderecoTamanho
+    MOV R8,[R9] ;R8 é o número de clientes na base de dados
     SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
     CMP R7,R8 
     JEQ NaoVerificado ;chegou ao fim da base
@@ -717,25 +984,33 @@ FimRefreshDiplay:
 LimpaPerifericosEntrada:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
-    PUSH R2 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R2 ;
     PUSH R3 ;
-    PUSH R4 ;
-    PUSH R5 ;*********************************************************************************************************************
+    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;*********************************************************************************************************************
     MOV R0, InputCodSeguranca
     MOV R1, InputID
     MOV R2, InputIncrementoBateria
     MOV R3, InputTempo
     MOV R4, InputTipoCarregamento
-    MOV R5,0
-    MOV [R0],R5
-    MOV [R1],R5
-    MOV [R2],R5
-    MOV [R3],R5
-    MOV [R4],R5
-    POP R5 ;*********************************************************************************************************************
-    POP R4 ;
+    MOV R5, InputSaldo
+    MOV R6, InputBateria
+    MOV R7,0
+    MOV [R0],R7
+    MOV [R1],R7
+    MOV [R2],R7
+    MOV [R3],R7
+    MOV [R4],R7
+    MOV [R5],R7
+    MOV [R6],R7
+    POP R7 ;*********************************************************************************************************************
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
     POP R3 ;
-    POP R2 ; Retira da pilha os registos guardados no início da rotina
+    POP R2 ;
     POP R1 ;
     POP R0 ;*********************************************************************************************************************
     RET
