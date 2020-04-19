@@ -292,8 +292,6 @@ IncrementaRapido:
 OverflowBateria:
     MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    MOV R6,0
-    MOV [R4],R6
     JMP FimFunc1
 OpcaoInvalida:
     MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
@@ -528,9 +526,6 @@ VerificaSaldo:
 	MOV R9, MenuSaldoInsuficiente ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	JMP NaoForneceEnergia	;salta para o "tag" NãoForneceEnergia
-	
-
-
 
 ForneceEnergia:
 	MOV R9, MenuInfoCarregamento ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
@@ -562,8 +557,6 @@ ForneceEnergiaNormal:
 	JEQ AtualizaValoresEnergia ;salta para o "tag" AtualizaPostoNormal
     JMP ForneceEnergiaNormal ;salta para o "tag" ForneceEnergiaNormal
 	
-
-	
 ForneceEnergiaSemiRapido:
     MOV R5, Base_Tabela_Dados
     ADD R5,R10
@@ -583,7 +576,6 @@ ForneceEnergiaRapido:
 	MOV R9,1
 	MOV R4,0
 	JMP BateriaCarregada ;salta para o "tag" BateriaCarregada
-
 
 BateriaCarregada:
 	MOV R6, 100 ;coloca no registo 0 a constante 100
