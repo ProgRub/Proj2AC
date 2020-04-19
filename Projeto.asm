@@ -447,11 +447,11 @@ AlterarDadosCliente:
     MOV R4, InputBateria
     MOV R9, Display_InserirDadosParaAlterar
     CALL RefreshDisplay
-    CALL LimpaPerifericosEntrada
     MOV R0,[R5]
     MOV R1,[R6]
     MOV R2,[R7]
     MOV R3,[R4]
+    CALL LimpaPerifericosEntrada
     CMP R2,0
     JLT SaldoInvalido
     CMP R3,0
@@ -518,6 +518,9 @@ InicioInsereEnergia:
     MOV R0,[R6] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
     MOV R1, [R7] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
     MOV R2,[R8] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa
+    MOV R6,R0
+    MOV R7,R1
+    MOV R8,R2
     MOV R5,4
     CMP R4,R5
     JNE IncrementaNormal
@@ -532,7 +535,8 @@ IncrementaNormal:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R0, R3 ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
-    JV OverflowBateria ;se ocorrer overflow informar
+    CMP R0, 0
+    JLT OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;se não ocorrer overflow, avançar para o display dos niveis de energia
 IncrementaSemiRapido:
     MOV R5,CustoSemiRapido
@@ -543,7 +547,8 @@ IncrementaSemiRapido:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R1,R3 ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
-    JV OverflowBateria; se ocorrer overflow informar
+    CMP R1,0
+    JLT OverflowBateria; se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o display dos niveis de energia
 IncrementaRapido:
     MOV R5, CustoRapido
@@ -554,13 +559,17 @@ IncrementaRapido:
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
-    JV OverflowBateria ;se ocorrer overflow informar
+    CMP R2,0
+    JLT OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o fim da função
 OverflowBateria:
     MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP FimFunc1
 OpcaoInvalida:
+    MOV R0,R6
+    MOV R1,R7
+    MOV R2,R8
     MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	CALL LimpaPerifericosEntrada
