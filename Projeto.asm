@@ -30,13 +30,6 @@ Proximo EQU 08H ;salto a executar para ler os dados do próximo cliente
 Tamanho EQU 3 ;número de clientes na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
-
-; ********************IMPORTANTE*******************************
-; R0 - Valor da bateria do posto normal
-; R1 - Valor da bateria do posto semirapido
-; R2 - Valor da bateria do posto rapido
-; *************************************************************
-
 PLACE 2000H
 Display_InputVerifyCliente:
     String "  VERIFICACAO   "
@@ -74,7 +67,7 @@ Display_InsereEnergia:
     String "1)- Normal      "
     String "2)- Semi-Rapido "
     String "3)- Rapido      "
-    String "4)- Fechar Posto"
+    String "4)- Avancar     "
 	String " OK - continuar "
 
 PLACE 2200H
@@ -231,20 +224,25 @@ Programa:
 	JMP Programa
     RET
 
+;***********************************************************************************************************************************
+;           ROTINA InsereEnergia
+;   Responsável por recarregar as baterias dos postos, se o utilizador assim desejar
+;***********************************************************************************************************************************
+
 InsereEnergia:
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    PUSH R7
-    PUSH R8
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ;
+    PUSH R3 ;
+    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;
+    PUSH R8 ;*********************************************************************************************************************
 InicioInsereEnergia:
     MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
-    MOV R9, Display_InsereEnergia
-    CALL RefreshDisplay
+    MOV R9, Display_InsereEnergia ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
 	CALL LimpaPerifericosEntrada
     MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
@@ -262,8 +260,8 @@ IncrementaNormal:
     MOV R5, CustoNormal
     CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
-	MOV R9, Display_InsereEnergiaQuanta
-    CALL RefreshDisplay
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R0, R3 ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
@@ -273,8 +271,8 @@ IncrementaSemiRapido:
     MOV R5,CustoSemiRapido
     CMP R4,R5
     JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
-	MOV R9, Display_InsereEnergiaQuanta
-    CALL RefreshDisplay
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R1,R3 ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
@@ -284,22 +282,22 @@ IncrementaRapido:
     MOV R5, CustoRapido
     CMP R4, R5
     JNE OpcaoInvalida ;verificar se escolheu carregar a bateria rapida, se não avançar
-	MOV R9, Display_InsereEnergiaQuanta
-    CALL RefreshDisplay
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
     ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
     JV OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o fim da função
 OverflowBateria:
-    MOV R9, Display_Overflow
-    CALL RefreshDisplay
+    MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R6,0
     MOV [R4],R6
     JMP FimFunc1
 OpcaoInvalida:
-    MOV R9,MenuOpcaoInvalida
-    CALL RefreshDisplay
+    MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	CALL LimpaPerifericosEntrada
     JMP InicioInsereEnergia
 FimFunc1:
@@ -309,27 +307,27 @@ FimFunc1:
     MOV [R6], R0
     MOV [R7], R1
     MOV [R8], R2
-    POP R8
-    POP R7
-    POP R6
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
+    POP R8 ;*********************************************************************************************************************
+    POP R7 ;
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;
+    POP R2 ;
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
     RET
 
 NiveisDeEnergia:
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    PUSH R7
-	MOV R10,0	
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ;
+    PUSH R3 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R4 ;
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;*********************************************************************************************************************
+	MOV R10,0
     MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -343,47 +341,44 @@ NiveisDeEnergia:
     CMP R0,R4
     JGE VerificaSemiRapido ;se verificarmos que a bateria normal tem o nivel minimo, verificamos as restantes
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
-    MOV R4,1
 VerificaSemiRapido:
     CMP R1,R5
     JGE VerificaRapido ;se verificarmos que a bateria semirapida tem o nivel minimo, verificamos a bateria rapida
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
-    MOV R5,1
 VerificaRapido:
     CMP R2, R6
     JGE FimFunc ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
     ADD R3,1 ;caso contrario, adicionamos 1 ao contador
-    MOV R6,1
     MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
     CMP R3,R7
     JNE FimFunc
     MOV R10,-1
 FimFunc:
+    MOV R9,Display_NiveisDeEnergia ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     CALL Display_NiveisDeEnergia_InserirInformacao
-    MOV R9,Display_NiveisDeEnergia
-    CALL RefreshDisplay
-    POP R7
-    POP R6
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
+    POP R7 ;*********************************************************************************************************************
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;
+    POP R2 ;
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
     RET
 
 Verificacao_Cliente:
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    PUSH R7
-    PUSH R8
-    MOV R9, Display_InputVerifyCliente
-    CALL RefreshDisplay
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ;
+    PUSH R3 ;
+    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;
+    PUSH R8 ;*********************************************************************************************************************
+    MOV R9, Display_InputVerifyCliente ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do cliente que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do cliente
@@ -402,8 +397,8 @@ Ciclo_Verify_Cliente:
 	MOV R10, Proximo
 	SHR R1,1
     MUL R10,R1 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
-	MOV R9, Display_VerificacaoSucesso
-    CALL RefreshDisplay
+	MOV R9, Display_VerificacaoSucesso ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
 VerificacaoFalhada:
     MOV R10,-1
@@ -417,31 +412,31 @@ VerificacaoFalhada:
     ADD R0,R3 ;avanca a base para o proximo cliente a verificar
     JMP Ciclo_Verify_Cliente
 NaoVerificado:
-    MOV R9, Display_VerificacaoFalhada
-    CALL RefreshDisplay
+    MOV R9, Display_VerificacaoFalhada ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 FimFunc2:
-    POP R8
-    POP R7
-    POP R6
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
+    POP R8 ;*********************************************************************************************************************
+    POP R7 ;
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;
+    POP R2 ;
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
     RET
 	
 
 EscolhaCarregamento: 
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    PUSH R7
-    PUSH R8
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ;
+    PUSH R3 ;
+    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5 ;
+    PUSH R6 ;
+    PUSH R7 ;
+    PUSH R8 ;*********************************************************************************************************************
     MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -451,9 +446,9 @@ EscolhaCarregamento:
 	MOV R6, CustoNormal								;coloca no registo 0 o valor do custo do carregamento do tipo normal
 	MOV R7, CustoSemiRapido							;coloca no registo 1 o valor do custo do carregamento do tipo semi-rápido
 	MOV R8, CustoRapido								;coloca no registo 2 o valor do custo do carregamento do tipo rápido
-	MOV R9, MenuEscolheCarregamento
+	MOV R9, MenuEscolheCarregamento ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     MOV R5, InputTipoCarregamento ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
-    CALL RefreshDisplay
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	MOVB R3, [R5]					                ;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
 	CALL LimpaPerifericosEntrada
 	CMP R3, R6										;compara o registo 3 com o registo 0
@@ -462,13 +457,13 @@ EscolhaCarregamento:
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
 	CMP R3, R8										;compara o registo 3 com o registo 2
 	JEQ EscolhaTempo								;verifica se a comparação anterior é verdadeira
-	MOV R9, MenuOpcaoInvalida
-    CALL RefreshDisplay
+	MOV R9, MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	JMP EscolhaCarregamento							;volta para o menu inicial
 
 EscolhaTempo: 
-	MOV R9, MenuEscolherTempo
-    CALL RefreshDisplay
+	MOV R9, MenuEscolherTempo ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputTempo   ;coloca no registo 6 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]	;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALL LimpaPerifericosEntrada
@@ -478,7 +473,7 @@ EscolhaTempo:
 	MOV R9, Normal
 	MUL R5, R9
 	CMP R5, R0
-	JGT OverflowTempo
+	JGT SemBateriaParaCarregamento
 	JMP FimVerificacoes
 VerificaEscolhaTempoSuperiorSemiRapido:
 	CMP R3, R7										;compara o registo 3 com o registo 1
@@ -487,25 +482,25 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MOV R9, Semirapido
 	MUL R5, R9
 	CMP R5, R1
-	JGT OverflowTempo
+	JGT SemBateriaParaCarregamento
 	JMP FimVerificacoes
 VerificaEscolhaTempoSuperiorRapido:
 	MOV R5, R4
 	MOV R9, Rapido
 	MUL R5, R9
 	CMP R5, R2
-	JGT OverflowTempo
+	JGT SemBateriaParaCarregamento
 FimVerificacoes:
 	CMP R4, 0		;se o valor do registo 4 for superior a 0, verifica o saldo do utilizador
 	JGT VerificaSaldo
-	MOV R9, MenuTempoInvalido
-    CALL RefreshDisplay
+	MOV R9, MenuTempoInvalido ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP EscolhaTempo
 
 
-OverflowTempo:
-	MOV R9, Display_TempoUltrapassa
-    CALL RefreshDisplay
+SemBateriaParaCarregamento:
+	MOV R9, Display_TempoUltrapassa ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	JMP FimFunc3
 
 VerificaSaldo:
@@ -516,16 +511,16 @@ VerificaSaldo:
     MOV R6,[R5+Saldo]
 	CMP R4, R6	;compara o custo do carregamento com o saldo do utilizador
 	JLE ForneceEnergia ;se a comparação for verdadeira, salta para o "tag" Debito
-	MOV R9, MenuSaldoInsuficiente
-    CALL RefreshDisplay
+	MOV R9, MenuSaldoInsuficiente ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	JMP NaoForneceEnergia	;salta para o "tag" NãoForneceEnergia
 	
 
 
 
 ForneceEnergia:
-	MOV R9, MenuInfoCarregamento
-    CALL RefreshDisplay
+	MOV R9, MenuInfoCarregamento ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R4,R7
 	MOV R9,R7
 	MOV R6, CustoNormal ;coloca no registo 2 o custo do carregamento normal
@@ -588,8 +583,8 @@ Debito:
 	MOV R6, [R5+Saldo]
 	SUB R6, R7
 	MOV [R5+Saldo],R6 ;atualiza o saldo do utilizador 
-	MOV R9, MenuDebito
-    CALL RefreshDisplay
+	MOV R9, MenuDebito ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	RET	
 	
 AtualizaValoresEnergia:
@@ -599,8 +594,8 @@ AtualizaValoresEnergia:
 	JMP NaoExcedeu 
 	
 Excedeu:
-	MOV R9, Display_UltrapassaCargaMaxima
-    CALL RefreshDisplay
+	MOV R9, Display_UltrapassaCargaMaxima ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 
 NaoExcedeu:
 	SUB R7, R4
@@ -634,8 +629,8 @@ AtualizaPostoRapido:
 	MUL R6, R4 ;coloca no registo 6 a energia do carregamento total
 	SUB R2, R6  ;subtrai o valor da energia do carregamento total à bateria do posto rapido
 CarregamentoConcluido:
-	MOV R9, MenuCarregamentoConcluido
-    CALL RefreshDisplay
+	MOV R9, MenuCarregamentoConcluido ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -643,20 +638,21 @@ CarregamentoConcluido:
     MOV [R7], R1
     MOV [R8], R2
 FimFunc3:
-    POP R8
-    POP R7
-    POP R6
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
+    POP R8 ;*********************************************************************************************************************
+    POP R7 ;
+    POP R6 ;
+    POP R5 ;
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;
+    POP R2 ;
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
 	RET
     
 VerificaOK:
-    PUSH R0
-    PUSH R1
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
+            ;*********************************************************************************************************************
 CicloVerOK:
     MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
     MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
@@ -664,14 +660,16 @@ CicloVerOK:
     JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
     MOV R1,0
     MOVB [R0],R1
-    POP R1
-    POP R0
+    POP R1  ;*********************************************************************************************************************
+    POP R0  ; Retira da pilha os registos guardados no início da rotina
+            ;*********************************************************************************************************************
     RET
 
 RefreshDisplay:
-    PUSH R0
-    PUSH R1
-    PUSH R2
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3 ;*********************************************************************************************************************
     MOV R0,InicioDisplay
     MOV R1,FimDisplay
 Ciclo_RefreshDisplay:
@@ -681,19 +679,28 @@ Ciclo_RefreshDisplay:
     ADD R9,2
     CMP R0,R1
     JLE Ciclo_RefreshDisplay
+    MOV R3, Display_NiveisDeEnergia
+    MOV R0,InicioDisplay
+    SUB R1,R0
+    ADD R1,1
+    ADD R3,R1
+    CMP R9,R3
+    JEQ FimRefreshDiplay
 	CALL VerificaOK
-    POP R2
-    POP R1
-    POP R0
+FimRefreshDiplay:
+    POP R3 ;*********************************************************************************************************************
+    POP R2 ;
+    POP R1 ; Retira da pilha os registos guardados no início da rotina
+    POP R0 ;*********************************************************************************************************************
     RET
 
 LimpaPerifericosEntrada:
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ;
+    PUSH R2 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3 ;
+    PUSH R4 ;
+    PUSH R5 ;*********************************************************************************************************************
     MOV R0, InputCodSeguranca
     MOV R1, InputID
     MOV R2, InputIncrementoBateria
@@ -705,18 +712,18 @@ LimpaPerifericosEntrada:
     MOV [R2],R5
     MOV [R3],R5
     MOV [R4],R5
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
+    POP R5 ;*********************************************************************************************************************
+    POP R4 ;
+    POP R3 ;
+    POP R2 ; Retira da pilha os registos guardados no início da rotina
+    POP R1 ;
+    POP R0 ;*********************************************************************************************************************
     RET
     
 LimpaDisplay:
-    PUSH R0
-    PUSH R1
-    PUSH R2
+    PUSH R0 ;*********************************************************************************************************************
+    PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R2 ;*********************************************************************************************************************
     MOV R0,InicioDisplay
     MOV R1,FimDisplay
 Ciclo_LimpaDisplay:
@@ -725,17 +732,17 @@ Ciclo_LimpaDisplay:
     ADD R0,1
     CMP R0,R1
     JLE Ciclo_LimpaDisplay
-    POP R2
-    POP R1
-    POP R0
+    POP R2 ;*********************************************************************************************************************
+    POP R1 ; Retira da pilha os registos guardados no início da rotina
+    POP R0 ;*********************************************************************************************************************
     RET
 
 Display_NiveisDeEnergia_InserirInformacao:
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    MOV R5, Display_NiveisDeEnergia
+    PUSH R3 ;*********************************************************************************************************************
+    PUSH R4 ;
+    PUSH R5 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R6 ;*********************************************************************************************************************
+    MOV R5, InicioDisplay
     MOV R4,Normal
     CMP R0,R4
     JLT NaoFuncionalNormal
@@ -776,10 +783,11 @@ NaoFuncionalRapido:
     CALL EscreveNao
     CALL EscreveFuncional
 FimF:
-    POP R6
-    POP R5
-    POP R4
-    POP R3
+    CALL VerificaOK
+    POP R6 ;*********************************************************************************************************************
+    POP R5 ;*********************************************************************************************************************
+    POP R4 ; Retira da pilha os registos guardados no início da rotina
+    POP R3 ;*********************************************************************************************************************
     RET
 
 EscreveNao:
