@@ -220,7 +220,7 @@ Programa:
 	MOV R4, -1 ;mete em R4 o valor -1 para comparar com R10, o indice do cliente verificado (possivelmente)
 	CMP R10, R4 ;se R10 for igual a -1 (R4), significa que o cliente não está na base de dados e a verificação falhou
 	JEQ Programa ;se tal acontecer, volta-se ao inicio do programa
-    CALL EscolhaCarregamento
+    CALL Carregamento
 	JMP Programa
     RET
 
@@ -318,6 +318,10 @@ FimFunc1:
     POP R0 ;*********************************************************************************************************************
     RET
 
+;**********************************************************************************************************************************************
+;                       ROTINA NiveisDeEnergia
+;           Responsável por mostrar ao utilizador quais dos postos estão funcionais ou não funcionais
+;**********************************************************************************************************************************************
 NiveisDeEnergia:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
@@ -367,6 +371,11 @@ FimFunc:
     POP R0 ;*********************************************************************************************************************
     RET
 
+;*************************************************************************************************************************************************
+;                                       ROTINA Verificacao_Cliente
+;                       Responsável por receber o ID e código de segurança do utilizador e compará-los
+;                       com os valores presentes na base de dados para ver se pode efetuar um carregamento
+;*************************************************************************************************************************************************
 Verificacao_Cliente:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
@@ -426,8 +435,12 @@ FimFunc2:
     POP R0 ;*********************************************************************************************************************
     RET
 	
-
-EscolhaCarregamento: 
+;***************************************************************************************************************************************************
+;                           ROTINA Carregamento
+;                   Responsável por efetuar o carregamento do carro do cliente previamente autorizado
+;                   efetuando as verificações necessárias e atualizando os postos
+;***************************************************************************************************************************************************
+Carregamento: 
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
     PUSH R2 ;
@@ -437,6 +450,7 @@ EscolhaCarregamento:
     PUSH R6 ;
     PUSH R7 ;
     PUSH R8 ;*********************************************************************************************************************
+EscolhaCarregamento:
     MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -649,6 +663,10 @@ FimFunc3:
     POP R0 ;*********************************************************************************************************************
 	RET
     
+;******************************************************************************************************************************************
+;                                       ROTINA VerificaOK
+;                       Responsável por registar que o utilizador "carregou" no OK
+;******************************************************************************************************************************************
 VerificaOK:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
@@ -665,6 +683,11 @@ CicloVerOK:
             ;*********************************************************************************************************************
     RET
 
+;***************************************************************************************************************************************
+;                                   ROTINA RefreshDisplay
+;                       Responsável por atualizar o display que o utilizador vê consoante o 
+;                       display a mostrar, indicado pelo registo R9
+;***************************************************************************************************************************************
 RefreshDisplay:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
@@ -694,6 +717,11 @@ FimRefreshDiplay:
     POP R0 ;*********************************************************************************************************************
     RET
 
+;******************************************************************************************************************************************
+;                               ROTINA LimpaPerifericosEntrada
+;                       Esta rotina, como o nome indica, "limpa" os endereços de onde se lê
+;                       os dados que o utilizador insira
+;******************************************************************************************************************************************
 LimpaPerifericosEntrada:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ;
@@ -720,6 +748,11 @@ LimpaPerifericosEntrada:
     POP R0 ;*********************************************************************************************************************
     RET
     
+;**********************************************************************************************************************************
+;                                       ROTINA LimpaDisplay
+;                       Como o nome indica, "limpa" o display mostrado ao utilizador,
+;                       preenchendo-o com espaços
+;**********************************************************************************************************************************
 LimpaDisplay:
     PUSH R0 ;*********************************************************************************************************************
     PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
@@ -737,6 +770,12 @@ Ciclo_LimpaDisplay:
     POP R0 ;*********************************************************************************************************************
     RET
 
+;*********************************************************************************************************************************************
+;                                           ROTINA Display_NiveisDeEnergia_InserirInformacao
+;                           Responsável por verificar os valores das baterias dos postos e escrever
+;                           no display mostrado ao utilizador o estado dos postos conforme os valores
+;                           das baterias (Funcional indica que a bateria está acima do valor mínimo de um carregamento de uma hora)
+;*********************************************************************************************************************************************
 Display_NiveisDeEnergia_InserirInformacao:
     PUSH R3 ;*********************************************************************************************************************
     PUSH R4 ;
@@ -790,6 +829,12 @@ FimF:
     POP R3 ;*********************************************************************************************************************
     RET
 
+;******************************************************************************************************************************************
+;                           ROTINA EscreveNao
+;                   Como o nome indica, esta rotina é responsável por escrever
+;                   a palavra "Nao" através do código ASCII e avançar para a
+;                   próxima linha, através de espaços
+;******************************************************************************************************************************************
 EscreveNao:
     MOV R4,78
     ADD R6,1
@@ -810,6 +855,11 @@ CicloEspacos:
     JNE CicloEspacos
     RET
 
+;*************************************************************************************************************************************
+;                                           ROTINA EscreveFuncional
+;                       Semelhante à anterior, só que escreve "Funcional" em vez de "Nao"
+;                       e não faz parágrafo, ao contrário da anterior
+;*************************************************************************************************************************************
 EscreveFuncional:
     MOV R4,70
     ADD R6,1
@@ -841,6 +891,11 @@ EscreveFuncional:
     ADD R6,1
     RET
 
+;********************************************************************************************************************************************
+;                                               ROTINA EscreveNao_Func
+;                               Semelhante às anteriores, só que esta escreve "Nao Func.".
+;                               Só é utilizada para demonstrar que o posto normal não está operacional
+;********************************************************************************************************************************************
 EscreveNao_Func:
     MOV R4,78
     ADD R6,1
