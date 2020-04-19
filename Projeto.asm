@@ -399,7 +399,7 @@ CriarOuAlterar:
     MOV [R1],R0
     MOV R9, Display_NovoClienteCriado
     CALL RefreshDisplay
-    JMP FimFunc4
+    JMP AlterarOuNao
 AlterarDados:
     CMP R0,2
     JNE OpcaoInvalidaDatabase
@@ -453,12 +453,13 @@ AlterarDadosCliente:
     MOV R2,[R7]
     MOV R3,[R4]
     CMP R2,0
-    JN SaldoInvalido
+    JLT SaldoInvalido
     CMP R3,0
-    JN BateriaInvalida
+    JLT BateriaInvalida
     MOV R7,100
     CMP R3,R7
     JGT BateriaInvalida
+    MOV R8,Base_Tabela_Dados
     ADD R8,R10
     MOV R6,CodSeguranca
     MOV R4,BateriaCarro
@@ -469,7 +470,7 @@ AlterarDadosCliente:
     MOV [R8+R4],R3
     MOV R9,Display_DadosAlterados
     CALL RefreshDisplay
-    JMP FimFunc4
+    JMP AlterarOuNao
 SaldoInvalido:
     MOV R9, Display_SaldoInvalido
     CALL RefreshDisplay
