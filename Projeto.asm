@@ -563,13 +563,13 @@ IncrementaRapido:
     JLT OverflowBateria ;se ocorrer overflow informar
     JMP FimFunc1 ;avançar para o fim da função
 OverflowBateria:
+	MOV R0,R6
+    MOV R1,R7
+    MOV R2,R8
     MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP FimFunc1
 OpcaoInvalida:
-    MOV R0,R6
-    MOV R1,R7
-    MOV R2,R8
     MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	CALL LimpaPerifericosEntrada
