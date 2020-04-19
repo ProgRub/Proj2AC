@@ -18,7 +18,7 @@ CANCEL                     EQU 00B2H     ;endereço do botão Cancel
 InputID                 EQU 00D0H     ;endereço onde inserir o ID do cliente
 InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
 InputSaldo                 EQU 00D4H     ;endereço onde inserir o ID do cliente
-InputBateria         EQU 00D5H     ;endereço onde inserir o código de segurança do cliente
+InputBateria         EQU 00D6H     ;endereço onde inserir o código de segurança do cliente
 InputTipoCarregamento    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
 InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
 InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
