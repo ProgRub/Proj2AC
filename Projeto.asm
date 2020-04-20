@@ -40,7 +40,7 @@ StackPointer EQU 8000H ;endereço da pilha
 ;*****************************************************************************************************************************************
 PLACE 2000H
 Display_InputVerifyCliente:
-    String "  VERIFICACAO   "
+    String "  VERIFICAÇÃO   "
     String "                "
     String "  INTRODUZA ID  "
     String "                "
@@ -63,7 +63,7 @@ Display_VerificacaoFalhada:
     String "                "
     String "                "
     String "                "
-    String " NAO AUTORIZADO "
+    String " NÃO AUTORIZADO "
     String "                "
     String "                "
 	String " OK - continuar "
@@ -200,7 +200,7 @@ Display_UltrapassaCargaMaxima:
 PLACE 2800H
 Display_TempoUltrapassa:
 	String "                "
-	String " NAO HA ENERGIA "
+	String " NÃO HA ENERGIA "
 	String " SUFICIENTE PARA"
 	String " O CARREGAMENTO "
 	String "   PRETENDIDO   "
@@ -214,7 +214,7 @@ Display_AlterarBaseDeDados:
 	String "alteracoes na   "
 	String "base de dados?  "
 	String "1- Sim          "
-	String "2- Nao          "
+	String "2- Não          "
 	String " OK - continuar "
 
 PLACE 2900H
@@ -261,7 +261,7 @@ PLACE 2B00H
 Display_ClienteNaoEstaNaDatabase:
 	String " BASE DE DADOS  "
 	String "                "
-	String "   Cliente nao  "
+	String "   Cliente não  "
 	String "  esta na base  "
 	String "    de dados    "
 	String "                "
