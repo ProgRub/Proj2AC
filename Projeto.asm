@@ -1,37 +1,36 @@
 ;constantes:
-Normal 					EQU 20 		;3.7 kWh
-Semirapido 				EQU 60 		;22 kWh
-Rapido 					EQU 100 	;50 kWh
-CustoNormal 			EQU 1		;custo do carregamento normal
-CustoSemiRapido 		EQU 2 		;custo do carregamento semirápido
-CustoRapido 			EQU 3 		;custo do carregamento rápido
+Normal 					    EQU 20 		;3.7 kWh
+Semirapido 				    EQU 60 		;22 kWh
+Rapido 					    EQU 100 	;50 kWh
+CustoNormal 			    EQU 1		;custo do carregamento normal
+CustoSemiRapido 		    EQU 2 		;custo do carregamento semirápido
+CustoRapido 			    EQU 3 		;custo do carregamento rápido
 EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateria para o carregamento normal
 EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
 EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
-InicioDisplay EQU 0030H
-FimDisplay EQU 009FH
+InicioDisplay 				EQU 0030H
+FimDisplay 					EQU 009FH
 
 ;endereços de memória relativos aos inputs:
-OK                         EQU 00B0H     ;endereço do botão OK
-CANCEL                     EQU 00B2H     ;endereço do botão Cancel
-InputID                 EQU 00D0H     ;endereço onde inserir o ID do cliente
-InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
-InputSaldo                 EQU 00D4H     ;endereço onde inserir o ID do cliente
-InputBateria         EQU 00D6H     ;endereço onde inserir o código de segurança do cliente
-InputOpcao    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
-InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
-InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
+OK                          EQU 00B0H     ;endereço do botão OK
+InputID                     EQU 00D0H     ;endereço onde inserir o ID do cliente
+InputCodSeguranca           EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
+InputSaldo                  EQU 00D4H     ;endereço onde inserir o ID do cliente
+InputBateria         	    EQU 00D6H     ;endereço onde inserir o código de segurança do cliente
+InputOpcao    			    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
+InputTempo                  EQU 00E2H     ;endereço onde inserir o tempo desejado
+InputIncrementoBateria      EQU 00E4H 	  ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
-Base_Tabela_Dados EQU 1100H ;endereço do início da base de dados
-CodSeguranca EQU 02H ;aumento relativo ao inicio dos dados do cliente para ler o código de segurança
-Saldo EQU 04H ;aumento relativo ao inicio dos dados do cliente para ler o saldo
-BateriaCarro EQU 06H ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
-Proximo EQU 08H ;salto a executar para ler os dados do próximo cliente
-EnderecoTamanho EQU 10FEH ;endereço que contém o número de clientes na base de dados
+Base_Tabela_Dados 		    EQU 1100H ;endereço do início da base de dados
+CodSeguranca 			    EQU 02H ;aumento relativo ao inicio dos dados do cliente para ler o código de segurança
+Saldo 					    EQU 04H ;aumento relativo ao inicio dos dados do cliente para ler o saldo
+BateriaCarro 				EQU 06H ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
+Proximo 					EQU 08H ;salto a executar para ler os dados do próximo cliente
+EnderecoTamanho 			EQU 10FEH ;endereço que contém o número de clientes na base de dados
 
-StackPointer EQU 8000H ;endereço da pilha
+StackPointer 				EQU 8000H ;endereço da pilha
 
 
 
