@@ -525,79 +525,77 @@ InicioInsereEnergia:
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
 	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
-    MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
-    MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
-    MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV R0,[R6] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
-    MOV R1, [R7] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
-    MOV R2,[R8] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa
-    MOV R6,R0
-    MOV R7,R1
-    MOV R8,R2
-    MOV R5,4
-    CMP R4,R5
-    JNE IncrementaNormal
-    JMP FimFunc1
+    MOV R6, EnderecoBateriaNormal ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV R0,[R6] ;guarda em R0 o valor da bateria do posto normal presente na memória
+    MOV R1, [R7] ;guarda em R1 o valor da bateria do posto semirapido presente na memória
+    MOV R2,[R8] ;guarda em R2 o valor da bateria do posto rapido presente na memória
+    MOV R6,R0 ;guarda em R6 o valor original da bateria do posto normal, caso o utilizador carregue a bateria com um valor inválido
+    MOV R7,R1 ;guarda em R7 o valor original da bateria do posto semirapido, caso o utilizador carregue a bateria com um valor inválido
+    MOV R8,R2 ;guarda em R8 o valor original da bateria do posto rapido, caso o utilizador carregue a bateria com um valor inválido
+    MOV R5,4 ;mete em R5 o valor da opção de avançar, que é 4
+    CMP R4,R5 ;compara a opção escolhida pelo utilizador com o valor em R5 (4)
+    JNE IncrementaNormal ;se não são iguais, o utilizador ou pretende carregar uma das baterias ou inseriu uma opção inválida, efetua-se o salto para verificar posteriormente
+    JMP FimFunc1 ;se são iguais, salta-se para o fim da função
 IncrementaNormal:
-	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
-    MOV R5, CustoNormal
-    CMP R4, R5
+    MOV R5, CustoNormal ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Normal, que coincide com o custo do carregamento (1)
+    CMP R4, R5 ;compara a opção escolhida pelo utilizador com o valor em R5 (1)
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
 	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     ADD R0, R3 ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
-    CMP R0, 0
-    JLT OverflowBateria ;se ocorrer overflow informar
-    JMP FimFunc1 ;se não ocorrer overflow, avançar para o display dos niveis de energia
+    CMP R0, 0 ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
+    JLT OverflowBateria ;se ocorrer overflow efetuar este salto para informar o utilizador
+    JMP FimFunc1 ;se não ocorrer overflow, avançar para o fim da rotina
 IncrementaSemiRapido:
-    MOV R5,CustoSemiRapido
-    CMP R4,R5
-    JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
+    MOV R5,CustoSemiRapido ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Semirapido, que coincide com o custo do carregamento (2)
+    CMP R4,R5 ;compara a opção escolhida pelo utilizador com o valor em R5 (2)
+    JNE IncrementaRapido ;se verificar-se que a bateria escolhida não é a semirapida, procede-se para a verificação das outras baterias
 	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     ADD R1,R3 ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
-    CMP R1,0
-    JLT OverflowBateria; se ocorrer overflow informar
-    JMP FimFunc1 ;avançar para o display dos niveis de energia
+    CMP R1,0 ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
+    JLT OverflowBateria ;se ocorrer overflow efetuar este salto para informar o utilizador
+    JMP FimFunc1 ;se não ocorrer overflow, avançar para o fim da rotina
 IncrementaRapido:
-    MOV R5, CustoRapido
-    CMP R4, R5
-    JNE OpcaoInvalida ;verificar se escolheu carregar a bateria rapida, se não avançar
+    MOV R5, CustoRapido ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Rapido, que coincide com o custo do carregamento (3)
+    CMP R4, R5 ;compara a opção escolhida pelo utilizador com o valor em R5 (3)
+    JNE OpcaoInvalida ;se verificar-se que a bateria escolhida não é a rapida, então o utilizador inseriu uma opção inválida
 	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     ADD R2,R3 ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
-    CMP R2,0
-    JLT OverflowBateria ;se ocorrer overflow informar
-    JMP FimFunc1 ;avançar para o fim da função
-OverflowBateria:
-	MOV R0,R6
-    MOV R1,R7
-    MOV R2,R8
+    CMP R2,0 ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
+    JLT OverflowBateria ;se ocorrer overflow efetuar este salto para informar o utilizador
+    JMP FimFunc1 ;se não ocorrer overflow, avançar para o fim da rotina
+OverflowBateria: ;se ocorreu overflow, faz-se reset dos valores das baterias com os valores guardados no início da rotina
+	MOV R0,R6 ;reset do valor da bateria do posto normal
+    MOV R1,R7 ;reset do valor da bateria do posto semirapido
+    MOV R2,R8 ;reset do valor da bateria do posto rapido
     MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc1
-OpcaoInvalida:
-    MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
-    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc1
+    JMP FimFunc1 ;avançar para o fim da rotina
 OpcaoInvalida:
     MOV R9,Display_OpcaoInvalida ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
-    JMP InicioInsereEnergia
+    JMP InicioInsereEnergia ;voltar ao início da rotina
 FimFunc1:
-    MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
-    MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
-    MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV [R6], R0
-    MOV [R7], R1
-    MOV [R8], R2
+    MOV R6, EnderecoBateriaNormal ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV [R6], R0 ;atualiza o valor da bateria do posto normal guardado em memória
+    MOV [R7], R1 ;atualiza o valor da bateria do posto semirapido guardado em memória
+    MOV [R8], R2 ;atualiza o valor da bateria do posto rapido guardado em memória
     POP R8 ;*********************************************************************************************************************
     POP R7 ;
     POP R6 ;
@@ -626,28 +624,27 @@ NiveisDeEnergia:
     MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
-    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido, e aqui fica ao longo do programa
-    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa 
-    MOV R3,0 ;R6 contará quantas bateria estiverem abaixo do nivel minimo
-    MOV R4,Normal ;R7 contém o nivel minimo que a bateria normal deve ter para ser considerada funcional
-    MOV R5,Semirapido ;R8 contém o nivel minimo que a bateria semirapida deve ter para ser considerada funcional
-    MOV R6,Rapido ;R9 contém o nivel minimo que a bateria rapida deve ter para ser considerada funcional
-    CMP R0,R4
-    JGE VerificaSemiRapido ;se verificarmos que a bateria normal tem o nivel minimo, verificamos as restantes
-    ADD R3,1 ;caso contrario, adicionamos 1 ao contador
+    MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal presente na memória
+    MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido presente na memória
+    MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido presente na memória
+    MOV R3,0 ;R3 contará quantas bateria estiverem abaixo do nivel mínimo
+    MOV R4,Normal ;R7 contém o nivel mínimo que a bateria normal deve ter para ser considerada funcional (carregamento de uma hora)
+    MOV R5,Semirapido ;R8 contém o nivel mínimo que a bateria semirapida deve ter para ser considerada funcional (carregamento de uma hora)
+    MOV R6,Rapido ;R9 contém o nivel mínimo que a bateria rapida deve ter para ser considerada funcional (carregamento de uma hora)
+    CMP R0,R4 ;compara o valor da bateria do posto normal com o seu valor mínimo
+    JGE VerificaSemiRapido ;se verificarmos que a bateria normal tem o nivel mínimo, verificamos as restantes
+    ADD R3,1 ;caso contrario, adicionamos 1 ao contador e verifica-se a bateria semirapida
 VerificaSemiRapido:
-    CMP R1,R5
-    JGE VerificaRapido ;se verificarmos que a bateria semirapida tem o nivel minimo, verificamos a bateria rapida
-    ADD R3,1 ;caso contrario, adicionamos 1 ao contador
+    CMP R1,R5 ;compara o valor da bateria do posto semirapido com o seu valor mínimo
+    JGE VerificaRapido ;se verificarmos que a bateria semirapida tem o nivel mínimo, verificamos a bateria rapida
+    ADD R3,1 ;caso contrario, adicionamos 1 ao contador e verifica-se a bateria rapida
 VerificaRapido:
-    CMP R2, R6
-    JGE FimFunc ;se verificarmos que a bateria rapida tem o nivel minimo, o posto esta operacional
-    ADD R3,1 ;caso contrario, adicionamos 1 ao contador
-    MOV R7,3 ;R10 guarda o valor 3 para comparar ao contador
-    CMP R3,R7
-    JNE FimFunc
-    MOV R10,-1
+    CMP R2, R6 ;compara o valor da bateria do posto rapido com o seu valor mínimo
+    JGE FimFunc ;se verificarmos que a bateria rapida tem o nivel mínimo, o posto esta operacional e salta-se para o fim da rotina
+    ADD R3,1 ;caso contrário, adicionamos 1 ao contador
+    CMP R3,3 ;compara-se o valor do contador com 3 (o número de baterias)
+    JNE FimFunc ;se o contador não é igual a 3, o posto está operacional e salta-se para o fim da função
+    MOV R10,-1 ;caso contrário, mete-se o R10 a -1 para o programa não avançar para a verificação do utilizador
 FimFunc:
     MOV R9,Display_NiveisDeEnergia ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -679,40 +676,37 @@ Verificacao_Cliente:
     PUSH R8 ;*********************************************************************************************************************
     MOV R9, Display_InputVerifyCliente ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do cliente que estamos a verifica e contém o ID deste
+    MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do cliente que estamos a verificar e contém o ID deste
     MOV R1, 0 ;R1 será o índice
     MOV R2, CodSeguranca ;R2 será a posição na tabela onde está o código de segurança do cliente
-    MOV R3, InputID ;R5 é o endereço de onde se lê o ID do utilizador
-    MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
-    MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
-    MOV R6, [R4] ;R8 é o código de segurança que o utilizador inseriu
+    MOV R3, InputID ;R3 é o endereço de onde se lê o ID do utilizador
+    MOV R4, InputCodSeguranca ;R4 é o endereço de onde se lê o código de segurança do utilizador
+    MOV R5, [R3] ;R5 é o ID que o utilizador inseriu
+    MOV R6, [R4] ;R6 é o código de segurança que o utilizador inseriu
 	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
 Ciclo_Verify_Cliente:
     MOV R3, [R0] ;R3 tem o valor do ID da tabela de base de dados a verificar
     MOV R4, [R0+R2] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
-    CMP R5,R3 
-    JNE VerificacaoFalhada ;se R7(ID do utilizador) for diferente de R3(ID a ser verificado na tabela), avançar para o próximo, se possivel
-    CMP R6,R4
-    JNE VerificacaoFalhada ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
-	MOV R10, Proximo
-	SHR R1,1
-    MUL R10,R1 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
+    CMP R5,R3  ;compara-se o ID inserido pelo utilizador com o ID da base de dados a verificar
+    JNE VerificacaoFalhada ;se são diferentes avançar para o próximo, se possivel
+    CMP R6,R4 ;compara-se o código de segurança inserido pelo utilizador com o código de segurança da tabela de base de dados a verificar
+    JNE VerificacaoFalhada ;se são diferentes avançar para o próximo, se possivel
+	MOV R10, Proximo ;caso contrário, mete-se em R10 o valor para passar aos dados de um próximo cliente
+    MUL R10,R1 ;multiplica o valor de Proximo pelo índice, para se obter o início dos dados do cliente verificado relativamente ao início da base de dados
 	MOV R9, Display_VerificacaoSucesso ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
-VerificacaoFalhada:
-    MOV R10,-1
-    ADD R1,2
-    MOV R7,R1 ;R7 serve para verificar se o indice é igual ao tamanho
-    MOV R9,EnderecoTamanho
-    MOV R8,[R9] ;R8 é o número de clientes na base de dados
-    SHR R7,1 ;dividir por 2, para a verificação do índice com o tamanho
-    CMP R7,R8 
-    JEQ NaoVerificado ;chegou ao fim da base
-    MOV R3,Proximo
-    ADD R0,R3 ;avanca a base para o proximo cliente a verificar
-    JMP Ciclo_Verify_Cliente
-NaoVerificado:
+    JMP FimFunc2 ;saltar para o fim da rotina pois o utilizador foi verificado com sucesso
+VerificacaoFalhada: ;se os dados que o utilizador inseriu não coincidirem com os dados do cliente que estava a ser verificado efetua-se isto
+    MOV R10,-1 ;mete-se em R10 o valor -1 para indicar, se chega-se ao fim da base de dados sem o utilizador ser verificado, que o utilizador não pode proceder para carregar o carro
+    ADD R1,1 ;adiciona-se um ao índice
+    MOV R9,EnderecoTamanho ;mete-se no registo 9 o endereço de onde ler o tamanho da base de dados
+    MOV R8,[R9] ;R8 é o número de clientes na base de dados (tamanho desta)
+    CMP R1,R8  ;compara-se o índice com o tamanho da base de dados
+    JEQ NaoVerificado ;se o índice é igual ao tamanho, chegou-se ao fim da base de dados sem o utilizador ser verificado
+    MOV R3,Proximo ;caso contrário, mete-se em R3 o valor a acrescentar ao início dos dados do cliente não verificado para avançar para o próximo
+    ADD R0,R3 ;avança a base para o proximo cliente a verificar
+    JMP Ciclo_Verify_Cliente ;volta-se a verificar os dados do utilizador com o novo cliente a verificar
+NaoVerificado: ;chega-se aqui se o utilizador não é verificado
     MOV R9, Display_VerificacaoFalhada ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 FimFunc2:
@@ -972,8 +966,6 @@ CicloVerOK:
     MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
     CMP R1,1
     JNE CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
-    MOV R1,0
-    MOVB [R0],R1
     POP R1  ;*********************************************************************************************************************
     POP R0  ; Retira da pilha os registos guardados no início da rotina
             ;*********************************************************************************************************************
@@ -1026,7 +1018,8 @@ LimpaPerifericosEntrada:
     PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R5 ;
     PUSH R6 ;
-    PUSH R7 ;*********************************************************************************************************************
+    PUSH R7 ;
+    PUSH R8 ;*********************************************************************************************************************
     MOV R0, InputCodSeguranca
     MOV R1, InputID
     MOV R2, InputIncrementoBateria
@@ -1034,15 +1027,18 @@ LimpaPerifericosEntrada:
     MOV R4, InputOpcao
     MOV R5, InputSaldo
     MOV R6, InputBateria
-    MOV R7,0
-    MOV [R0],R7
-    MOV [R1],R7
-    MOV [R2],R7
-    MOV [R3],R7
-    MOV [R4],R7
-    MOV [R5],R7
-    MOV [R6],R7
-    POP R7 ;*********************************************************************************************************************
+    MOV R7, OK
+    MOV R8,0
+    MOV [R0],R8
+    MOV [R1],R8
+    MOV [R2],R8
+    MOV [R3],R8
+    MOV [R4],R8
+    MOV [R5],R8
+    MOV [R6],R8
+    MOV [R7],R8
+    POP R8 ;*********************************************************************************************************************
+    POP R7 ;
     POP R6 ;
     POP R5 ;
     POP R4 ; Retira da pilha os registos guardados no início da rotina
