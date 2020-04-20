@@ -39,7 +39,7 @@ StackPointer 				EQU 8000H ;endereço da pilha
 ;*****************************************************************************************************************************************
 PLACE 2000H
 Display_InputVerifyCliente:
-    String "  VERIFICAÇÃO   "
+    String "  VERIFICACAO   "
     String "                "
     String "  INTRODUZA ID  "
     String "                "
@@ -62,7 +62,7 @@ Display_VerificacaoFalhada:
     String "                "
     String "                "
     String "                "
-    String " NÃO AUTORIZADO "
+    String " NAO AUTORIZADO "
     String "                "
     String "                "
 	String " OK - continuar "
@@ -111,7 +111,7 @@ PLACE 2380H
 Display_OpcaoInvalida:
 	String "    ATENÇÃO     "
 	String "                "
-	String "     OPCÃO      "
+	String "     OPCAO      "
 	String "    INVALIDA    "
 	String "                "
 	String "                "
@@ -199,7 +199,7 @@ Display_UltrapassaCargaMaxima:
 PLACE 2800H
 Display_TempoUltrapassa:
 	String "                "
-	String " NÃO HA ENERGIA "
+	String " NAO HA ENERGIA "
 	String " SUFICIENTE PARA"
 	String " O CARREGAMENTO "
 	String "   PRETENDIDO   "
@@ -213,7 +213,7 @@ Display_AlterarBaseDeDados:
 	String "alteracoes na   "
 	String "base de dados?  "
 	String "1- Sim          "
-	String "2- Não          "
+	String "2- Nao          "
 	String " OK - continuar "
 
 PLACE 2900H
@@ -260,7 +260,7 @@ PLACE 2B00H
 Display_ClienteNaoEstaNaDatabase:
 	String " BASE DE DADOS  "
 	String "                "
-	String "   Cliente não  "
+	String "   Cliente nao  "
 	String "  esta na base  "
 	String "    de dados    "
 	String "                "
@@ -583,7 +583,7 @@ OverflowBateria: ;se ocorreu overflow, faz-se reset dos valores das baterias com
     MOV R2,R8 ;reset do valor da bateria do posto rapido
     MOV R9, Display_Overflow ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc1 ;avançar para o fim da rotina
+    JMP FimFunc1
 OpcaoInvalida:
     MOV R9,Display_OpcaoInvalida ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -757,7 +757,7 @@ EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PE
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 7, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento semi-rapido
 	CMP R3, R8																;compara o registo 3 com o registo 8
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 8, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento rapido
-	MOV R9, Display_OpcaoInvalida 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida) ********************************************************													
+	MOV R9, Display_OpcaoInvalida 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida) ********************************************************													
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE FOR INSERIDO UM VALOR DIFERENTE DE 1,2,3 *
 	JMP EscolhaCarregamento													;volta para o Display_ inicial (volta a escolher o tipo carregamento)								********************************************************
 
@@ -796,7 +796,7 @@ VerificaEscolhaTempoSuperiorRapido:
 FimVerificacoes:
 	CMP R4, 0																;compara o valor do registo 4 com a constante 0
 	JGT VerificaSaldo														;se o valor do registo 4 for superior a 0, ou seja, o tempo for superior a 0, salta para o tag "VerificaSaldo"
-	MOV R9, Display_TempoInvalido 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
+	MOV R9, Display_TempoInvalido 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
     CALL RefreshDisplay 													;mostra o display metido anteriormente em R9 ao utilizador
     JMP EscolhaTempo														;salta para o tag "EscolhaTempo" --> tempo inválido
 
@@ -814,13 +814,13 @@ VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PA
     MOV R6,[R5+Saldo]														;é colocado no registo 6, o valor do saldo do cliente
 	CMP R4, R6																;é comparado o valor do registo 4 com o valor do registo 6, ou seja, o custo do carregamento com o saldo do utilizador
 	JLE ForneceEnergia 														;se o valor do registo 4 (o custo) for inferior ou igual ao do registo 6 (saldo), salta para o tag "ForneceEnergia", ou seja, o utilizador tem saldo suficiente
-	MOV R9, Display_SaldoInsuficiente											;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)		*****************************************************
+	MOV R9, Display_SaldoInsuficiente										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)		*****************************************************
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE O UTILIZADOR NÃO TEM SALDO SUFICIENTE *
 	JMP NaoForneceEnergia													;salta para o tag "NãoForneceEnergia" 															*****************************************************
 	
 	
 ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
-	MOV R9, Display_InfoCarregamento 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R4,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
