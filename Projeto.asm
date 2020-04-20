@@ -19,7 +19,7 @@ InputID                 EQU 00D0H     ;endereço onde inserir o ID do cliente
 InputCodSeguranca         EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
 InputSaldo                 EQU 00D4H     ;endereço onde inserir o ID do cliente
 InputBateria         EQU 00D6H     ;endereço onde inserir o código de segurança do cliente
-InputTipoCarregamento    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
+InputOpcao    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
 InputTempo                 EQU 00E2H     ;endereço onde inserir o tempo desejado
 InputIncrementoBateria  EQU 00E4H ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
@@ -32,6 +32,12 @@ Proximo EQU 08H ;salto a executar para ler os dados do próximo cliente
 EnderecoTamanho EQU 10FEH ;endereço que contém o número de clientes na base de dados
 
 StackPointer EQU 8000H ;endereço da pilha
+
+
+
+;*****************************************************************************************************************************************
+;                                           DISPLAYS
+;*****************************************************************************************************************************************
 PLACE 2000H
 Display_InputVerifyCliente:
     String "  VERIFICACAO   "
@@ -93,7 +99,7 @@ Display_NiveisDeEnergia:
 	String " OK - continuar "
 
 PLACE 2300H
-MenuEscolheCarregamento:
+Display_EscolheCarregamento:
 	String " ESCOLHA O TIPO	"
 	String "DE CARREGAMENTO:"
 	String "  1- Normal     "
@@ -103,17 +109,17 @@ MenuEscolheCarregamento:
 	String " OK - continuar "
 
 PLACE 2380H
-MenuOpcaoInvalida:
+Display_OpcaoInvalida:
+	String "    ATENÇÃO     "
 	String "                "
-	String "                "
-	String "     OPCAO      "
+	String "     OPCÃO      "
 	String "    INVALIDA    "
 	String "                "
 	String "                "
 	String " OK - continuar "
 
 PLACE 2400H
-MenuEscolherTempo:
+Display_EscolherTempo:
 	String " ESCOLHA O TEMPO"
 	String "DE CARREGAMENTO:"
 	String "                "
@@ -123,7 +129,7 @@ MenuEscolherTempo:
 	String " OK - continuar "
 
 PLACE 2480H
-MenuTempoInvalido:
+Display_TempoInvalido:
 	String "     OPCAO      "
 	String "    INVALIDA    "
 	String "                "
@@ -133,7 +139,7 @@ MenuTempoInvalido:
 	String " OK - continuar "
 
 PLACE 2500H
-MenuDebito:
+Display_Debito:
 	String "  CARREGAMENTO  "
 	String "                "
 	String "   Saldo:       "
@@ -143,7 +149,7 @@ MenuDebito:
 	String " OK - continuar "
 
 PLACE 2580H
-MenuSaldoInsuficiente:
+Display_SaldoInsuficiente:
 	String "                "
 	String "                "
 	String "     SALDO      "
@@ -153,7 +159,7 @@ MenuSaldoInsuficiente:
 	String " OK - continuar "
 
 PLACE 2600H
-MenuInfoCarregamento:
+Display_InfoCarregamento:
 	String "  CARREGAMENTO  "
 	String "                "
 	String "   Tipo:        "
@@ -163,7 +169,7 @@ MenuInfoCarregamento:
 	String " OK - continuar "
 
 PLACE 2680H
-MenuCarregamentoConcluido:
+Display_CarregamentoConcluido:
 	String "                "
 	String "                "
 	String "  CARREGAMENTO  "
@@ -300,10 +306,21 @@ Display_NovoClienteCriado:
 	String "                "
 	String "                "
 	String " OK - continuar "
+
+
+;*****************************************************************************************************************************************
+;                                               MAIN
+;*****************************************************************************************************************************************
+
 PLACE 0000H
 Inicio:
     MOV R0,Main
     JMP R0
+
+
+;*****************************************************************************************************************************************
+;                                               PROGRAMA
+;*****************************************************************************************************************************************
 PLACE 6000H
 Main:
     MOV SP, StackPointer
@@ -342,144 +359,141 @@ AlteraBaseDeDados:
     PUSH R6 ;
     PUSH R7 ;
     PUSH R8 ;*********************************************************************************************************************
-AlterarOuNao:
-    MOV R2, InputTipoCarregamento
-    MOV R9, Display_AlterarBaseDeDados
-    CALL RefreshDisplay
-    MOVB R0,[R2]
-    CMP R0,1
-    JEQ CriarOuAlterar
-    CMP R0,2
-    JNE OpcaoInvalidaDatabase
-    JMP FimFunc4
-OpcaoInvalidaDatabase:
-    MOV R9, MenuOpcaoInvalida
-    CALL RefreshDisplay
-    JMP AlterarOuNao
-CriarOuAlterar:
-    CALL LimpaPerifericosEntrada
-    MOV R9, Display_CriarOuAlterar
-    CALL RefreshDisplay
-    MOVB R0,[R2]
-    CMP R0,1
-    JNE AlterarDados
-    MOV R8,Base_Tabela_Dados
-    MOV R9,EnderecoTamanho
-    MOV R10,[R9]
-    MOV R7,Proximo
-    MUL R10,R7
-    ADD R8,R10
-    MOV R5, InputID
-    MOV R6, InputCodSeguranca
-    MOV R7, InputSaldo
-    MOV R4, InputBateria
-    MOV R9, Display_InserirDadosNovos
-    CALL RefreshDisplay
-    MOV R0,[R5]
-    MOV R1,[R6]
-    MOV R2,[R7]
-    MOV R3,[R4]
-    CMP R2,0
-    JN SaldoInvalido
-    CMP R3,0
-    JN BateriaInvalida
-    MOV R7,100
-    CMP R3,R7
-    JGT BateriaInvalida
-    MOV R5,CodSeguranca
-    MOV R6,Saldo
-    MOV R7,BateriaCarro
-    MOV [R8],R0
-    MOV [R8+R5],R1
-    MOV [R8+R6],R2
-    MOV [R8+R7],R3
-    MOV R1,EnderecoTamanho
-    MOV R0,[R1]
-    ADD R0,1
-    MOV [R1],R0
-    MOV R9, Display_NovoClienteCriado
-    CALL RefreshDisplay
-    JMP AlterarOuNao
-AlterarDados:
-    CMP R0,2
-    JNE OpcaoInvalidaDatabase
-    CALL LimpaPerifericosEntrada
-    MOV R5,InputID
-    MOV R6, InputCodSeguranca
-    MOV R8, Base_Tabela_Dados
-    MOV R3,0
-    MOV R4,CodSeguranca
-    MOV R9, Display_QualCliente
-    CALL RefreshDisplay
-    MOV R0,[R5]
-    MOV R1,[R6]
-Ciclo_AlterarDados:
-    MOV R5, [R8] ;R3 tem o valor do ID da tabela de base de dados a verificar
-    MOV R6, [R8+R4] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
-    CMP R0,R5 
-    JNE ContinuarTabela ;se R7(ID do utilizador) for diferente de R3(ID a ser verificado na tabela), avançar para o próximo, se possivel
-    CMP R1,R6
-    JNE ContinuarTabela ;se R8(Código de segurança do utilizador) for diferente de R4(código de segurança a ser verificado na tabela), avançar para o próximo, se possivel
-	MOV R10, Proximo
-	SHR R3,1
-    MUL R10,R3 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
-    JMP AlterarDadosCliente ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
-ContinuarTabela:
-    MOV R10,-1
-    ADD R3,2
-    MOV R2,R3 ;R7 serve para verificar se o indice é igual ao tamanho
-    MOV R9,EnderecoTamanho
-    MOV R7,[R9] ;R8 é o número de clientes na base de dados
-    SHR R2,1 ;dividir por 2, para a verificação do índice com o tamanho
-    CMP R2,R7
-    JEQ ClienteNaoPresente ;chegou ao fim da base
-    MOV R2,Proximo
-    ADD R8,R2 ;avanca a base para o proximo cliente a verificar
-    JMP Ciclo_AlterarDados
-ClienteNaoPresente:
-    MOV R9, Display_ClienteNaoEstaNaDatabase ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+AlterarOuNao: ;Inicio da rotina
+    MOV R2, InputOpcao ;mete-se em R2 o endereço de onde ler a opção que o utilizador escolhe
+    MOV R9, Display_AlterarBaseDeDados ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc4
-AlterarDadosCliente:
-    MOV R5, InputID
-    MOV R6, InputCodSeguranca
-    MOV R7, InputSaldo
-    MOV R4, InputBateria
-    MOV R9, Display_InserirDadosParaAlterar
-    CALL RefreshDisplay
-    MOV R0,[R5]
-    MOV R1,[R6]
-    MOV R2,[R7]
-    MOV R3,[R4]
-    CALL LimpaPerifericosEntrada
-    CMP R2,0
-    JLT SaldoInvalido
-    CMP R3,0
-    JLT BateriaInvalida
-    MOV R7,100
-    CMP R3,R7
-    JGT BateriaInvalida
-    MOV R8,Base_Tabela_Dados
-    ADD R8,R10
-    MOV R6,CodSeguranca
-    MOV R4,BateriaCarro
-    MOV R7,Saldo
-    MOV [R8],R0
-    MOV [R8+R6],R1
-    MOV [R8+R7],R2
-    MOV [R8+R4],R3
-    MOV R9,Display_DadosAlterados
-    CALL RefreshDisplay
-    JMP AlterarOuNao
-SaldoInvalido:
-    MOV R9, Display_SaldoInvalido
-    CALL RefreshDisplay
-    JMP AlterarOuNao
-BateriaInvalida:
-    MOV R9, Display_BateriaInvalida
-    CALL RefreshDisplay
-    JMP AlterarOuNao
-FimFunc4:
+    MOVB R0,[R2] ;move o byte endereçado por R2, onde está a opção selecionada pelo utilizador, para R0
+    CMP R0,1 ;compara a opção selecionada pelo utilizador com 1
+    JEQ CriarOuAlterar ;se for igual, o utilizador indicou que pretende alterar a base de dados
+    CMP R0,2 ;se R0 não é igual a 1, compara-se a 2
+    JNE OpcaoInvalidaDatabase  ;se R0 não é igual a 2, o utilizador inseriu uma opção inválida
+    JMP FimFunc4 ;se R0 é igual a 2, o utilizador indicou que não pretende alterar a base de dados e salta-se para o fim desta rotina
+OpcaoInvalidaDatabase: ;instruções relativas ao registo de uma opção inválida inserida pelo utilizador
+    MOV R9, Display_OpcaoInvalida ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;volta ao início da rotina
+CriarOuAlterar: ;a rotina chega aqui se o utilizador indicou que quer fazer alterações à base de dados
+    CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
+    MOV R9, Display_CriarOuAlterar ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    MOVB R0,[R2] ;move o byte endereçado por R2, onde está a opção selecionada pelo utilizador, para R0
+    CMP R0,1 ;compara a opção selecionada pelo utilizador com 1
+    JNE AlterarDados ;se R0 não é igual a 1, o utilizador ou pretende alterar os dados de um cliente existente ou inseriu uma opção inválida, por isso salta-se para a tag AlterarDados
+    MOV R8,Base_Tabela_Dados ;mete-se em R8 o início da base de dados
+    MOV R9,EnderecoTamanho ;mete-se em R9 o endereço onde está guardado o tamanho da base de dados
+    MOV R10,[R9] ;mete-se em R10 o tamanho da base de dados (endereçado por R9)
+    MOV R7,Proximo ;mete-se em R7 o tamanho do salto a ser efetuado para saltar dos dados de um cliente para os dados de outro
+    MUL R10,R7 ;esta multiplicação do tamanho pelo valor Proximo garante que o novo cliente é criado no fim da base de dados
+    ADD R8,R10 ;adiciona-se o valor da multiplicação anterior ao início da base de dados, para gravar-se os dados inseridos no fim da base de dados
+    MOV R5, InputID ;mete em R5 o endereço de onde se lê o ID do novo cliente
+    MOV R6, InputCodSeguranca ;mete em R6 o endereço de onde se lê o código de segurança do novo cliente
+    MOV R7, InputSaldo ;mete em R7 o endereço de onde se lê o saldo do novo cliente
+    MOV R4, InputBateria ;mete em R7 o endereço de onde se lê quanta bateria o carro do cliente terá
+    MOV R9, Display_InserirDadosNovos ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    MOV R0,[R5] ;mete em R0 o valor do ID do novo cliente que o utilizador meteu
+    MOV R1,[R6] ;mete em R1 o valor do código de segurança do novo cliente que o utilizador meteu
+    MOV R2,[R7] ;mete em R2 o valor do saldo do novo cliente que o utilizador meteu
+    MOV R3,[R4] ;mete em R3 o valor da bateria do carro do novo cliente que o utilizador meteu
+    CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
+    CMP R2,0 ;compara o valor do saldo com zero
+    JLT SaldoInvalido ;se o saldo que o utilizador inseriu para o novo cliente for negativo, efetua-se este salto e o novo cliente não é criado
+    CMP R3,0 ;compara o valor da bateria do carro com zero
+    JLT BateriaInvalida ;se o valor da bateria do carro for negativo, efetua-se este salto e o novo cliente não é criado
+    MOV R7,100 ;mete em R7 o valor 100 para fins de comparação
+    CMP R3,R7 ;compara o valor da bateria do carro com R7, que é 100
+    JGT BateriaInvalida ;se o valor da bateria do carro for maior que 100, efetua-se este salto e o novo cliente não é criado
+    MOV R5,CodSeguranca ;mete em R5 o incremento relativo ao inicio dos dados de um cliente de onde se lê o código de segurança dele
+    MOV R6,Saldo ;mete em R6 o incremento relativo ao inicio dos dados de um cliente de onde se lê o saldo dele
+    MOV R7,BateriaCarro ;mete em R7 o incremento relativo ao inicio dos dados de um cliente de onde se lê o valor da bateria do carro dele
+    MOV [R8],R0 ;mete em R8, que é o fim da base de dados, onde se vai inserir o novo cliente, o ID deste 
+    MOV [R8+R5],R1 ;mete em R8 + R5, o lugar onde está o código de segurança de um cliente, o código de segurança do novo cliente
+    MOV [R8+R6],R2 ;mete em R8 + R6, o lugar onde está o saldo de um cliente, o saldo do novo cliente
+    MOV [R8+R7],R3 ;mete em R8 + R7, o lugar onde está o valor da bateria do carro do cliente, o valor da bateria do carro do novo cliente
+    MOV R1,EnderecoTamanho ;mete em R1 o endereço onde está guardado o tamanho da base de dados para fins de atualização
+    MOV R0,[R1] ;mete em R0 o tamanho da base de dados
+    ADD R0,1 ;incrementa-se o tamanho por 1, pois foi criado um novo cliente
+    MOV [R1],R0 ;atualiza-se o tamanho guardado em memória com o novo tamanho, em R0
+    MOV R9, Display_NovoClienteCriado ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;Volta ao início do programa
+AlterarDados: ;A rotina chega aqui se o utilizador ou pretende alterar os dados de um cliente existente ou inseriu uma opção inválida
+    CMP R0,2 ;Compara a opção escolhida pelo utilizador com 2
+    JNE OpcaoInvalidaDatabase ;se é diferente de 2, o utilizador inseriu uma opção inválida efetua-se este salto; se é igual a 2, procede-se para as instruções abaixo
+    MOV R5,InputID ;mete-se em R5 o endereço de onde se lerá o ID do cliente ao qual a alterar os dados
+    MOV R6, InputCodSeguranca ;mete-se em R6 o endereço de onde se lerá o código de segurança do cliente ao qual alterar os dados
+    MOV R8, Base_Tabela_Dados ;mete-se em R8 o início da base de dados
+    MOV R3,0 ;mete-se em R3 o índice
+    MOV R4,CodSeguranca ;mete-se em R4 o "salto" relativo ao início dos dados de um cliente para ler o código de segurança deste na base de dados
+    MOV R9, Display_QualCliente ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    MOV R0,[R5] ;mete em R0 o ID que o utilizador inseriu
+    MOV R1,[R6] ;mete em R1 o código de segurança que o utilizador inseriu
+    CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
+Ciclo_AlterarDados: ;ciclo em que se percorre a base de dados
+    MOV R5, [R8] ;R5 tem o valor do ID da tabela de base de dados a verificar
+    MOV R6, [R8+R4] ;R6 tem o valor de código de segurança da tabela de base de dados a verificar
+    CMP R0,R5 ;compara-se o ID inserido pelo utilizador com o ID do cliente a ser verificado atualmente
+    JNE ContinuarTabela ;se os valores forem diferentes, efetua-se este salto para avançar para o próximo cliente, se não estivermos já no último cliente da base de dados
+    CMP R1,R6 ;compara-se o código de segurança inserido pelo utilizador com o código de segurança do cliente a ser verificado atualmente
+    JNE ContinuarTabela ;se os valores forem diferentes, efetua-se este salto para avançar para o próximo cliente, se não estivermos já no último cliente da base de dados
+	MOV R10, Proximo ;se tanto o ID como o código de segurança são iguais, guarda-se em R10 o incremento a efetuar para ler os dados de um novo cliente
+    MUL R10,R3 ;multiplicamos o valor de Proximo pelo índice para obtermos em R10 o incremento a adicionar ao início da base de dados para alterarmos os dados do cliente verificado
+    JMP AlterarDadosCliente ;efetua-se o salto para a parte que tratará de alterar os dados do cliente que o utilizador selecionou
+ContinuarTabela: ;esta parte avança para verificar os dados do próximo cliente, porque previamente os dados que o utilizador inseriu e os que estão na base de dados não coincidiam
+    ADD R3,1 ;adiciona-se ao índice 1 para indicar que avançamos um cliente
+    MOV R9,EnderecoTamanho ;mete em R9 o endereço onde encontra-se o tamanho da base de dados
+    MOV R7,[R9] ;R7 é o número de clientes na base de dados
+    CMP R3,R7 ;compara-se o índice com o tamanho da base de dados
+    JEQ ClienteNaoPresente ;se é igual, chegou-se ao fim da base de dados e efetua-se este salto
+    MOV R2,Proximo ;se não é igual, mete-se em R2 o valor de Proximo para avançarmos para o próximo cliente a verificar
+    ADD R8,R2 ;avanca a base para o próximo cliente a verificar
+    JMP Ciclo_AlterarDados ;faz o salto para o ciclo para verificarmos este próximo cliente
+ClienteNaoPresente: ;esta parte da rotina indica ao utilizador que os dados (ID e código de segurança) que inseriu não coincidem com os dados de nenhum cliente na base de dados
+    MOV R9, Display_ClienteNaoEstaNaDatabase ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;salta-se para o ínicio da função
+AlterarDadosCliente: ;chega-se aqui se encontrou-se na base de dados o cliente ao qual o utilizador pretende alterar os dados
+    MOV R5, InputID ;mete em R5 o endereço de onde se lê o novo ID do cliente ao qual alterarermos os dados
+    MOV R6, InputCodSeguranca ;mete em R6 o endereço de onde se lê o novo código de segurança do cliente ao qual alterarermos os dados
+    MOV R7, InputSaldo ;mete em R7 o endereço de onde se lê o novo saldo do cliente ao qual alterarermos os dados
+    MOV R4, InputBateria ;mete em R7 o endereço de onde se lê quanta bateria o carro do cliente terá agora que iremos alterar os seus dados
+    MOV R9, Display_InserirDadosParaAlterar ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    MOV R0,[R5] ;mete em R0 o novo valor do ID do cliente, que o utilizador meteu
+    MOV R1,[R6] ;mete em R1 o novo valor do código de segurança do cliente, que o utilizador meteu
+    MOV R2,[R7] ;mete em R2 o novo valor do saldo do cliente, que o utilizador meteu
+    MOV R3,[R4] ;mete em R3 o novo valor da bateria do carro do cliente, que o utilizador meteu
+    CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
+    CMP R2,0 ;compara o valor do saldo com zero
+    JLT SaldoInvalido ;se o saldo que o utilizador inseriu para o novo cliente for negativo, efetua-se este salto e o novo cliente não é criado
+    CMP R3,0 ;compara o valor da bateria do carro com zero
+    JLT BateriaInvalida ;se o valor da bateria do carro for negativo, efetua-se este salto e o novo cliente não é criado
+    MOV R7,100 ;mete em R7 o valor 100 para fins de comparação
+    CMP R3,R7 ;compara o valor da bateria do carro com R7, que é 100
+    JGT BateriaInvalida ;se o valor da bateria do carro for maior que 100, efetua-se este salto e o novo cliente não é criado
+    MOV R8,Base_Tabela_Dados ;mete em R8 o início da base de dados
+    ADD R8,R10 ;acrescenta ao início da base de dados o R10 que foi definido anteriormente como sendo o incremento a adicionar ao início da base de dados para chegarmos aos dados do cliente pretendido pelo utilizador
+    MOV R5,CodSeguranca ;mete em R5 o incremento relativo ao inicio dos dados de um cliente de onde se lê o código de segurança dele
+    MOV R6,Saldo ;mete em R6 o incremento relativo ao inicio dos dados de um cliente de onde se lê o saldo dele
+    MOV R7,BateriaCarro ;mete em R7 o incremento relativo ao inicio dos dados de um cliente de onde se lê o valor da bateria do carro dele
+    MOV [R8],R0 ;atualizar o ID do cliente com o ID que o utilizador inseriu
+    MOV [R8+R5],R1 ;atualizar o código de segurança do cliente com o código de segurança que o utilizador inseriu
+    MOV [R8+R6],R2 ;atualizar o saldo do cliente com o saldo do cliente que o utilizador inseriu
+    MOV [R8+R7],R3 ;atualizar o valor da bateria do carro do cliente com o valor que o utilizador inseriu
+    MOV R9,Display_DadosAlterados ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;Voltar ao início da rotina
+SaldoInvalido: ;a rotina chega aqui se o valor que o utilizador inseriu como possível saldo é inválido (valor negativo)
+    MOV R9, Display_SaldoInvalido ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;volta ao início da rotina
+BateriaInvalida: ;a rotina chega aqui se o valor que o utilizador inseriu como possível valor da bateria do carro é inválido (valor negativo ou superior a 100)
+    MOV R9, Display_BateriaInvalida ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao ;volta ao início da rotina
+FimFunc4: ;Fim da rotina, chega aqui se o utilizador já não pretende fazer alterações à base de dados
     POP R8 ;*********************************************************************************************************************
     POP R7 ;
     POP R6 ;
@@ -507,11 +521,11 @@ InsereEnergia:
     PUSH R7 ;
     PUSH R8 ;*********************************************************************************************************************
 InicioInsereEnergia:
-    MOV R6, InputTipoCarregamento ;R6 contém o endereço de onde se lê o input de qual bateria carregar
-    MOV R9, Display_InsereEnergia ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    MOV R6, InputOpcao ;R6 contém o endereço de onde se lê o input de qual bateria carregar
+    MOV R9, Display_InsereEnergia ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOVB R4, [R6]  ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
-	CALL LimpaPerifericosEntrada
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
@@ -526,11 +540,11 @@ InicioInsereEnergia:
     JNE IncrementaNormal
     JMP FimFunc1
 IncrementaNormal:
-	CALL LimpaPerifericosEntrada
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     MOV R5, CustoNormal
     CMP R4, R5
     JNE IncrementaSemiRapido ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
-	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
@@ -542,7 +556,7 @@ IncrementaSemiRapido:
     MOV R5,CustoSemiRapido
     CMP R4,R5
     JNE IncrementaRapido ;verificar se escolheu carregar a bateria semirapida, se não avançar
-	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
@@ -554,7 +568,7 @@ IncrementaRapido:
     MOV R5, CustoRapido
     CMP R4, R5
     JNE OpcaoInvalida ;verificar se escolheu carregar a bateria rapida, se não avançar
-	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+	MOV R9, Display_InsereEnergiaQuanta ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R5, InputIncrementoBateria ;R5 contém o endereço de onde se lê o input de quanto carregar a bateria
     MOV R3, [R5] ;R3 contém o valor a adicionar à bateria selecionada, se possivel
@@ -572,7 +586,11 @@ OverflowBateria:
 OpcaoInvalida:
     MOV R9,MenuOpcaoInvalida ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
-	CALL LimpaPerifericosEntrada
+    JMP FimFunc1
+OpcaoInvalida:
+    MOV R9,Display_OpcaoInvalida ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
     JMP InicioInsereEnergia
 FimFunc1:
     MOV R6, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
@@ -632,7 +650,7 @@ VerificaRapido:
     JNE FimFunc
     MOV R10,-1
 FimFunc:
-    MOV R9,Display_NiveisDeEnergia ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    MOV R9,Display_NiveisDeEnergia ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     CALL Display_NiveisDeEnergia_InserirInformacao
     POP R7 ;*********************************************************************************************************************
@@ -660,7 +678,7 @@ Verificacao_Cliente:
     PUSH R6 ;
     PUSH R7 ;
     PUSH R8 ;*********************************************************************************************************************
-    MOV R9, Display_InputVerifyCliente ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    MOV R9, Display_InputVerifyCliente ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     MOV R0, Base_Tabela_Dados ;mover para R0 a base da tabela de dados, será a base dos dados do cliente que estamos a verifica e contém o ID deste
     MOV R1, 0 ;R1 será o índice
@@ -669,7 +687,7 @@ Verificacao_Cliente:
     MOV R4, InputCodSeguranca ;R6 é o endereço de onde se lê o código de segurança do utilizador
     MOV R5, [R3] ;R7 é o ID que o utilizador inseriu
     MOV R6, [R4] ;R8 é o código de segurança que o utilizador inseriu
-	CALL LimpaPerifericosEntrada
+	CALL LimpaPerifericosEntrada ;limpa os endereços de onde se lê os inputs do utilizador
 Ciclo_Verify_Cliente:
     MOV R3, [R0] ;R3 tem o valor do ID da tabela de base de dados a verificar
     MOV R4, [R0+R2] ;R4 tem o valor de código de segurança da tabela de base de dados a verificar
@@ -680,7 +698,7 @@ Ciclo_Verify_Cliente:
 	MOV R10, Proximo
 	SHR R1,1
     MUL R10,R1 ;mete no registo 10 o indice do cliente verificado com sucesso, para ser utilizado posteriormente para verificar o seu saldo
-	MOV R9, Display_VerificacaoSucesso ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+	MOV R9, Display_VerificacaoSucesso ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP FimFunc2 ;se não saltou anteriormente, então o utilizador foi verificado com sucesso e pode carregar o seu veículo
 VerificacaoFalhada:
@@ -696,7 +714,7 @@ VerificacaoFalhada:
     ADD R0,R3 ;avanca a base para o proximo cliente a verificar
     JMP Ciclo_Verify_Cliente
 NaoVerificado:
-    MOV R9, Display_VerificacaoFalhada ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
+    MOV R9, Display_VerificacaoFalhada ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay ;Mostra o display metido anteriormente em R9 ao utilizador
 FimFunc2:
     POP R8 ;*********************************************************************************************************************
@@ -735,27 +753,27 @@ EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PE
 	MOV R6, CustoNormal														;coloca no registo 6 o valor do custo do carregamento do tipo normal
 	MOV R7, CustoSemiRapido													;coloca no registo 7 o valor do custo do carregamento do tipo semi-rápido
 	MOV R8, CustoRapido														;coloca no registo 8 o valor do custo do carregamento do tipo rápido
-	MOV R9, MenuEscolheCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar (MenuEscolheCarregamento)
-    MOV R5, InputTipoCarregamento 											;coloca no registo 5 o endereço de onde ler o tipo de carregamento
+	MOV R9, Display_EscolheCarregamento 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_EscolheCarregamento)
+    MOV R5, InputOpcao 											            ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
     CALL RefreshDisplay 													;mostra ao utilizador o display  metido anteriormente em R9 
 	MOVB R3, [R5]					                						;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
-	CALL LimpaPerifericosEntrada											;é feita a limpeza dos perifericos de entrada, tomando o valor inicial (0)
+	CALL LimpaPerifericosEntrada                                            ;limpa os endereços de onde se lê os inputs do utilizador
 	CMP R3, R6																;compara o registo 3 com o registo 6
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 6, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento normal
 	CMP R3, R7																;compara o registo 3 com o registo 7
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 7, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento semi-rapido
 	CMP R3, R8																;compara o registo 3 com o registo 8
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 8, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento rapido
-	MOV R9, MenuOpcaoInvalida 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (MenuOpcaoInvalida) ********************************************************													
+	MOV R9, Display_OpcaoInvalida 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida) ********************************************************													
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE FOR INSERIDO UM VALOR DIFERENTE DE 1,2,3 *
-	JMP EscolhaCarregamento													;volta para o menu inicial (volta a escolher o tipo carregamento)								********************************************************
+	JMP EscolhaCarregamento													;volta para o Display_ inicial (volta a escolher o tipo carregamento)								********************************************************
 
 EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
-	MOV R9, MenuEscolherTempo 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+	MOV R9, Display_EscolherTempo 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
-	CALL LimpaPerifericosEntrada											;é feita a limpeza dos perifericos de entrada, tomando o valor inicial (0)
+	CALL LimpaPerifericosEntrada                                            ;limpa os endereços de onde se lê os inputs do utilizador
 	CMP R3,R6																;compara o registo 3 com o registo 6
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
@@ -785,7 +803,7 @@ VerificaEscolhaTempoSuperiorRapido:
 FimVerificacoes:
 	CMP R4, 0																;compara o valor do registo 4 com a constante 0
 	JGT VerificaSaldo														;se o valor do registo 4 for superior a 0, ou seja, o tempo for superior a 0, salta para o tag "VerificaSaldo"
-	MOV R9, MenuTempoInvalido 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (MenuTempoInvalido)
+	MOV R9, Display_TempoInvalido 												;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
     CALL RefreshDisplay 													;mostra o display metido anteriormente em R9 ao utilizador
     JMP EscolhaTempo														;salta para o tag "EscolhaTempo" --> tempo inválido
 
@@ -803,13 +821,13 @@ VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PA
     MOV R6,[R5+Saldo]														;é colocado no registo 6, o valor do saldo do cliente
 	CMP R4, R6																;é comparado o valor do registo 4 com o valor do registo 6, ou seja, o custo do carregamento com o saldo do utilizador
 	JLE ForneceEnergia 														;se o valor do registo 4 (o custo) for inferior ou igual ao do registo 6 (saldo), salta para o tag "ForneceEnergia", ou seja, o utilizador tem saldo suficiente
-	MOV R9, MenuSaldoInsuficiente											;mete no registo 9, onde está o endereço do que pretendemos mostrar (MenuSaldoInsuficiente)		*****************************************************
+	MOV R9, Display_SaldoInsuficiente											;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)		*****************************************************
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE O UTILIZADOR NÃO TEM SALDO SUFICIENTE *
 	JMP NaoForneceEnergia													;salta para o tag "NãoForneceEnergia" 															*****************************************************
 	
 	
 ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
-	MOV R9, MenuInfoCarregamento 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+	MOV R9, Display_InfoCarregamento 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R4,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
@@ -899,7 +917,7 @@ Debito:																		;REALIZA O PAGAMENTO DO CARREGAMENTO
 	MOV R6, [R5+Saldo]														;coloca no registo 6 o valor do saldo do cliente
 	SUB R6, R7																;subtrai ao registo 6 o valor do registo 7 (o custo do carregamento)
 	MOV [R5+Saldo],R6 														;atualiza o saldo do utilizador 
-	MOV R9, MenuDebito 														;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+	MOV R9, Display_Debito 														;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 	RET	
 
@@ -921,7 +939,7 @@ AtualizaPostoRapido:														;ATUALIZA O VALOR DA BATERIA DO POSTO RAPIDO
 	SUB R2, R6  															;subtrai ao registo 2 (bateria Rapida do posto) o valor do registo 6 (o valor da energia fornecida no carregamento)
 	
 CarregamentoConcluido:														;ATUALIZA VALORES DAS BATERIAS DO POSTO (CARREGAMENTO CONCLUIDO)
-	MOV R9, MenuCarregamentoConcluido 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+	MOV R9, Display_CarregamentoConcluido 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R6, EnderecoBateriaNormal 											;coloca no registo 6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido 										;coloca no registo 7 o endereço onde está guardado o valor da bateria do posto semi-rapido
@@ -953,8 +971,8 @@ VerificaOK:
 CicloVerOK:
     MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
     MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
-    CMP R1,0
-    JEQ CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
+    CMP R1,1
+    JNE CicloVerOK ;só quando o utilizador mudar o valor para diferente de 0 é que se lê os inputs do utilizador
     MOV R1,0
     MOVB [R0],R1
     POP R1  ;*********************************************************************************************************************
@@ -1014,7 +1032,7 @@ LimpaPerifericosEntrada:
     MOV R1, InputID
     MOV R2, InputIncrementoBateria
     MOV R3, InputTempo
-    MOV R4, InputTipoCarregamento
+    MOV R4, InputOpcao
     MOV R5, InputSaldo
     MOV R6, InputBateria
     MOV R7,0
