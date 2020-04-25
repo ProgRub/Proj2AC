@@ -693,14 +693,14 @@ FimFunc:
     MOV R9,Display_NiveisDeEnergia                                          ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
     CALL Display_NiveisDeEnergia_InserirInformacao                          ;chama a rotina que insere a informação sobre os estados dos postos no display
-    POP R7 ;*********************************************************************************************************************
-    POP R6 ;
-    POP R5 ;
-    POP R4 ; Retira da pilha os registos guardados no início da rotina
-    POP R3 ;
+    POP R7                                                                  ;*********************************************************************************************************************
+    POP R6                                                                  ;
+    POP R5                                                                  ;
+    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R3                                                                  ;
     ; POP R2 ;
     ; POP R1 ;
-    ; POP R0 ;*********************************************************************************************************************
+    ; POP R0                                                                ;*********************************************************************************************************************
     RET
 
 ;*************************************************************************************************************************************************
@@ -709,15 +709,15 @@ FimFunc:
 ;                       com os valores presentes na base de dados para ver se pode efetuar um carregamento
 ;*************************************************************************************************************************************************
 Verificacao_Cliente:
-    PUSH R0 ;*********************************************************************************************************************
-    PUSH R1 ;
-    PUSH R2 ;
-    PUSH R3 ;
-    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R5 ;
-    PUSH R6 ;
-    PUSH R7 ;
-    PUSH R8 ;*********************************************************************************************************************
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ;
+    PUSH R2                                                                 ;
+    PUSH R3                                                                 ;
+    PUSH R4                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5                                                                 ;
+    PUSH R6                                                                 ;
+    PUSH R7                                                                 ;
+    PUSH R8                                                                 ;*********************************************************************************************************************
     MOV R3, InputID                                                         ;R3 é o endereço de onde se lê o ID do utilizador
     MOV R4, InputCodSeguranca                                               ;R4 é o endereço de onde se lê o código de segurança do utilizador
     MOV R9, Display_InputVerifyCliente                                      ;Mete no registo 9 o endereço do display a mostrar ao utilizador
@@ -754,15 +754,15 @@ NaoVerificado:                                                              ;che
     MOV R9, Display_VerificacaoFalhada                                      ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
 FimFunc2:
-    POP R8 ;*********************************************************************************************************************
-    POP R7 ;
-    POP R6 ;
-    POP R5 ;
-    POP R4 ; Retira da pilha os registos guardados no início da rotina
-    POP R3 ;
-    POP R2 ;
-    POP R1 ;
-    POP R0 ;*********************************************************************************************************************
+    POP R8                                                                  ;*********************************************************************************************************************
+    POP R7                                                                  ;
+    POP R6                                                                  ;
+    POP R5                                                                  ;
+    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R3                                                                  ;
+    POP R2                                                                  ;
+    POP R1                                                                  ;
+    POP R0                                                                  ;*********************************************************************************************************************
     RET
 	
 ;***************************************************************************************************************************************************
@@ -771,15 +771,15 @@ FimFunc2:
 ;                   efetuando as verificações necessárias e atualizando os postos
 ;***************************************************************************************************************************************************
 Carregamento: 
-    ; PUSH R0 ;*********************************************************************************************************************
+    ; PUSH R0                                                               ;*********************************************************************************************************************
     ; PUSH R1 ;
     ; PUSH R2 ;
-    PUSH R3 ;
-    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R5 ;
-    PUSH R6 ;
-    PUSH R7 ;
-    PUSH R8 ;*********************************************************************************************************************
+    PUSH R3                                                                 ;
+    PUSH R4                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5                                                                 ;
+    PUSH R6                                                                 ;
+    PUSH R7                                                                 ;
+    PUSH R8                                                                 ;*********************************************************************************************************************
 EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PELO UTILIZADOR
     ; MOV R3, EnderecoBateriaNormal 											;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
     ; MOV R4, EnderecoBateriaSemiRapido 										;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
@@ -1008,15 +1008,15 @@ CarregamentoConcluido:														;ATUALIZA VALORES DAS BATERIAS DO POSTO (CAR
     ; MOV [R8], R2															;atualiza o valor da bateria do posto rapido
 	
 FimFunc3:
-    POP R8 ;*********************************************************************************************************************
-    POP R7 ;
-    POP R6 ;
-    POP R5 ;
-    POP R4 ; Retira da pilha os registos guardados no início da rotina
-    POP R3 ;
+    POP R8                                                                  ;*********************************************************************************************************************
+    POP R7                                                                  ;
+    POP R6                                                                  ;
+    POP R5                                                                  ;
+    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R3                                                                  ;
     ; POP R2 ;
     ; POP R1 ;
-    ; POP R0 ;*********************************************************************************************************************
+    ; POP R0                                                                ;*********************************************************************************************************************
 	RET
     
 ;******************************************************************************************************************************************
@@ -1024,19 +1024,19 @@ FimFunc3:
 ;                       Responsável por registar que o utilizador "carregou" no OK
 ;******************************************************************************************************************************************
 VerificaOK:
-    PUSH R0 ;*********************************************************************************************************************
-    PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
-            ;*********************************************************************************************************************
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+                                                                            ;*********************************************************************************************************************
 CicloVerOK:
-    MOV R0, OK ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
-    MOVB R1, [R0] ;mete em R1 o valor lido do endereço R0
+    MOV R0, OK                                                              ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
+    MOVB R1, [R0]                                                           ;mete em R1 o valor lido do endereço R0
     CMP R1,1
-    JNE CicloVerOK ;só quando o utilizador mudar o valor para 1 é que se lê os inputs do utilizador
+    JNE CicloVerOK                                                          ;só quando o utilizador mudar o valor para 1 é que se lê os inputs do utilizador
     MOV R1,0
     MOVB[R0],R1
-    POP R1  ;*********************************************************************************************************************
-    POP R0  ; Retira da pilha os registos guardados no início da rotina
-            ;*********************************************************************************************************************
+    POP R1                                                                  ;*********************************************************************************************************************
+    POP R0                                                                  ; Retira da pilha os registos guardados no início da rotina
+                                                                            ;*********************************************************************************************************************
     RETF
 
 ;***************************************************************************************************************************************
@@ -1045,32 +1045,32 @@ CicloVerOK:
 ;                       display a mostrar, indicado pelo registo R9
 ;***************************************************************************************************************************************
 RefreshDisplay:
-    PUSH R0 ;*********************************************************************************************************************
-    PUSH R1 ;
-    PUSH R2 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R3 ;*********************************************************************************************************************
-    MOV R0,InicioDisplay ;mete em R0 o início do display
-    MOV R1,FimDisplay ;mete em R1 o fim do display
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ;
+    PUSH R2                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3                                                                 ;*********************************************************************************************************************
+    MOV R0,InicioDisplay                                                    ;mete em R0 o início do display
+    MOV R1,FimDisplay                                                       ;mete em R1 o fim do display
 Ciclo_RefreshDisplay:
-    MOV R2,[R9] ;mete-se em R2 o conteúdo do display que queremos apresentar, indicado por R9
-    MOV [R0],R2 ;mete-se no display mostrado ao utilizador o conteúdo de R2
-    ADD R0,2 ;avança-se para a próxima palavra o display mostrado ao utilizador
-    ADD R9,2 ;avança-se para a próxima palavra o display que pretendemos mostrar ao utilizador
-    CMP R0,R1 ;compara-se R0, posição atual no display, com o fim do display (R1)
-    JLE Ciclo_RefreshDisplay ;se ainda não chegámos ao fim (é menor ou igual) volta-se ao início do ciclo
-    MOV R3, Display_NiveisDeEnergia ;mete-se em R3 o endereço do display dos niveis de energia
-    MOV R0,InicioDisplay ;mete-se em R0 o início do display novamente
-    SUB R1,R0 ;subtrai-se o fim do display pelo início, para termos o número total de bytes
-    ADD R1,1 ;adicionamos 1 para chegarmos às 7 linhas de 16 bytes
-    ADD R3,R1 ;adiciona-se a R3 (endereço do display dos niveis de energia) o valor de R1
-    CMP R9,R3 ;compara-se o valor de R9 com R3 pois se o display que atualizamos (indicado por R9) é o display dos Niveis de Energia, ainda há informação a ser escrita no display
-    JEQ FimRefreshDiplay ;por isso, se R9 é igual a R3, efetua-se este salto para não se chamar o VerificaOK pois falta escrever no display os estados dos postos
-	CALLF VerificaOK ;regista se o utilizador quer procedir
+    MOV R2,[R9]                                                             ;mete-se em R2 o conteúdo do display que queremos apresentar, indicado por R9
+    MOV [R0],R2                                                             ;mete-se no display mostrado ao utilizador o conteúdo de R2
+    ADD R0,2                                                                ;avança-se para a próxima palavra o display mostrado ao utilizador
+    ADD R9,2                                                                ;avança-se para a próxima palavra o display que pretendemos mostrar ao utilizador
+    CMP R0,R1                                                               ;compara-se R0, posição atual no display, com o fim do display (R1)
+    JLE Ciclo_RefreshDisplay                                                ;se ainda não chegámos ao fim (é menor ou igual) volta-se ao início do ciclo
+    MOV R3, Display_NiveisDeEnergia                                         ;mete-se em R3 o endereço do display dos niveis de energia
+    MOV R0,InicioDisplay                                                    ;mete-se em R0 o início do display novamente
+    SUB R1,R0                                                               ;subtrai-se o fim do display pelo início, para termos o número total de bytes
+    ADD R1,1                                                                ;adicionamos 1 para chegarmos às 7 linhas de 16 bytes
+    ADD R3,R1                                                               ;adiciona-se a R3 (endereço do display dos niveis de energia) o valor de R1
+    CMP R9,R3                                                               ;compara-se o valor de R9 com R3 pois se o display que atualizamos (indicado por R9) é o display dos Niveis de Energia, ainda há informação a ser escrita no display
+    JEQ FimRefreshDiplay                                                    ;por isso, se R9 é igual a R3, efetua-se este salto para não se chamar o VerificaOK pois falta escrever no display os estados dos postos
+	CALLF VerificaOK                                                        ;regista se o utilizador quer procedir
 FimRefreshDiplay:
-    POP R3 ;*********************************************************************************************************************
-    POP R2 ;
-    POP R1 ; Retira da pilha os registos guardados no início da rotina
-    POP R0 ;*********************************************************************************************************************
+    POP R3                                                                  ;*********************************************************************************************************************
+    POP R2                                                                  ;
+    POP R1                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R0                                                                  ;*********************************************************************************************************************
     RET
 
 ;******************************************************************************************************************************************
@@ -1079,37 +1079,37 @@ FimRefreshDiplay:
 ;                       os dados que o utilizador insira
 ;******************************************************************************************************************************************
 LimpaPerifericosEntrada:
-    PUSH R0 ;*********************************************************************************************************************
-    PUSH R1 ;
-    PUSH R2 ;
-    PUSH R3 ;
-    PUSH R4 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R5 ;
-    PUSH R6 ;
-    PUSH R7 ;*********************************************************************************************************************
-    MOV R0, InputCodSeguranca       ;*************************************************************************************
-    MOV R1, InputID                 ;
-    MOV R2, InputIncrementoBateria  ;
-    MOV R3, InputTempo              ; Endereços dos periféricos a "limpar" (por a 0)
-    MOV R4, InputOpcao              ;
-    MOV R5, InputSaldo              ;
-    MOV R6, InputBateria            ;*************************************************************************************
-    MOV R7, 0                       ;mete-se no registo 7 o 0 para limpar os periféricos
-    MOV [R0],R7                     ;*************************************************************************************
-    MOV [R1],R7                     ;
-    MOV [R2],R7                     ;
-    MOV [R3],R7                     ; Limpeza dos periféricos de entrada
-    MOV [R4],R7                     ;
-    MOV [R5],R7                     ;
-    MOV [R6],R7                     ;*************************************************************************************
-    POP R7 ;*********************************************************************************************************************
-    POP R6 ;
-    POP R5 ;
-    POP R4 ; Retira da pilha os registos guardados no início da rotina
-    POP R3 ;
-    POP R2 ;
-    POP R1 ;
-    POP R0 ;*********************************************************************************************************************
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ;
+    PUSH R2                                                                 ;
+    PUSH R3                                                                 ;
+    PUSH R4                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R5                                                                 ;
+    PUSH R6                                                                 ;
+    PUSH R7                                                                 ;*********************************************************************************************************************
+    MOV R0, InputCodSeguranca                                               ;*************************************************************************************
+    MOV R1, InputID                                                         ;
+    MOV R2, InputIncrementoBateria                                          ;
+    MOV R3, InputTempo                                                      ; Endereços dos periféricos a "limpar" (por a 0)
+    MOV R4, InputOpcao                                                      ;
+    MOV R5, InputSaldo                                                      ;
+    MOV R6, InputBateria                                                    ;*************************************************************************************
+    MOV R7, 0                                                               ;mete-se no registo 7 o 0 para limpar os periféricos
+    MOV [R0],R7                                                             ;*************************************************************************************
+    MOV [R1],R7                                                             ;
+    MOV [R2],R7                                                             ;
+    MOV [R3],R7                                                             ; Limpeza dos periféricos de entrada
+    MOV [R4],R7                                                             ;
+    MOV [R5],R7                                                             ;
+    MOV [R6],R7                                                             ;*************************************************************************************
+    POP R7                                                                  ;*********************************************************************************************************************
+    POP R6                                                                  ;
+    POP R5                                                                  ;
+    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R3                                                                  ;
+    POP R2                                                                  ;
+    POP R1                                                                  ;
+    POP R0                                                                  ;*********************************************************************************************************************
     RETF
     
 ;**********************************************************************************************************************************
@@ -1118,20 +1118,20 @@ LimpaPerifericosEntrada:
 ;                       preenchendo-o com espaços
 ;**********************************************************************************************************************************
 LimpaDisplay:
-    PUSH R0 ;*********************************************************************************************************************
-    PUSH R1 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R2 ;*********************************************************************************************************************
-    MOV R0,InicioDisplay ;mete-se em R0 o início do display
-    MOV R1,FimDisplay ;mete-se em R1 o fim do display
-    MOV R2,20 ;mete-se em R2 um caratér vazio (valor em código ASCII de 20)
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R2                                                                 ;*********************************************************************************************************************
+    MOV R0,InicioDisplay                                                    ;mete-se em R0 o início do display
+    MOV R1,FimDisplay                                                       ;mete-se em R1 o fim do display
+    MOV R2,20                                                               ;mete-se em R2 um caratér vazio (valor em código ASCII de 20)
 Ciclo_LimpaDisplay:
-    MOVB [R0],R2 ;mete-mos no byte endereçado por R0 o caratér vazio
-    ADD R0,1 ;avança-se para o próximo byte
-    CMP R0,R1 ;verifica-se se chegou-se ao fim do display
-    JLE Ciclo_LimpaDisplay ;se não, volta-se ao início do ciclo
-    POP R2 ;*********************************************************************************************************************
-    POP R1 ; Retira da pilha os registos guardados no início da rotina
-    POP R0 ;*********************************************************************************************************************
+    MOVB [R0],R2                                                            ;mete-mos no byte endereçado por R0 o caratér vazio
+    ADD R0,1                                                                ;avança-se para o próximo byte
+    CMP R0,R1                                                               ;verifica-se se chegou-se ao fim do display
+    JLE Ciclo_LimpaDisplay                                                  ;se não, volta-se ao início do ciclo
+    POP R2                                                                  ;*********************************************************************************************************************
+    POP R1                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R0                                                                  ;*********************************************************************************************************************
     RETF
 
 ;*********************************************************************************************************************************************
@@ -1141,10 +1141,10 @@ Ciclo_LimpaDisplay:
 ;                           das baterias (Funcional indica que a bateria está acima do valor mínimo de um carregamento de uma hora)
 ;*********************************************************************************************************************************************
 Display_NiveisDeEnergia_InserirInformacao:
-    PUSH R3 ;*********************************************************************************************************************
-    PUSH R4 ;
-    PUSH R5 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R6 ;*********************************************************************************************************************
+    PUSH R3                                                                 ;*********************************************************************************************************************
+    PUSH R4                                                                 ;
+    PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R6                                                                 ;*********************************************************************************************************************
     MOV R5, InicioDisplay
     MOV R4,Normal
     CMP R0,R4
@@ -1187,10 +1187,10 @@ NaoFuncionalRapido:
     CALLF EscreveFuncional
 FimF:
     CALLF VerificaOK
-    POP R6 ;*********************************************************************************************************************
-    POP R5 ;*********************************************************************************************************************
-    POP R4 ; Retira da pilha os registos guardados no início da rotina
-    POP R3 ;*********************************************************************************************************************
+    POP R6                                                                  ;*********************************************************************************************************************
+    POP R5                                                                  ;
+    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R3                                                                  ;*********************************************************************************************************************
     RET
 
 ;******************************************************************************************************************************************
