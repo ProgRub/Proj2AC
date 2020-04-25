@@ -328,6 +328,16 @@ Display_BateriaCarregada:
 	String "                "
 	String " OK - continuar "
 
+PLACE 2E80H
+Display_LigarPosto:
+	String " Pretende ligar "
+	String "   ou desligar  "
+	String "    o posto?    "
+	String "1 - Ligar       "
+	String "2 - Desligar    "
+	String "                "
+	String " OK - continuar "
+
 
 ;*****************************************************************************************************************************************
 ;                                               MAIN
@@ -344,15 +354,34 @@ Inicio:
 ;*****************************************************************************************************************************************
 PLACE 6000H
 Main:
+    MOV R6, InputOpcao
+    MOV R9, Display_LigarPosto
+    CALL RefreshDisplay
+    MOVB R7,[R6]
+    CALLF LimpaPerifericosEntrada
+    CMP R7,2
+    JEQ Fim
+    CMP R7,1
+    JEQ InicioPrograma
+    MOV R9,Display_OpcaoInvalida
+    CALL RefreshDisplay
+    JMP Main
+InicioPrograma:
     MOV SP, StackPointer                                                    ;mete em SP o endereço do início da pilha
     MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV R0,[R6]                                                             ;guarda em R0 o valor da bateria do posto normal presente na memória
+    MOV R0, [R6]                                                            ;guarda em R0 o valor da bateria do posto normal presente na memória
     MOV R1, [R7]                                                            ;guarda em R1 o valor da bateria do posto semirapido presente na memória
-    MOV R2,[R8]                                                             ;guarda em R2 o valor da bateria do posto rapido presente na memória
+    MOV R2, [R8]                                                            ;guarda em R2 o valor da bateria do posto rapido presente na memória
     CALL Programa                                                           ;chama-se o programa
-    JMP Fim
+    MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
+    MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV [R6], R0                                                            ;guarda em R0 o valor da bateria do posto normal presente na memória
+    MOV [R7], R1                                                            ;guarda em R1 o valor da bateria do posto semirapido presente na memória
+    MOV [R8], R2                                                            ;guarda em R2 o valor da bateria do posto rapido presente na memória
+    JMP Main
 
 Programa:
     CALLF LimpaDisplay                                                      ;limpa o display
@@ -367,8 +396,13 @@ Programa:
 	CMP R10, R4                                                             ;se R10 for igual a -1 (R4), significa que o cliente não está na base de dados e o utilizador não foi verificado
 	JEQ Programa                                                            ;se tal acontecer, volta-se ao inicio do programa
     CALL Carregamento                                                       ;rotina para efetuar o carregamento do carro
-	JMP Programa                                                            ;voltar ao início do programa
+	;JMP Programa                                                            ;voltar ao início do programa
     RET
+	
+Fim:
+    CALLF LimpaDisplay
+FimFim:
+    JMP FimFim
 
 ;*************************************************************************************************************************************
 ;                                       ROTINA AlteraBaseDeDados
@@ -809,7 +843,7 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
-	CALLF LimpaPerifericosEntrada                                            ;limpa os endereços de onde se lê os inputs do utilizador
+	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
 	CMP R3,R6																;compara o registo 3 com o registo 6
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
@@ -950,7 +984,23 @@ NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO D
 	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
     MOV R9,89
-    CALL EscreveValores														
+    CALL EscreveValores
+    MOV R6, InicioDisplay
+    MOV R8,47
+    ADD R6,R8
+    CMP R3,1
+    JNE VerSemi
+    CALLF EscreveNormal
+    JMP Salto
+VerSemi:    
+    CMP R3,2
+    JNE VerRapido
+    CALLF EscreveSemiRapido
+    JMP Salto
+VerRapido:
+    CALLF EscreveRapido
+Salto:	
+    CALLF VerificaOK													
 	MOV R4, R7																;é colocado no registo 4 o valor do tempo que foi necessario para o carregamento da bateria
 	MUL R7,R3																;é multiplicado o valor do registo 7 com o valor do registo 3, ou seja, o valor do tempo necessario com o valor do custo do tipo de carregamento escolhido -> registo 7 com o valor do custo do carregamento
 	CALL Debito																;é feito o pagamento do carregamento
@@ -977,6 +1027,7 @@ Debito:																		;REALIZA O PAGAMENTO DO CARREGAMENTO
     MOV R8,R7
     MOV R9,89
     CALL EscreveValores
+    CALLF VerificaOK
 	RET	
 
 AtualizaPostoNormal:														;ATUALIZA O VALOR DA BATERIA DO POSTO NORMAL
@@ -1064,6 +1115,14 @@ Ciclo_RefreshDisplay:
     ADD R3,R1                                                               ;adiciona-se a R3 (endereço do display dos niveis de energia) o valor de R1
     CMP R9,R3                                                               ;compara-se o valor de R9 com R3 pois se o display que atualizamos (indicado por R9) é o display dos Niveis de Energia, ainda há informação a ser escrita no display
     JEQ FimRefreshDiplay                                                    ;por isso, se R9 é igual a R3, efetua-se este salto para não se chamar o VerificaOK pois falta escrever no display os estados dos postos
+    MOV R3, Display_Debito
+    ADD R3,R1
+    CMP R9,R3
+    JEQ FimRefreshDiplay
+    MOV R3, Display_InfoCarregamento
+    ADD R3,R1
+    CMP R9,R3
+    JEQ FimRefreshDiplay
 	CALLF VerificaOK                                                        ;regista se o utilizador quer procedir
 FimRefreshDiplay:
     POP R3                                                                  ;*********************************************************************************************************************
@@ -1122,7 +1181,7 @@ LimpaDisplay:
     PUSH R2                                                                 ;*********************************************************************************************************************
     MOV R0,InicioDisplay                                                    ;mete-se em R0 o início do display
     MOV R1,FimDisplay                                                       ;mete-se em R1 o fim do display
-    MOV R2,20                                                               ;mete-se em R2 um caratér vazio (valor em código ASCII de 20)
+    MOV R2,32                                                               ;mete-se em R2 um caratér vazio (valor em código ASCII de 32)
 Ciclo_LimpaDisplay:
     MOVB [R0],R2                                                            ;mete-mos no byte endereçado por R0 o caratér vazio
     ADD R0,1                                                                ;avança-se para o próximo byte
@@ -1290,6 +1349,85 @@ EscreveNao_Func:
     RETF
 
 
+EscreveNormal:
+    ADD R6,1
+    MOV R4,78
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,114
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,109
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,108
+    MOVB [R6],R4
+    RETF
+
+EscreveSemiRapido:
+    ADD R6,1
+    MOV R4,83
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,101
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,109
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,105
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,45
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,114
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,112
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,105
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,100
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    RETF
+
+EscreveRapido:
+    ADD R6,1
+    MOV R4,82
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,97
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,112
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,105
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,100
+    MOVB [R6],R4
+    ADD R6,1
+    MOV R4,111
+    MOVB [R6],R4
+    RETF
+
+
 EscreveValores:
     PUSH R0
     PUSH R1
@@ -1315,7 +1453,6 @@ CicloEscreveValores:
     SUB R0,1
     JMP CicloEscreveValores
 FimEscreveValores:
-    CALLF VerificaOK
     POP R7
     POP R6
     POP R5
@@ -1325,6 +1462,3 @@ FimEscreveValores:
     POP R1
     POP R0
     RET
-	
-Fim:
-    JMP Fim
