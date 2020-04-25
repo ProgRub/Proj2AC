@@ -1,36 +1,36 @@
 ;constantes:
-Normal 					    EQU 20 		;3.7 kWh
-Semirapido 				    EQU 60 		;22 kWh
-Rapido 					    EQU 100 	;50 kWh
-CustoNormal 			    EQU 1		;custo do carregamento normal
-CustoSemiRapido 		    EQU 2 		;custo do carregamento semirápido
-CustoRapido 			    EQU 3 		;custo do carregamento rápido
-EnderecoBateriaNormal   	EQU 1200H ;endereço onde é guardado o valor da bateria para o carregamento normal
-EnderecoBateriaSemiRapido   EQU 1202H ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
-EnderecoBateriaRapido   	EQU 1204H ;endereço onde é guardado o valor da bateria para o carregamento rápido
+Normal 					    EQU 20 		                                    ;percentagem da bateria carregada por uma hora em carregamento normal
+Semirapido 				    EQU 60 		                                    ;percentagem da bateria carregada por uma hora em carregamento semirapido
+Rapido 					    EQU 100 	                                    ;percentagem da bateria carregada por uma hora em carregamento rapido
+CustoNormal 			    EQU 1		                                    ;custo do carregamento normal
+CustoSemiRapido 		    EQU 2 		                                    ;custo do carregamento semirápido
+CustoRapido 			    EQU 3 		                                    ;custo do carregamento rápido
+EnderecoBateriaNormal   	EQU 1200H                                       ;endereço onde é guardado o valor da bateria para o carregamento normal
+EnderecoBateriaSemiRapido   EQU 1202H                                       ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
+EnderecoBateriaRapido   	EQU 1204H                                       ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
 InicioDisplay 				EQU 0030H
 FimDisplay 					EQU 009FH
 
 ;endereços de memória relativos aos inputs:
-OK                          EQU 00B0H     ;endereço do botão OK
-InputID                     EQU 00D0H     ;endereço onde inserir o ID do cliente
-InputCodSeguranca           EQU 00D2H     ;endereço onde inserir o código de segurança do cliente
-InputSaldo                  EQU 00D4H     ;endereço onde inserir o ID do cliente
-InputBateria         	    EQU 00D6H     ;endereço onde inserir o código de segurança do cliente
-InputOpcao    			    EQU 00E0H     ;endereço onde inserir o tipo de carregamento
-InputTempo                  EQU 00E2H     ;endereço onde inserir o tempo desejado
-InputIncrementoBateria      EQU 00E4H 	  ;endereço onde inserir a bateria a adicionar à bateria selecionada
+OK                          EQU 00B0H                                       ;endereço do botão OK
+InputID                     EQU 00D0H                                       ;endereço onde inserir o ID do cliente
+InputCodSeguranca           EQU 00D2H                                       ;endereço onde inserir o código de segurança do cliente
+InputSaldo                  EQU 00D4H                                       ;endereço onde inserir o ID do cliente
+InputBateria         	    EQU 00D6H                                       ;endereço onde inserir o código de segurança do cliente
+InputOpcao    			    EQU 00E0H                                       ;endereço onde inserir o tipo de carregamento
+InputTempo                  EQU 00E2H                                       ;endereço onde inserir o tempo desejado
+InputIncrementoBateria      EQU 00E4H 	                                    ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
-Base_Tabela_Dados 		    EQU 1100H ;endereço do início da base de dados
-CodSeguranca 			    EQU 02H ;aumento relativo ao inicio dos dados do cliente para ler o código de segurança
-Saldo 					    EQU 04H ;aumento relativo ao inicio dos dados do cliente para ler o saldo
-BateriaCarro 				EQU 06H ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
-Proximo 					EQU 08H ;salto a executar para ler os dados do próximo cliente
-EnderecoTamanho 			EQU 10FEH ;endereço que contém o número de clientes na base de dados
+Base_Tabela_Dados 		    EQU 1100H                                       ;endereço do início da base de dados
+CodSeguranca 			    EQU 02H                                         ;aumento relativo ao inicio dos dados do cliente para ler o código de segurança
+Saldo 					    EQU 04H                                         ;aumento relativo ao inicio dos dados do cliente para ler o saldo
+BateriaCarro 				EQU 06H                                         ;aumento relativo ao inicio dos dados do cliente para ler quanta bateria o carro do cliente tem
+Proximo 					EQU 08H                                         ;salto a executar para ler os dados do próximo cliente
+EnderecoTamanho 			EQU 10FEH                                       ;endereço que contém o número de clientes na base de dados
 
-StackPointer 				EQU 8000H ;endereço da pilha
+StackPointer 				EQU 8000H                                       ;endereço da pilha
 
 
 
@@ -375,12 +375,12 @@ InicioPrograma:
     MOV R1, [R7]                                                            ;guarda em R1 o valor da bateria do posto semirapido presente na memória
     MOV R2, [R8]                                                            ;guarda em R2 o valor da bateria do posto rapido presente na memória
     CALL Programa                                                           ;chama-se o programa
-    MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
-    MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
-    MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
-    MOV [R6], R0                                                            ;guarda em R0 o valor da bateria do posto normal presente na memória
-    MOV [R7], R1                                                            ;guarda em R1 o valor da bateria do posto semirapido presente na memória
-    MOV [R8], R2                                                            ;guarda em R2 o valor da bateria do posto rapido presente na memória
+    MOV R6, EnderecoBateriaNormal 											;coloca no registo 6 o endereço onde está guardado o valor da bateria do posto normal
+    MOV R7, EnderecoBateriaSemiRapido 										;coloca no registo 7 o endereço onde está guardado o valor da bateria do posto semi-rapido
+    MOV R8, EnderecoBateriaRapido 											;coloca no registo 8 o endereço onde está guardado o valor da bateria do posto rapido
+    MOV [R6], R0															;atualiza o valor da bateria do posto normal
+    MOV [R7], R1															;atualiza o valor da bateria do posto semi-rapido
+    MOV [R8], R2															;atualiza o valor da bateria do posto rapido
     JMP Main
 
 Programa:
@@ -804,22 +804,13 @@ FimFunc2:
 ;                   efetuando as verificações necessárias e atualizando os postos
 ;***************************************************************************************************************************************************
 Carregamento: 
-    ; PUSH R0                                                               ;*********************************************************************************************************************
-    ; PUSH R1 ;
-    ; PUSH R2 ;
-    PUSH R3                                                                 ;
-    PUSH R4                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3                                                                 ;*********************************************************************************************************************
+    PUSH R4                                                                 ; 
     PUSH R5                                                                 ;
-    PUSH R6                                                                 ;
+    PUSH R6                                                                 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R7                                                                 ;
     PUSH R8                                                                 ;*********************************************************************************************************************
 EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PELO UTILIZADOR
-    ; MOV R3, EnderecoBateriaNormal 											;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
-    ; MOV R4, EnderecoBateriaSemiRapido 										;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
-    ; MOV R5, EnderecoBateriaRapido 											;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    ; MOV R0,[R3] 															;guarda em R0 o valor da bateria do posto normal, e aqui fica ao longo do programa
-    ; MOV R1, [R4] 															;guarda em R1 o valor da bateria do posto semi-rapido, e aqui fica ao longo do programa
-    ; MOV R2,[R5] 															;guarda em R2 o valor da bateria do posto rapido, e aqui fica ao longo do programa 
 	MOV R6, CustoNormal														;coloca no registo 6 o valor do custo do carregamento do tipo normal
 	MOV R7, CustoSemiRapido													;coloca no registo 7 o valor do custo do carregamento do tipo semi-rápido
 	MOV R8, CustoRapido														;coloca no registo 8 o valor do custo do carregamento do tipo rápido
@@ -1050,23 +1041,14 @@ AtualizaPostoRapido:														;ATUALIZA O VALOR DA BATERIA DO POSTO RAPIDO
 CarregamentoConcluido:														;ATUALIZA VALORES DAS BATERIAS DO POSTO (CARREGAMENTO CONCLUIDO)
 	MOV R9, Display_CarregamentoConcluido 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-    ; MOV R6, EnderecoBateriaNormal 											;coloca no registo 6 o endereço onde está guardado o valor da bateria do posto normal
-    ; MOV R7, EnderecoBateriaSemiRapido 										;coloca no registo 7 o endereço onde está guardado o valor da bateria do posto semi-rapido
-    ; MOV R8, EnderecoBateriaRapido 											;coloca no registo 8 o endereço onde está guardado o valor da bateria do posto rapido
-    ; MOV [R6], R0															;atualiza o valor da bateria do posto normal
-    ; MOV [R7], R1															;atualiza o valor da bateria do posto semi-rapido
-    ; MOV [R8], R2															;atualiza o valor da bateria do posto rapido
 	
 FimFunc3:
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
     POP R6                                                                  ;
-    POP R5                                                                  ;
-    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
-    POP R3                                                                  ;
-    ; POP R2 ;
-    ; POP R1 ;
-    ; POP R0                                                                ;*********************************************************************************************************************
+    POP R5                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R4                                                                  ; 
+    POP R3                                                                  ;*********************************************************************************************************************
 	RET
     
 ;******************************************************************************************************************************************
