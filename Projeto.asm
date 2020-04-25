@@ -566,7 +566,7 @@ InicioInsereEnergia:
     MOV R5,4                                                                ;mete em R5 o valor da opção de avançar, que é 4
     CMP R4,R5                                                               ;compara a opção escolhida pelo utilizador com o valor em R5 (4)
     JNE IncrementaNormal                                                    ;se não são iguais, o utilizador ou pretende carregar uma das baterias ou inseriu uma opção inválida, efetua-se o salto para verificar posteriormente
-    JMP FimFunc1                                                            ;se são iguais, salta-se para o fim da função
+    JMP FimInsereEnergia                                                    ;se são iguais, salta-se para o fim da função
 IncrementaNormal:
     MOV R5, CustoNormal                                                     ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Normal, que coincide com o custo do carregamento (1)
     CMP R4, R5                                                              ;compara a opção escolhida pelo utilizador com o valor em R5 (1)
@@ -618,7 +618,6 @@ OverflowBateria:                                                            ;se 
     MOV R2,R8                                                               ;reset do valor da bateria do posto rapido
     MOV R9, Display_Overflow                                                ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFFimInsereEnergiaunc1
     JMP InicioInsereEnergia                                                 ;volta ao início da rotina
 IncrementaBateriaInvalido:                                                  ;a rotina chega aqui se o utilizador quer tirar em vez de carregar bateria a um posto
     MOV R9,Display_IncrementaBateriaInvalido                                ;Mete no registo 9, onde está o endereço do display a mostrar, o display que pretendemos mostrar
@@ -864,11 +863,6 @@ VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PA
 	
 	
 ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
-    MOV R8, R4
-	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
-    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-    MOV R9,89
-    CALL EscreveValores
     MOV R4,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R6, CustoNormal 													;coloca no registo 6 o custo/hora do carregamento normal
@@ -891,7 +885,7 @@ ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	MOV R8, 100 															;coloca no registo 8 a constante 100
 	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
-	JGT BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
+	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente														
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
@@ -907,7 +901,7 @@ ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV R8, 100 															;coloca no registo 8 a constante 100
 	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
-	JGT BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
+	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente	
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
@@ -922,7 +916,7 @@ ForneceEnergiaRapido:														;FORNECE ENERGIA DO TIPO RAPIDO
 	MOV R8, 100 															;coloca no registo 8 a constante 100
 	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
-	JGT BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
+	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente	
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
@@ -952,6 +946,11 @@ Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA B
 
 NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
 	SUB R7, R4																;é subtraido ao registo 7 (o tempo inserido) o valor do registo 4 (o valor do tempo que sobrou)
+	MOV R8, R7
+	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
+    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
+    MOV R9,89
+    CALL EscreveValores														
 	MOV R4, R7																;é colocado no registo 4 o valor do tempo que foi necessario para o carregamento da bateria
 	MUL R7,R3																;é multiplicado o valor do registo 7 com o valor do registo 3, ou seja, o valor do tempo necessario com o valor do custo do tipo de carregamento escolhido -> registo 7 com o valor do custo do carregamento
 	CALL Debito																;é feito o pagamento do carregamento
