@@ -587,13 +587,11 @@ InicioInsereEnergia:
     MOV R6,R0                                                               ;guarda em R6 o valor original da bateria do posto normal, caso o utilizador carregue a bateria com um valor inválido
     MOV R7,R1                                                               ;guarda em R7 o valor original da bateria do posto semirapido, caso o utilizador carregue a bateria com um valor inválido
     MOV R8,R2                                                               ;guarda em R8 o valor original da bateria do posto rapido, caso o utilizador carregue a bateria com um valor inválido
-    MOV R5,4                                                                ;mete em R5 o valor da opção de avançar, que é 4
-    CMP R4,R5                                                               ;compara a opção escolhida pelo utilizador com o valor em R5 (4)
+    CMP R4,4                                                                ;compara a opção escolhida pelo utilizador com o valor 4, que é a opção de avançar
     JNE IncrementaNormal                                                    ;se não são iguais, o utilizador ou pretende carregar uma das baterias ou inseriu uma opção inválida, efetua-se o salto para verificar posteriormente
     JMP FimInsereEnergia                                                    ;se são iguais, salta-se para o fim da função
 IncrementaNormal:
-    MOV R5, CustoNormal                                                     ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Normal, que coincide com o custo do carregamento (1)
-    CMP R4, R5                                                              ;compara a opção escolhida pelo utilizador com o valor em R5 (1)
+    CMP R4, CustoNormal                                                     ;compara a opção escolhida pelo utilizador com o valor co custoNormal (1)
     JNE IncrementaSemiRapido                                                ;se verificar-se que a bateria escolhida não é a normal, procede-se para a verificação das outras baterias
 	MOV R9, Display_InsereEnergiaQuanta                                     ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -607,8 +605,7 @@ IncrementaNormal:
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
     JMP AtualizaPostos                                                      ;se não ocorrer overflow, atualizamos os valores dos postos em memória
 IncrementaSemiRapido:
-    MOV R5,CustoSemiRapido                                                  ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Semirapido, que coincide com o custo do carregamento (2)
-    CMP R4,R5                                                               ;compara a opção escolhida pelo utilizador com o valor em R5 (2)
+    CMP R4,custoSemiRapido                                                  ;compara a opção escolhida pelo utilizador com o valor co custoSemiRapido (2)
     JNE IncrementaRapido                                                    ;se verificar-se que a bateria escolhida não é a semirapida, procede-se para a verificação das outras baterias
 	MOV R9, Display_InsereEnergiaQuanta                                     ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -622,8 +619,7 @@ IncrementaSemiRapido:
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
     JMP AtualizaPostos                                                      ;se não ocorrer overflow, atualizamos os valores dos postos em memória
 IncrementaRapido:
-    MOV R5, CustoRapido                                                     ;mete em R5 o valor de opção correspondente a carregar a bateria do posto Rapido, que coincide com o custo do carregamento (3)
-    CMP R4, R5                                                              ;compara a opção escolhida pelo utilizador com o valor em R5 (3)
+    CMP R4, CustoRapido                                                     ;compara a opção escolhida pelo utilizador com o valor co custoRapido (3)
     JNE OpcaoInvalida                                                       ;se verificar-se que a bateria escolhida não é a rapida, então o utilizador inseriu uma opção inválida
 	MOV R9, Display_InsereEnergiaQuanta                                     ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
