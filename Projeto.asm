@@ -14,6 +14,7 @@ FimDisplay 					EQU 008FH
 
 ;endereços de memória relativos aos inputs:
 OK                          EQU 00A0H                                       ;endereço do botão OK
+Ligar                       EQU 00A1H                                       ;endereço do botão para ligar o posto (ou desligar)
 InputID                     EQU 00B0H                                       ;endereço onde inserir o ID do cliente
 InputCodSeguranca           EQU 00B2H                                       ;endereço onde inserir o código de segurança do cliente
 InputSaldo                  EQU 00B4H                                       ;endereço onde inserir o ID do cliente
@@ -327,17 +328,6 @@ Display_BateriaCarregada:
 	String "                "
 	String " OK - continuar "
 
-PLACE 2E80H
-Display_LigarPosto:
-	String " Pretende ligar "
-	String "   ou desligar  "
-	String "    o posto?    "
-	String "1 - Ligar       "
-	String "2 - Desligar    "
-	String "                "
-	String " OK - continuar "
-
-
 ;*****************************************************************************************************************************************
 ;                                               MAIN
 ;*****************************************************************************************************************************************
@@ -354,19 +344,13 @@ Inicio:
 ;*****************************************************************************************************************************************
 PLACE 6000H
 Main:
-    MOV R6, InputOpcao
-    MOV R9, Display_LigarPosto
-    CALL RefreshDisplay
-    MOVB R7,[R6]
-    CALLF LimpaPerifericosEntrada
-    CMP R7,2
-    JEQ Fim
-    CMP R7,1
-    JEQ InicioPrograma
-    MOV R9,Display_OpcaoInvalida
-    CALL RefreshDisplay
-    JMP Main
-InicioPrograma:
+    MOV R6, Ligar
+    CALLF LimpaDisplay                                                      ;limpa o display
+Desligado:
+    MOVB R4,[R6]
+    CMP R4,0
+    JEQ Desligado
+Ligado:
     MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
@@ -374,6 +358,7 @@ InicioPrograma:
     MOV R1, [R7]                                                            ;guarda em R1 o valor da bateria do posto semirapido presente na memória
     MOV R2, [R8]                                                            ;guarda em R2 o valor da bateria do posto rapido presente na memória
     CALL Programa                                                           ;chama-se o programa
+    CALLF LimpaPerifericosEntrada                                           ;limpa os periféricos de entrada
     MOV R6, EnderecoBateriaNormal 											;coloca no registo 6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido 										;coloca no registo 7 o endereço onde está guardado o valor da bateria do posto semi-rapido
     MOV R8, EnderecoBateriaRapido 											;coloca no registo 8 o endereço onde está guardado o valor da bateria do posto rapido
@@ -605,7 +590,7 @@ IncrementaNormal:
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
     JMP AtualizaPostos                                                      ;se não ocorrer overflow, atualizamos os valores dos postos em memória
 IncrementaSemiRapido:
-    CMP R4,custoSemiRapido                                                  ;compara a opção escolhida pelo utilizador com o valor co custoSemiRapido (2)
+    CMP R4,CustoSemiRapido                                                  ;compara a opção escolhida pelo utilizador com o valor co custoSemiRapido (2)
     JNE IncrementaRapido                                                    ;se verificar-se que a bateria escolhida não é a semirapida, procede-se para a verificação das outras baterias
 	MOV R9, Display_InsereEnergiaQuanta                                     ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -927,7 +912,7 @@ NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO D
     MOV R9,89                                                               ;mete no registo 9 o número de bytes a adicionar ao início do display para escrever o valor no lugar certo
     CALLF EscreveValores                                                    ;chama a função que escreve o valor pretendido (que se encontra no registo 8)
     MOV R6, InicioDisplay                                                   ;mete no registo 6 o início do display
-    MOV R8,46                                                               ;mete no registo 8 o valor a acrescentar ao início do display
+    MOV R8,48                                                               ;mete no registo 8 o valor a acrescentar ao início do display
     ADD R6,R8                                                               ;adiciona ao registo 6 o registo 8, para escrevermos o tipo de carregamento no lugar certo
     CMP R3, CustoNormal                                                     ;compara o tipo de carregamento escolhido com CustoNormal (1, igual à opção de escolher normal)
     JNE VerSemi                                                             ;se não for igual, o utilizador não escolheu o carregamento normal e verifica-se o próximo tipo de carregamento
@@ -1390,10 +1375,10 @@ EscreveValores:
     MOV R1,10                                                               ;mete em R1 o valor 10, para fins de cálculo de resto e divisão
     MOV R2,48                                                               ;mete em R2 o incremento ao valor numerico para obter o carater ASCII do valor numerico
 CicloEscreveValores:
-    MOV R4,R8                                                               ;guarda em R4 uma cópia do valor (R8)
-    MOD R4,R1                                                               ;calcula-se o resto de R4 por R1 (valor por 10), para obter o valor a mostrar no display
-    ADD R4,R2                                                               ;adicionar ao valor obtido R2 (para obter o código ASCII do valor)
-    MOVB [R0],R4                                                            ;escrever o valor númerico no display (byte endereçado por R0)
+    MOV R3,R8                                                               ;guarda em R4 uma cópia do valor (R8)
+    MOD R3,R1                                                               ;calcula-se o resto de R4 por R1 (valor por 10), para obter o valor a mostrar no display
+    ADD R3,R2                                                               ;adicionar ao valor obtido R2 (para obter o código ASCII do valor)
+    MOVB [R0],R3                                                            ;escrever o valor númerico no display (byte endereçado por R0)
     SUB R0,1                                                                ;como estamos a escrever o valor da direita para a esquerda, subtrair 1 a R0
     DIV R8,R1                                                               ;divide-se o valor por 10, para avançar para mostrar o próximo valor (possivelmente)
     CMP R8,0                                                                ;compara o valor númerico com 0
