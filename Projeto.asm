@@ -344,13 +344,10 @@ Inicio:
 ;*****************************************************************************************************************************************
 PLACE 6000H
 Main:
-    MOV R6, Ligar
     CALLF LimpaDisplay                                                      ;limpa o display
-Desligado:
-    MOVB R4,[R6]
-    CMP R4,0
-    JEQ Desligado
-Ligado:
+    CALL Desligado                                                          ;chama a rotina para verificar se é para desligar a máquina (e desligá-la, caso seja)
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+	JEQ Main                                                                ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o main (não se avança)
     MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
@@ -370,23 +367,43 @@ Ligado:
 Programa:
     CALLF LimpaDisplay                                                      ;limpa o display
     CALL AlteraBaseDeDados                                                  ;rotina para alterar a base de dados
+    CALL Desligado                                                          ;chama a rotina para verificar se é para desligar a máquina (e desligá-la, caso seja)
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+	JEQ FimPrograma                                                         ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
     CALL InsereEnergia                                                      ;rotina para carregar os postos
+    CALL Desligado                                                          ;chama a rotina para verificar se é para desligar a máquina (e desligá-la, caso seja)
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+	JEQ FimPrograma                                                         ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
     CALL NiveisDeEnergia                                                    ;rotina para indicar se os postos estão operacionais
-    MOV R4,-1                                                               ;mete em R4 o valor -1 para fins de comparação
-    CMP R10,R4                                                              ;compara-se o valor em R10 com R4 (-1)
-    JEQ Programa                                                            ;se são iguais, isto significa que nenhum dos postos tem o nível mínimo de bateria e volta-se ao início do programa
+    CALL Desligado                                                          ;chama a rotina para verificar se é para desligar a máquina (e desligá-la, caso seja)
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+	JEQ FimPrograma                                                         ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+    JEQ FimPrograma                                                         ;se são iguais, isto significa que nenhum dos postos tem o nível mínimo de bateria e termina-se o programa
     CALL Verificacao_Cliente                                                ;rotina para efetuar a verificação do cliente
-	MOV R4, -1                                                              ;mete em R4 o valor -1 para comparar com R10, o indice do cliente verificado (possivelmente)
-	CMP R10, R4                                                             ;se R10 for igual a -1 (R4), significa que o cliente não está na base de dados e o utilizador não foi verificado
-	JEQ Programa                                                            ;se tal acontecer, volta-se ao inicio do programa
+    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
+	JEQ FimPrograma                                                         ;R10 será igual a -1 se o utilizador não foi verificado. Se tal acontecer, salta-se para o fim do programa
     CALL Carregamento                                                       ;rotina para efetuar o carregamento do carro
-	;JMP Programa                                                            ;voltar ao início do programa
+FimPrograma:
     RET
 	
+Desligado:
+                                                                            ;*********************************************************************************************************************
+    PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R6                                                                 ;*********************************************************************************************************************
+    MOV R10,0
+    MOV R6, Ligar                                                           ;mete no R6 o endereço do botão que liga a máquina
+    MOVB R5,[R6]                                                            ;mete em R5 o byte endereçado por R6 (o botão de ligar / desligar)
+    CMP R5,0                                                                ;compara R5 com 0
+    JNE FimDesligado                                                        ;se R5 é diferente de 0, o posto está ligado e efetua-se este jump; caso contrário, este jump não é efetuado
+    MOV R10,-1                                                              ;mete-se em R10 o valor -1, para indicar que o posto está desligado
+FimDesligado:
+    POP R6                                                                  ;*********************************************************************************************************************
+    POP R5                                                                  ; Retira da pilha os registos guardados no início da rotina
+                                                                            ;*********************************************************************************************************************
+    RET
 Fim:
-    CALLF LimpaDisplay
-FimFim:
-    JMP FimFim
+    JMP Fim
 
 ;*************************************************************************************************************************************
 ;                                       ROTINA AlteraBaseDeDados
@@ -414,7 +431,7 @@ AlterarOuNao:                                                               ;Ini
     JEQ CriarOuAlterar                                                      ;se for igual, o utilizador indicou que pretende alterar a base de dados
     CMP R0,2                                                                ;se R0 não é igual a 1, compara-se a 2
     JNE OpcaoInvalidaDatabase                                               ;se R0 não é igual a 2, o utilizador inseriu uma opção inválida
-    JMP FimFunc4                                                            ;se R0 é igual a 2, o utilizador indicou que não pretende alterar a base de dados e salta-se para o fim desta rotina
+    JMP FimAlterarBaseDeDados                                               ;se R0 é igual a 2, o utilizador indicou que não pretende alterar a base de dados e salta-se para o fim desta rotina
 OpcaoInvalidaDatabase:                                                      ;instruções relativas ao registo de uma opção inválida inserida pelo utilizador
     MOV R9, Display_OpcaoInvalida                                           ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
@@ -539,7 +556,7 @@ BateriaInvalida:                                                            ;a r
     MOV R9, Display_BateriaInvalida                                         ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP AlterarOuNao                                                        ;volta ao início da rotina
-FimFunc4:                                                                   ;Fim da rotina, chega aqui se o utilizador já não pretende fazer alterações à base de dados
+FimAlterarBaseDeDados:                                                                   ;Fim da rotina, chega aqui se o utilizador já não pretende fazer alterações à base de dados
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
     POP R6                                                                  ;
@@ -669,12 +686,12 @@ VerificaSemiRapido:
     ADD R3,1                                                                ;caso contrario, adicionamos 1 ao contador e verifica-se a bateria rapida
 VerificaRapido:
     CMP R2, R6                                                              ;compara o valor da bateria do posto rapido com o seu valor mínimo
-    JGE FimFunc                                                             ;se verificarmos que a bateria rapida tem o nivel mínimo, o posto esta operacional e salta-se para o fim da rotina
+    JGE FimNiveisDeEnergia                                                  ;se verificarmos que a bateria rapida tem o nivel mínimo, o posto esta operacional e salta-se para o fim da rotina
     ADD R3,1                                                                ;caso contrário, adicionamos 1 ao contador
     CMP R3,3                                                                ;compara-se o valor do contador com 3 (o número de baterias)
-    JNE FimFunc                                                             ;se o contador não é igual a 3, o posto está operacional e salta-se para o fim da função
+    JNE FimNiveisDeEnergia                                                  ;se o contador não é igual a 3, o posto está operacional e salta-se para o fim da função
     MOV R10,-1                                                              ;caso contrário, mete-se o R10 a -1 para o programa não avançar para a verificação do utilizador
-FimFunc:
+FimNiveisDeEnergia:
     MOV R9,Display_NiveisDeEnergia                                          ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
     CALL Display_NiveisDeEnergia_InserirInformacao                          ;chama a rotina que insere a informação sobre os estados dos postos no display
@@ -726,7 +743,7 @@ Ciclo_Verify_Cliente:
     MUL R10,R1                                                              ;multiplica o valor de Proximo pelo índice, para se obter o início dos dados do cliente verificado relativamente ao início da base de dados
 	MOV R9, Display_VerificacaoSucesso                                      ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
-    JMP FimFunc2                                                            ;saltar para o fim da rotina pois o utilizador foi verificado com sucesso
+    JMP FimVerificacao_Cliente                                              ;saltar para o fim da rotina pois o utilizador foi verificado com sucesso
 VerificacaoFalhada:                                                         ;se os dados que o utilizador inseriu não coincidirem com os dados do cliente que estava a ser verificado efetua-se isto
     ADD R1,1                                                                ;adiciona-se um ao índice
     MOV R3,Proximo                                                          ;caso contrário, mete-se em R3 o valor a acrescentar ao início dos dados do cliente não verificado para avançar para o próximo
@@ -735,7 +752,7 @@ VerificacaoFalhada:                                                         ;se 
 NaoVerificado:                                                              ;chega-se aqui se o utilizador não é verificado
     MOV R9, Display_VerificacaoFalhada                                      ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
-FimFunc2:
+FimVerificacao_Cliente:
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
     POP R6                                                                  ;
@@ -791,7 +808,7 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
 	JMP FimVerificacoes														;se for inferior ou igual, salta para o tag "FimVerificacoes"
 
 VerificaEscolhaTempoSuperiorSemiRapido:
-	CMP R3, CustoRapido														;compara o valor do registo 3 com o valor do registo 7
+	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do registo 7
 	JNE VerificaEscolhaTempoSuperiorRapido									;se o valor do registo 3 não for igual ao valor do registo 7, salta para o tag "VerificaEscolhaTempoSuperiorRapido" - ou seja, é verificado se o tipo de carregamento não é semi-rapido
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
 	MOV R9, Semirapido														;coloca no registo 9 o valor da energia de um carregamento SemiRapido/hora
