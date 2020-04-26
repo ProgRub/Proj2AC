@@ -398,8 +398,6 @@ Programa:
     CALL NiveisDeEnergia                                                    ;rotina para indicar se os postos estão operacionais
     CALL Desligado                                                          ;chama a rotina para verificar se é para desligar a máquina (e desligá-la, caso seja)
     CMP R10,-1                                                              ;compara-se o valor em R10 com -1
-	JEQ FimPrograma                                                         ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
-    CMP R10,-1                                                              ;compara-se o valor em R10 com -1
     JEQ FimPrograma                                                         ;se são iguais, isto significa que nenhum dos postos tem o nível mínimo de bateria e termina-se o programa
     CALL Verificacao_Cliente                                                ;rotina para efetuar a verificação do cliente
     CMP R10,-1                                                              ;compara-se o valor em R10 com -1
