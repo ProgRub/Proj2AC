@@ -5,22 +5,22 @@ Rapido 					    EQU 100 	                                    ;percentagem da bat
 CustoNormal 			    EQU 1		                                    ;custo do carregamento normal
 CustoSemiRapido 		    EQU 2 		                                    ;custo do carregamento semirápido
 CustoRapido 			    EQU 3 		                                    ;custo do carregamento rápido
-EnderecoBateriaNormal   	EQU 1200H                                       ;endereço onde é guardado o valor da bateria para o carregamento normal
-EnderecoBateriaSemiRapido   EQU 1202H                                       ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
-EnderecoBateriaRapido   	EQU 1204H                                       ;endereço onde é guardado o valor da bateria para o carregamento rápido
+EnderecoBateriaNormal   	EQU 10E0H                                       ;endereço onde é guardado o valor da bateria para o carregamento normal
+EnderecoBateriaSemiRapido   EQU 10E2H                                       ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
+EnderecoBateriaRapido   	EQU 10E4H                                       ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
-InicioDisplay 				EQU 0030H
-FimDisplay 					EQU 009FH
+InicioDisplay 				EQU 0020H
+FimDisplay 					EQU 008FH
 
 ;endereços de memória relativos aos inputs:
-OK                          EQU 00B0H                                       ;endereço do botão OK
-InputID                     EQU 00D0H                                       ;endereço onde inserir o ID do cliente
-InputCodSeguranca           EQU 00D2H                                       ;endereço onde inserir o código de segurança do cliente
-InputSaldo                  EQU 00D4H                                       ;endereço onde inserir o ID do cliente
-InputBateria         	    EQU 00D6H                                       ;endereço onde inserir o código de segurança do cliente
-InputOpcao    			    EQU 00E0H                                       ;endereço onde inserir o tipo de carregamento
-InputTempo                  EQU 00E2H                                       ;endereço onde inserir o tempo desejado
-InputIncrementoBateria      EQU 00E4H 	                                    ;endereço onde inserir a bateria a adicionar à bateria selecionada
+OK                          EQU 00A0H                                       ;endereço do botão OK
+InputID                     EQU 00B0H                                       ;endereço onde inserir o ID do cliente
+InputCodSeguranca           EQU 00B2H                                       ;endereço onde inserir o código de segurança do cliente
+InputSaldo                  EQU 00B4H                                       ;endereço onde inserir o ID do cliente
+InputBateria         	    EQU 00B6H                                       ;endereço onde inserir o código de segurança do cliente
+InputOpcao    			    EQU 00C0H                                       ;endereço onde inserir o tipo de carregamento
+InputTempo                  EQU 00C2H                                       ;endereço onde inserir o tempo desejado
+InputIncrementoBateria      EQU 00C4H 	                                    ;endereço onde inserir a bateria a adicionar à bateria selecionada
 
 ;endereços relativos à base de dados
 Base_Tabela_Dados 		    EQU 1100H                                       ;endereço do início da base de dados
@@ -120,11 +120,11 @@ Display_OpcaoInvalida:
 
 PLACE 2400H
 Display_EscolherTempo:
-	String " ESCOLHA O TEMPO"
-	String "DE CARREGAMENTO:"
+	String "  CARREGAMENTO  "
 	String "                "
-	String "                "
-	String "    Tempo:      "
+	String "Por quanto tempo"
+	String "quer carregar o "
+	String "   seu carro?   "
 	String "                "
 	String " OK - continuar "
 
@@ -199,7 +199,6 @@ Display_UltrapassaCargaMaxima:
 	
 PLACE 2800H
 Display_TempoUltrapassa:
-	String "                "
 	String "     ATENCAO    "
 	String " NAO HA ENERGIA "
 	String " SUFICIENTE PARA"
@@ -345,6 +344,7 @@ Display_LigarPosto:
 
 PLACE 0000H
 Inicio:
+    MOV SP, StackPointer                                                   ;mete em SP o endereço do início da pilha 
     MOV R0,Main
     JMP R0
 
@@ -367,7 +367,6 @@ Main:
     CALL RefreshDisplay
     JMP Main
 InicioPrograma:
-    MOV SP, StackPointer                                                    ;mete em SP o endereço do início da pilha
     MOV R6, EnderecoBateriaNormal                                           ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
     MOV R7, EnderecoBateriaSemiRapido                                       ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
     MOV R8, EnderecoBateriaRapido                                           ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
@@ -573,12 +572,9 @@ FimFunc4:                                                                   ;Fim
 ;***********************************************************************************************************************************
 
 InsereEnergia:
-    ; PUSH R0                                                               ;*********************************************************************************************************************
-    ; PUSH R1                                                               ;
-    ; PUSH R2                                                               ;
-    PUSH R3                                                                 ;
-    PUSH R4                                                                 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R5                                                                 ;
+    PUSH R3                                                                 ;*********************************************************************************************************************
+    PUSH R4                                                                 ;
+    PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R6                                                                 ;
     PUSH R7                                                                 ;
     PUSH R8                                                                 ;*********************************************************************************************************************
@@ -588,12 +584,6 @@ InicioInsereEnergia:
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
     MOVB R4, [R6]                                                           ;R4 contém a seleção de qual bateria carregar, por parte do utilizador
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
-    ; MOV R6, EnderecoBateriaNormal ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
-    ; MOV R7, EnderecoBateriaSemiRapido ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
-    ; MOV R8, EnderecoBateriaRapido ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
-    ; MOV R0,[R6] ;guarda em R0 o valor da bateria do posto normal presente na memória
-    ; MOV R1, [R7] ;guarda em R1 o valor da bateria do posto semirapido presente na memória
-    ; MOV R2,[R8] ;guarda em R2 o valor da bateria do posto rapido presente na memória
     MOV R6,R0                                                               ;guarda em R6 o valor original da bateria do posto normal, caso o utilizador carregue a bateria com um valor inválido
     MOV R7,R1                                                               ;guarda em R7 o valor original da bateria do posto semirapido, caso o utilizador carregue a bateria com um valor inválido
     MOV R8,R2                                                               ;guarda em R8 o valor original da bateria do posto rapido, caso o utilizador carregue a bateria com um valor inválido
@@ -665,23 +655,14 @@ OpcaoInvalida:
 AtualizaPostos:
     MOV R9, Display_BateriaCarregada                                        ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
-    ; MOV R6, EnderecoBateriaNormal ;mete em R6 o endereço onde está guardado o valor da bateria do posto normal
-    ; MOV R7, EnderecoBateriaSemiRapido ;mete em R7 o endereço onde está guardado o valor da bateria do posto semirapido
-    ; MOV R8, EnderecoBateriaRapido ;mete em R8 o endereço onde está guardado o valor da bateria do posto rapido
-    ; MOV [R6], R0 ;atualiza o valor da bateria do posto normal guardado em memória
-    ; MOV [R7], R1 ;atualiza o valor da bateria do posto semirapido guardado em memória
-    ; MOV [R8], R2 ;atualiza o valor da bateria do posto rapido guardado em memória
     JMP InicioInsereEnergia                                                 ;Volta ao início da rotina
 FimInsereEnergia:
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
-    POP R6                                                                  ;
+    POP R6                                                                  ; Retira da pilha os registos guardados no início da rotina
     POP R5                                                                  ;
-    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
-    POP R3                                                                  ;
-    ; POP R2                                                                ;
-    ; POP R1                                                                ;
-    ; POP R0                                                                ;*********************************************************************************************************************
+    POP R4                                                                  ;
+    POP R3                                                                  ;*********************************************************************************************************************
     RET
 
 ;**********************************************************************************************************************************************
@@ -689,22 +670,12 @@ FimInsereEnergia:
 ;           Responsável por mostrar ao utilizador quais dos postos estão funcionais ou não funcionais
 ;**********************************************************************************************************************************************
 NiveisDeEnergia:
-    ; PUSH R0                                                               ;*********************************************************************************************************************
-    ; PUSH R1                                                               ;
-    ; PUSH R2                                                               ;
-    PUSH R3                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3                                                                 ;*********************************************************************************************************************
     PUSH R4                                                                 ;
-    PUSH R5                                                                 ;
+    PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R6                                                                 ;
     PUSH R7                                                                 ;*********************************************************************************************************************
-	MOV R10,0   
-    ; MOV R3, EnderecoBateriaNormal ;mete em R3 o endereço onde está guardado o valor da bateria do posto normal
-    ; MOV R4, EnderecoBateriaSemiRapido ;mete em R4 o endereço onde está guardado o valor da bateria do posto semirapido
-    ; MOV R5, EnderecoBateriaRapido ;mete em R5 o endereço onde está guardado o valor da bateria do posto rapido
-    ; MOV R0,[R3] ;guarda em R0 o valor da bateria do posto normal presente na memória
-    ; MOV R1, [R4] ;guarda em R1 o valor da bateria do posto semirapido presente na memória
-    ; MOV R2,[R5] ;guarda em R2 o valor da bateria do posto rapido presente na memória
-    ; MOV R3,0 ;R3 contará quantas bateria estiverem abaixo do nivel mínimo
+	MOV R10,0
     MOV R4,Normal                                                           ;R7 contém o nivel mínimo que a bateria normal deve ter para ser considerada funcional (carregamento de uma hora)
     MOV R5,Semirapido                                                       ;R8 contém o nivel mínimo que a bateria semirapida deve ter para ser considerada funcional (carregamento de uma hora)
     MOV R6,Rapido                                                           ;R9 contém o nivel mínimo que a bateria rapida deve ter para ser considerada funcional (carregamento de uma hora)
@@ -728,12 +699,9 @@ FimFunc:
     CALL Display_NiveisDeEnergia_InserirInformacao                          ;chama a rotina que insere a informação sobre os estados dos postos no display
     POP R7                                                                  ;*********************************************************************************************************************
     POP R6                                                                  ;
-    POP R5                                                                  ;
-    POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
-    POP R3                                                                  ;
-    ; POP R2 ;
-    ; POP R1 ;
-    ; POP R0                                                                ;*********************************************************************************************************************
+    POP R5                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R4                                                                  ;
+    POP R3                                                                  ;*********************************************************************************************************************
     RET
 
 ;*************************************************************************************************************************************************
@@ -811,20 +779,17 @@ Carregamento:
     PUSH R7                                                                 ;
     PUSH R8                                                                 ;*********************************************************************************************************************
 EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PELO UTILIZADOR
-	MOV R6, CustoNormal														;coloca no registo 6 o valor do custo do carregamento do tipo normal
-	MOV R7, CustoSemiRapido													;coloca no registo 7 o valor do custo do carregamento do tipo semi-rápido
-	MOV R8, CustoRapido														;coloca no registo 8 o valor do custo do carregamento do tipo rápido
 	MOV R9, Display_EscolheCarregamento 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_EscolheCarregamento)
     MOV R5, InputOpcao 											            ;coloca no registo 5 o endereço de onde ler o tipo de carregamento
     CALL RefreshDisplay 													;mostra ao utilizador o display  metido anteriormente em R9 
 	MOVB R3, [R5]					                						;coloca no registo 3 o tipo de carregamento escolhido pelo utilizador
-	CALLF LimpaPerifericosEntrada                                            ;limpa os endereços de onde se lê os inputs do utilizador
-	CMP R3, R6																;compara o registo 3 com o registo 6
-	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 6, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento normal
-	CMP R3, R7																;compara o registo 3 com o registo 7
-	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 7, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento semi-rapido
-	CMP R3, R8																;compara o registo 3 com o registo 8
-	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao valor do registo 8, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento rapido
+	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
+	CMP R3, CustoNormal														;compara o registo 3 com o custoNormal (1, equivalente à opção)
+	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao custoNormal, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento normal
+	CMP R3, CustoSemiRapido													;compara o registo 3 com o custoSemiRapido (2, equivalente à opção)
+	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao custoSemiRapido, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento semi-rapido
+	CMP R3, CustoRapido														;compara o registo 3 com o custoRapido (3, equivalente à opção)
+	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao custoRapido, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento rapido
 	MOV R9, Display_OpcaoInvalida 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida) ********************************************************													
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE FOR INSERIDO UM VALOR DIFERENTE DE 1,2,3 *
 	JMP EscolhaCarregamento													;volta para o Display_ inicial (volta a escolher o tipo carregamento)								********************************************************
@@ -835,7 +800,7 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
-	CMP R3,R6																;compara o registo 3 com o registo 6
+	CMP R3, CustoNormal														;compara o registo 3 com o registo 6
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
 	MOV R9, Normal															;coloca no registo 9 o valor de energia de um carregamento Normal/hora
@@ -845,7 +810,7 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
 	JMP FimVerificacoes														;se for inferior ou igual, salta para o tag "FimVerificacoes"
 
 VerificaEscolhaTempoSuperiorSemiRapido:
-	CMP R3, R7																;compara o valor do registo 3 com o valor do registo 7
+	CMP R3, CustoRapido														;compara o valor do registo 3 com o valor do registo 7
 	JNE VerificaEscolhaTempoSuperiorRapido									;se o valor do registo 3 não for igual ao valor do registo 7, salta para o tag "VerificaEscolhaTempoSuperiorRapido" - ou seja, é verificado se o tipo de carregamento não é semi-rapido
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
 	MOV R9, Semirapido														;coloca no registo 9 o valor da energia de um carregamento SemiRapido/hora
@@ -872,7 +837,7 @@ FimVerificacoes:
 SemBateriaParaCarregamento:
 	MOV R9, Display_TempoUltrapassa 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-	JMP FimFunc3															;salta para o tag "FimFunc3"
+	JMP FimCarregamento														;salta para o tag "FimCarregamento"
 
 VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
     MOV R7,R4																;coloca no registo 7 o valor do registo 4 (o tempo escolhido pelo utilizador)
@@ -890,21 +855,18 @@ VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PA
 ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
     MOV R4,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
-	MOV R6, CustoNormal 													;coloca no registo 6 o custo/hora do carregamento normal
-	MOV R7, CustoSemiRapido 												;coloca no registo 7 o custo/hora do carregamento semi-rapido
-	MOV R8, CustoRapido 													;coloca no registo 8 o custo/hora do carregamento rapido
-	CMP R3, R6																;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do registo 6 (custo do carregamento Normal)									
+    MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
+    ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
+	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do vehiculo do cliente
+	CMP R3, CustoNormal														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoNormal (1, equivalente à opção)									
 	JEQ	ForneceEnergiaNormal												;se o valor do registo 3 for igual ao do registo 6, salta para o tag "ForneceEnergiaNormal" - ou seja, o carregamento escolhido é o normal
-	CMP R3, R7																;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do registo 7 (custo do carregamento Semi-Rapido)	
+	CMP R3, CustoSemiRapido													;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoSemiRapido (2, equivalente à opção)
 	JEQ	ForneceEnergiaSemiRapido 											;se o valor do registo 3 for igual ao do registo 7, salta para o tag "ForneceEnergiaSemiRapido" - ou seja, o carregamento escolhido é o semi-rapido
-	CMP R3,	R8																;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do registo 8 (custo do carregamento Rapido)	
+	CMP R3,	CustoRapido														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoRapido (3, equivalente à opção)	
 	JEQ ForneceEnergiaRapido												;se o valor do registo 3 for igual ao do registo 8, salta para o tag "ForneceEnergiaRapido" - ou seja, o carregamento escolhido é o rapido
 
 
 ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
-    MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
-    ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
-	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do vehiculo do cliente
 	MOV R7, Normal 															;coloca no registo 7 o valor de energia de um carregamento Normal/hora
 	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (20)
 	MOV R8, 100 															;coloca no registo 8 a constante 100
@@ -918,9 +880,6 @@ ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	
 
 ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
-    MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
-    ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
-	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do vehiculo do cliente
 	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
 	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (60)
 	MOV R8, 100 															;coloca no registo 8 a constante 100
@@ -933,9 +892,6 @@ ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
     JMP ForneceEnergiaSemiRapido 											;salta para o "tag" ForneceEnergiaSemiRapido"
 
 ForneceEnergiaRapido:														;FORNECE ENERGIA DO TIPO RAPIDO
-    MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
-    ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
-	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do vehiculo do cliente
 	MOV R7, Rapido 														    ;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
 	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (60)
 	MOV R8, 100 															;coloca no registo 8 a constante 100
@@ -946,8 +902,6 @@ ForneceEnergiaRapido:														;FORNECE ENERGIA DO TIPO RAPIDO
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP ForneceEnergiaRapido
-	;MOV R9,1																;coloca no registo 9 a constante 1
-	;MOV R4,0																;coloca no registo 4 a constante 0
 
 BateriaCarregada:															;QUANDO A BATERIA DO VEHICULO ULTRAPASSA OS 100%
 	MOV R6, 100 															;coloca no registo 6 a constante 100
@@ -955,7 +909,7 @@ BateriaCarregada:															;QUANDO A BATERIA DO VEHICULO ULTRAPASSA OS 100%
 	JMP AtualizaValoresEnergia 												;salta para o tag "AtualizaValoresEnergia"
 	
 NaoForneceEnergia:															;NÃO É FORNECIDA ENERGIA
-    JMP FimFunc3															;salta para o tag "FimFunc3"
+    JMP FimCarregamento														;salta para o tag "FimCarregamento"
 	
 
 AtualizaValoresEnergia:														;VERIFICA SE O TEMPO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
@@ -970,28 +924,28 @@ Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA B
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 
 NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
-	SUB R7, R4																;é subtraido ao registo 7 (o tempo inserido) o valor do registo 4 (o valor do tempo que sobrou)
-	MOV R8, R7
+	SUB R7, R4																;é subtraido ao registo 7 (o tempo inserido) o valor do registo 4 (o valor do tempo que sobrou) para obter o tempo que demorou para carregar o carro
+	MOV R8, R7                                                              ;move-se o registo 7 (tempo que demorou para carregar o carro) para o registo 8 para escrever o valor no display
 	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-    MOV R9,89
-    CALL EscreveValores
-    MOV R6, InicioDisplay
-    MOV R8,47
-    ADD R6,R8
-    CMP R3,1
-    JNE VerSemi
-    CALLF EscreveNormal
-    JMP Salto
+    MOV R9,89                                                               ;mete no registo 9 o número de bytes a adicionar ao início do display para escrever o valor no lugar certo
+    CALLF EscreveValores                                                    ;chama a função que escreve o valor pretendido (que se encontra no registo 8)
+    MOV R6, InicioDisplay                                                   ;mete no registo 6 o início do display
+    MOV R8,46                                                               ;mete no registo 8 o valor a acrescentar ao início do display
+    ADD R6,R8                                                               ;adiciona ao registo 6 o registo 8, para escrevermos o tipo de carregamento no lugar certo
+    CMP R3, CustoNormal                                                     ;compara o tipo de carregamento escolhido com CustoNormal (1, igual à opção de escolher normal)
+    JNE VerSemi                                                             ;se não for igual, o utilizador não escolheu o carregamento normal e verifica-se o próximo tipo de carregamento
+    CALLF EscreveNormal                                                     ;se foi igual, escrevemos o tipo de carregamento (Normal) no display
+    JMP CarregamentoEscrito                                                 ;efetua-se este salto para não verificar os outros tipos de carregamento
 VerSemi:    
-    CMP R3,2
-    JNE VerRapido
-    CALLF EscreveSemiRapido
-    JMP Salto
-VerRapido:
-    CALLF EscreveRapido
-Salto:	
-    CALLF VerificaOK													
+    CMP R3,CustoSemiRapido                                                  ;compara o tipo de carregamento escolhido com CustoSemiRapido (2, igual à opção)
+    JNE VerRapido                                                           ;se não for igual salta-se para escrever rápido
+    CALLF EscreveSemiRapido                                                 ;se for igual, escreve-se o tipo de carregamento (Semi-Rapido) no dipslay
+    JMP CarregamentoEscrito                                                 ;efetua-se este salto para não verificar o último tipo de carregamento
+VerRapido:                                                                  ;não é efetuadas comparações pois só chega aqui se o utilizador não escolheu os outros dois tipos de carregamento
+    CALLF EscreveRapido                                                     ;escreve o tipo de carregamento (Rapido) no display
+CarregamentoEscrito:	
+    CALLF VerificaOK													    ;verifica-se que o utilizador pretende continuar
 	MOV R4, R7																;é colocado no registo 4 o valor do tempo que foi necessario para o carregamento da bateria
 	MUL R7,R3																;é multiplicado o valor do registo 7 com o valor do registo 3, ou seja, o valor do tempo necessario com o valor do custo do tipo de carregamento escolhido -> registo 7 com o valor do custo do carregamento
 	CALL Debito																;é feito o pagamento do carregamento
@@ -1012,13 +966,13 @@ Debito:																		;REALIZA O PAGAMENTO DO CARREGAMENTO
 	MOV [R5+Saldo],R6 														;atualiza o saldo do utilizador 
 	MOV R9, Display_Debito 													;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-    MOV R8,R6
-    MOV R9,57
-    CALL EscreveValores
-    MOV R8,R7
-    MOV R9,89
-    CALL EscreveValores
-    CALLF VerificaOK
+    MOV R8,R6                                                               ;mete-se em R8 o saldo do utilizador (R6), para mostrar no display
+    MOV R9,57                                                               ;mete-se em R9 o número de bytes a saltar desde o início do display para escrever R8 no lugar certo
+    CALLF EscreveValores                                                    ;escreve o valor de R8 no display
+    MOV R8,R7                                                               ;mete-se em R8 o custo do carregamento (R7) para escrever no display
+    MOV R9, 89                                                              ;mete-se em R9 o número de bytes a saltar desde o início do display para escrever R8 no lugar certo
+    CALLF EscreveValores                                                    ;escreve o valor de R8 no display
+    CALLF VerificaOK                                                        ;verifica se o utilizador quer continuar
 	RET	
 
 AtualizaPostoNormal:														;ATUALIZA O VALOR DA BATERIA DO POSTO NORMAL
@@ -1042,7 +996,7 @@ CarregamentoConcluido:														;ATUALIZA VALORES DAS BATERIAS DO POSTO (CAR
 	MOV R9, Display_CarregamentoConcluido 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 	
-FimFunc3:
+FimCarregamento:
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
     POP R6                                                                  ;
@@ -1080,7 +1034,9 @@ RefreshDisplay:
     PUSH R0                                                                 ;*********************************************************************************************************************
     PUSH R1                                                                 ;
     PUSH R2                                                                 ; Guarda na pilha os registos alterados durante esta rotina
-    PUSH R3                                                                 ;*********************************************************************************************************************
+    PUSH R3                                                                 ;
+    PUSH R4                                                                 ;*********************************************************************************************************************
+    MOV R4,R9                                                               ;guarda-se em R4 o endereço do display a mostrar (R9)
     MOV R0,InicioDisplay                                                    ;mete em R0 o início do display
     MOV R1,FimDisplay                                                       ;mete em R1 o fim do display
 Ciclo_RefreshDisplay:
@@ -1091,23 +1047,18 @@ Ciclo_RefreshDisplay:
     CMP R0,R1                                                               ;compara-se R0, posição atual no display, com o fim do display (R1)
     JLE Ciclo_RefreshDisplay                                                ;se ainda não chegámos ao fim (é menor ou igual) volta-se ao início do ciclo
     MOV R3, Display_NiveisDeEnergia                                         ;mete-se em R3 o endereço do display dos niveis de energia
-    MOV R0,InicioDisplay                                                    ;mete-se em R0 o início do display novamente
-    SUB R1,R0                                                               ;subtrai-se o fim do display pelo início, para termos o número total de bytes
-    ADD R1,1                                                                ;adicionamos 1 para chegarmos às 7 linhas de 16 bytes
-    ADD R3,R1                                                               ;adiciona-se a R3 (endereço do display dos niveis de energia) o valor de R1
-    CMP R9,R3                                                               ;compara-se o valor de R9 com R3 pois se o display que atualizamos (indicado por R9) é o display dos Niveis de Energia, ainda há informação a ser escrita no display
+    CMP R3,R4                                                               ;compara-se o valor de R3 com R4 pois se o display que mostrou-se (indicado por R4) é o display dos Niveis de Energia, ainda há informação a ser escrita no display
     JEQ FimRefreshDiplay                                                    ;por isso, se R9 é igual a R3, efetua-se este salto para não se chamar o VerificaOK pois falta escrever no display os estados dos postos
-    MOV R3, Display_Debito
-    ADD R3,R1
-    CMP R9,R3
-    JEQ FimRefreshDiplay
-    MOV R3, Display_InfoCarregamento
-    ADD R3,R1
-    CMP R9,R3
-    JEQ FimRefreshDiplay
+    MOV R3, Display_Debito                                                  ;mesmo raciocínio aqui, R3 agora é o endereço do display do débito
+    CMP R3,R4                                                               ;compara-se o valor de R4 (endereço do display que foi mostrado) com R3 (endereço do display de débito)
+    JEQ FimRefreshDiplay                                                    ;se é igual, este salto significa que não se chama a rotina VerificaOK pois ainda há informação a ser escrita no display
+    MOV R3, Display_InfoCarregamento                                        ;mesmo raciocínio aqui, R3 agora é o endereço do display da informação do carregamento
+    CMP R3,R4                                                               ;compara-se o valor de R4 (endereço do display que foi mostrado) com R3 (endereço do display da informação do carregamento)
+    JEQ FimRefreshDiplay                                                    ;se é igual, efetua-se este salto para não chamar a rotina VerificaOK pois ainda há informação a ser mostrada no display
 	CALLF VerificaOK                                                        ;regista se o utilizador quer procedir
 FimRefreshDiplay:
-    POP R3                                                                  ;*********************************************************************************************************************
+    POP R4                                                                  ;*********************************************************************************************************************
+    POP R3                                                                  ;
     POP R2                                                                  ;
     POP R1                                                                  ; Retira da pilha os registos guardados no início da rotina
     POP R0                                                                  ;*********************************************************************************************************************
@@ -1185,48 +1136,46 @@ Display_NiveisDeEnergia_InserirInformacao:
     PUSH R4                                                                 ;
     PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R6                                                                 ;*********************************************************************************************************************
-    MOV R5, InicioDisplay
-    MOV R4,Normal
-    CMP R0,R4
-    JLT NaoFuncionalNormal
-    MOV R6,22
-    ADD R6,R5
-    CALLF EscreveFuncional
-    JMP InfoSemiRapido
+    MOV R5, InicioDisplay                                                   ;mete em R5 o início do display
+    MOV R4,Normal                                                           ;mete-se em R4 o valor mínimo da bateria que o posto normal tem de ter
+    MOV R6,23                                                               ;mete-se em R6 o aumento ao início do display, para escrever a informação no lugar certo
+    ADD R6,R5                                                               ;adiciona-se a R6 o início do display (R5) para escrever o estado do posto no lugar certo
+    CMP R0,R4                                                               ;compara-se a bateria do posto normal (R0) com o valor mínimo (R4)
+    JLT NaoFuncionalNormal                                                  ;se é menor, efetua-se este salto para escrever essa informação
+    CALLF EscreveFuncional                                                  ;se é maior ou igual, o posto está funcional e escreve-se essa informação
+    JMP InfoSemiRapido                                                      ;salta-se para escrever o estado do posto semi-rápido
 NaoFuncionalNormal:
-    MOV R6,22
-    ADD R6,R5
-    CALLF EscreveNao_Func
+    CALLF EscreveNao_Func                                                   ;como o posto não está funcional (se chegou aqui), escreve-se essa informação
 InfoSemiRapido:
-    MOV R4,Semirapido
-    CMP R1,R4
-    JLT NaoFuncionalSemiRapido
-    MOV R6,47
-    ADD R6,R5
-    CALLF EscreveFuncional
-    JMP InfoRapido
+    MOV R4,Semirapido                                                       ;mete-se em R4 o valor mínimo da bateria que o posto semi-rápido tem de ter
+    CMP R1,R4                                                               ;compara-se a bateria do posto semi-rápido (R1) com o valor mínimo (R4)
+    JLT NaoFuncionalSemiRapido                                              ;se é menor, efetua-se este salto para escrever essa informação
+    MOV R6,48                                                               ;se é maior ou igual, mete-se em R6 o avanço relativo ao início do display para escrever a informação no lugar certo
+    ADD R6,R5                                                               ;acrescenta-se a R6 o início do display
+    CALLF EscreveFuncional                                                  ;se o salto anterior não foi efetuado, então o posto está funcional e escreve-se essa informação no display
+    JMP InfoRapido                                                          ;avança-se para escrever a informação relativa ao posto Rápido
 NaoFuncionalSemiRapido:
-    MOV R6,42
-    ADD R6,R5
-    MOV R3,1
-    CALLF EscreveNao
-    CALLF EscreveFuncional
+    MOV R6,43                                                               ;como é menor, mete-se em R6 o avanço relativo ao início do display para escrever a informação no lugar certo
+    ADD R6,R5                                                               ;acrescenta-se a R6 o início do display
+    MOV R3,2                                                                ;mete-se em R3 quantos espaços dar para avançar para a próxima linha, depois de escrever o "Nao"
+    CALLF EscreveNao                                                        ;como não está funcional, escreve-se "Nao Funcional"
+    CALLF EscreveFuncional                                                  ;como não está funcional, escreve-se "Nao Funcional"
 InfoRapido:
-    MOV R4,Rapido
-    CMP R2,R4
-    JLT NaoFuncionalRapido
-    MOV R6,79
-    ADD R6,R5
-    CALLF EscreveFuncional
-    JMP FimF
+    MOV R4,Rapido                                                           ;mete-se em R4 o valor mínimo da bateria que o posto rápido tem de ter
+    CMP R2,R4                                                               ;compara-se a bateria do posto rápido (R2) com o valor mínimo (R4)
+    JLT NaoFuncionalRapido                                                  ;se é menor, efetua-se este salto para escrever a informação que não está funcional
+    MOV R6,80                                                               ;se é maior ou igual, mete-se em R6 o avanço relativo ao início do display para escrever a informação no lugar certo
+    ADD R6,R5                                                               ;acrescenta-se a R6 o início do display
+    CALLF EscreveFuncional                                                  ;escreve-se que o posto não está funcional
+    JMP FimInformacoesPosto                                                 ;salta-se par o fim da função
 NaoFuncionalRapido:
-    MOV R6,72
-    ADD R6,R5
-    MOV R3,3
-    CALLF EscreveNao
-    CALLF EscreveFuncional
-FimF:
-    CALLF VerificaOK
+    MOV R6,73                                                               ;mete-se em R6 o avanço relativo ao início do display para escrever a informação no lugar certo
+    ADD R6,R5                                                               ;acrescenta-se a R6 o início do display
+    MOV R3,4                                                                ;mete-se em R3 o número de espaços a dar depois de escrever "Nao" para avançar para a próxima linha
+    CALLF EscreveNao                                                        ;como não está funcional, escreve-se "Nao Funcional"
+    CALLF EscreveFuncional                                                  ;como não está funcional, escreve-se "Nao Funcional"
+FimInformacoesPosto:
+    CALLF VerificaOK                                                        ;verifica que o utilizador quer proceder
     POP R6                                                                  ;*********************************************************************************************************************
     POP R5                                                                  ;
     POP R4                                                                  ; Retira da pilha os registos guardados no início da rotina
@@ -1238,209 +1187,228 @@ FimF:
 ;                   Como o nome indica, esta rotina é responsável por escrever
 ;                   a palavra "Nao" através do código ASCII e avançar para a
 ;                   próxima linha, através de espaços
+;                   R4 - carater a mostrar no display,
+;                   R6 - endereço onde escrever o carater (R4)
 ;******************************************************************************************************************************************
 EscreveNao:
-    MOV R4,78
-    ADD R6,1
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
-    ADD R6,1
-CicloEspacos:
-    MOV R4,32
-    MOVB[R6],R4
-    ADD R6,1
-    SUB R3,1
-    CMP R3,0
-    JNE CicloEspacos
-    RETF
+    MOV R4,78                                                               ;código ASCII de "N"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+CicloEspacos:                                                               ;ciclo para escrever o número de espaços necessários para avançar para a próxima linha
+    MOV R4,32                                                               ;código ASCII do espaço
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    SUB R3,1                                                                ;subtrai 1 a R3 (o contador de espaços)
+    CMP R3,0                                                                ;verifica-se se R3 já chegou a 0
+    JNE CicloEspacos                                                        ;se ainda não chegou, volta-se ao início do ciclo para escrever mais um espaço
+    RETF                                                                    ;se chegou, a rotina terminou
 
 ;*************************************************************************************************************************************
 ;                                           ROTINA EscreveFuncional
 ;                       Semelhante à anterior, só que escreve "Funcional" em vez de "Nao"
 ;                       e não faz parágrafo, ao contrário da anterior
+;                       R4 - carater a mostrar no display,
+;                       R6 - endereço onde escrever o carater (R4)
 ;*************************************************************************************************************************************
 EscreveFuncional:
-    MOV R4,70
-    ADD R6,1
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,117
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,110
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,99
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,105
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,110
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,108
-    MOVB [R6],R4
-    ADD R6,1
+    MOV R4,70                                                               ;código ASCII de "F"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,117                                                              ;código ASCII de "u"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,110                                                              ;código ASCII de "n"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,99                                                               ;código ASCII de "c"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,105                                                              ;código ASCII de "i"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,110                                                              ;código ASCII de "n"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,108                                                              ;código ASCII de "l"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
     RETF
 
 ;********************************************************************************************************************************************
 ;                                               ROTINA EscreveNao_Func
 ;                               Semelhante às anteriores, só que esta escreve "Nao Func.".
 ;                               Só é utilizada para demonstrar que o posto normal não está operacional
+;                               R4 - carater a mostrar no display,
+;                               R6 - endereço onde escrever o carater (R4)
 ;********************************************************************************************************************************************
 EscreveNao_Func:
-    MOV R4,78
-    ADD R6,1
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
-    MOV R4,32
-    ADD R6,1
-    MOVB [R6],R4
-    MOV R4,70
-    ADD R6,1
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,117
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,110
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,99
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,46
-    MOVB [R6],R4
+    MOV R4,78                                                               ;código ASCII de "N"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    MOV R4,32                                                               ;código ASCII do espaço
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    MOV R4,70                                                               ;código ASCII de "F"
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,117                                                              ;código ASCII de "u"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,110                                                              ;código ASCII de "n"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,99                                                               ;código ASCII de "c"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,46                                                               ;código ASCII do ponto "."
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
     RETF
 
 
+;********************************************************************************************************************************************
+;                                               ROTINA EscreveNormal
+;                               Semelhante às anteriores, só que esta escreve "Normal".
+;                               Só é utilizada para demonstrar o tipo de carregamento escolhido pelo utilizador, neste caso Normal
+;                               R4 - carater a mostrar no display,
+;                               R6 - endereço onde escrever o carater (R4)
+;********************************************************************************************************************************************
 EscreveNormal:
-    ADD R6,1
-    MOV R4,78
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,114
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,109
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,108
-    MOVB [R6],R4
+    MOV R4,78                                                               ;código ASCII de "N"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,114                                                              ;código ASCII de "r"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,109                                                              ;código ASCII de "m"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,108                                                              ;código ASCII de "l"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
     RETF
 
+
+;********************************************************************************************************************************************
+;                                               ROTINA EscreveSemiRapido
+;                               Semelhante às anteriores, só que esta escreve "Semi-Rapido".
+;                               Só é utilizada para demonstrar o tipo de carregamento escolhido pelo utilizador, neste caso SemiRapido
+;                               R4 - carater a mostrar no display,
+;                               R6 - endereço onde escrever o carater (R4)
+;********************************************************************************************************************************************
 EscreveSemiRapido:
-    ADD R6,1
-    MOV R4,83
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,101
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,109
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,105
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,45
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,114
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,112
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,105
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,100
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
+    MOV R4,83                                                               ;código ASCII de "S"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,101                                                              ;código ASCII de "e"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,109                                                              ;código ASCII de "m"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,105                                                              ;código ASCII de "i"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,45                                                               ;código ASCII de "-", o hifen
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,82                                                               ;código ASCII de "R"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,112                                                              ;código ASCII de "p"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,105                                                              ;código ASCII de "i"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,100                                                              ;código ASCII de "d"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
     RETF
 
+
+;********************************************************************************************************************************************
+;                                               ROTINA EscreveRapido
+;                               Semelhante às anteriores, só que esta escreve "Rapido".
+;                               Só é utilizada para demonstrar o tipo de carregamento escolhido pelo utilizador, neste caso Rapido
+;                               R4 - carater a mostrar no display,
+;                               R6 - endereço onde escrever o carater (R4)
+;********************************************************************************************************************************************
 EscreveRapido:
-    ADD R6,1
-    MOV R4,82
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,97
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,112
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,105
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,100
-    MOVB [R6],R4
-    ADD R6,1
-    MOV R4,111
-    MOVB [R6],R4
+    MOV R4,82                                                               ;código ASCII de "R"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,97                                                               ;código ASCII de "a"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,112                                                              ;código ASCII de "p"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,105                                                              ;código ASCII de "i"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,100                                                              ;código ASCII de "d"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
+    ADD R6,1                                                                ;avança para o próximo byte
+    MOV R4,111                                                              ;código ASCII de "o"
+    MOVB [R6],R4                                                            ;escreve-se no display o carater dado por R4
     RETF
 
 
+;********************************************************************************************************************************************
+;                                               ROTINA EscreveValores
+;                               Rotina responsável por escrever valores númericos no display.
+;                               R8 - valor numerico a mostrar no display
+;                               R9 - número de bytes a avançar para escrever o valor no lugar certo
+;********************************************************************************************************************************************
 EscreveValores:
-    PUSH R0
-    PUSH R1
-    PUSH R2
-    PUSH R3
-    PUSH R4
-    PUSH R5
-    PUSH R6
-    PUSH R7
-    MOV R4,R8
-    MOV R0,InicioDisplay
-    ADD R0, R9
-    MOV R2,10
-    MOV R7,48
+    PUSH R0                                                                 ;*********************************************************************************************************************
+    PUSH R1                                                                 ;
+    PUSH R2                                                                 ; Guarda na pilha os registos alterados durante esta rotina
+    PUSH R3                                                                 ;*********************************************************************************************************************
+    MOV R0,InicioDisplay                                                    ; mete em R0 o início do display
+    ADD R0, R9                                                              ; adiciona ao início do display o valor em R9 (número de bytes a avançar para escrever o valor no lugar certo)
+    MOV R1,10                                                               ;mete em R1 o valor 10, para fins de cálculo de resto e divisão
+    MOV R2,48                                                               ;mete em R2 o incremento ao valor numerico para obter o carater ASCII do valor numerico
 CicloEscreveValores:
-    CMP R4,0
-    JEQ FimEscreveValores
-    MOV R5,R4
-    MOD R5,R2
-    DIV R4,R2
-    ADD R5,R7
-    MOVB [R0],R5
-    SUB R0,1
-    JMP CicloEscreveValores
+    MOV R4,R8                                                               ;guarda em R4 uma cópia do valor (R8)
+    MOD R4,R1                                                               ;calcula-se o resto de R4 por R1 (valor por 10), para obter o valor a mostrar no display
+    ADD R4,R2                                                               ;adicionar ao valor obtido R2 (para obter o código ASCII do valor)
+    MOVB [R0],R4                                                            ;escrever o valor númerico no display (byte endereçado por R0)
+    SUB R0,1                                                                ;como estamos a escrever o valor da direita para a esquerda, subtrair 1 a R0
+    DIV R8,R1                                                               ;divide-se o valor por 10, para avançar para mostrar o próximo valor (possivelmente)
+    CMP R8,0                                                                ;compara o valor númerico com 0
+    JEQ FimEscreveValores                                                   ;se chegou a 0, já não há mais carateres a mostrar, salta-se para o fim da função
+    JMP CicloEscreveValores                                                 ;se não chegou a 0, volta-se ao início do ciclo
 FimEscreveValores:
-    POP R7
-    POP R6
-    POP R5
-    POP R4
-    POP R3
-    POP R2
-    POP R1
-    POP R0
-    RET
+    POP R3                                                                  ;*********************************************************************************************************************
+    POP R2                                                                  ; Retira da pilha os registos guardados no início da rotina
+    POP R1                                                                  ;
+    POP R0                                                                  ;*********************************************************************************************************************
+    RETF
