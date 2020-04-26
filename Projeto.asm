@@ -338,6 +338,16 @@ Display_ClienteExiste:                                                      ;Dis
 	String "    esse ID)    "
 	String " OK - continuar "
 
+PLACE 2F00H
+Display_CarregarPosto:                                                      ;Display para informar o utilizador é necessário carregar o posto
+	String "     ATENCAO    "
+	String "O POSTO NAO ESTA"
+	String "OPERACIONAL. E  "
+	String "PRECISO CARREGAR"
+	String "  AS BATERIAS   "
+	String "                "
+	String " OK - continuar "
+
 
 ;*****************************************************************************************************************************************
 ;                                               MAIN
@@ -723,6 +733,8 @@ VerificaRapido:
     CMP R3,3                                                                ;compara-se o valor do contador com 3 (o número de baterias)
     JNE FimNiveisDeEnergia                                                  ;se o contador não é igual a 3, o posto está operacional e salta-se para o fim da função
     MOV R10,-1                                                              ;caso contrário, mete-se o R10 a -1 para o programa não avançar para a verificação do utilizador
+    MOV R9,Display_CarregarPosto                                            ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
 FimNiveisDeEnergia:
     MOV R9,Display_NiveisDeEnergia                                          ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
