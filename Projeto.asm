@@ -949,14 +949,11 @@ CarregamentoEscrito:
 	MOV R4, R7																;é colocado no registo 4 o valor do tempo que foi necessario para o carregamento da bateria
 	MUL R7,R3																;é multiplicado o valor do registo 7 com o valor do registo 3, ou seja, o valor do tempo necessario com o valor do custo do tipo de carregamento escolhido -> registo 7 com o valor do custo do carregamento
 	CALL Debito																;é feito o pagamento do carregamento
-	MOV R6, CustoNormal 													;coloca no registo 6 o custo/hora do carregamento normal
-	MOV R7, CustoSemiRapido 												;coloca no registo 7 o custo/hora do carregamento semi-rapido
-	MOV R8, CustoRapido 													;coloca no registo 8 o custo/hora do carregamento rapido
-	CMP R3, R6																;compara o valor do registo 3 com o valor do registo 6									
+	CMP R3, CustoNormal														;compara o valor do registo 3 com o valor do custoNormal (1, equivalente à opção)									
 	JEQ	AtualizaPostoNormal													;se o valor do registo 3 for igual ao do registo 6, salta para o tag "AtualizaPostoNormal" -> o carregamento foi Normal
-	CMP R3, R7																;compara o valor do registo 3 com o valor do registo 7	
+	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do custoSemiRapido (2, equivalente à opção)	
 	JEQ	AtualizaPostoSemiRapido 											;se o valor do registo 3 for igual ao do registo 7, salta para o tag "AtualizaPostoSemiRapido" -> o carregamento foi Semi-Rapido
-	CMP R3,	R8																;compara o valor do registo 3 com o valor do registo 8
+	CMP R3,	CustoRapido														;compara o valor do registo 3 com o valor do custoRapido (3, equivalente à opção)
 	JEQ AtualizaPostoRapido													;se o valor do registo 3 for igual ao do registo 7, salta para o tag "AtualizaPostoRapido" -> o carregamento foi Rapido
 
 
