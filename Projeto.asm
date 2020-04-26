@@ -9,8 +9,8 @@ EnderecoBateriaNormal   	EQU 10E0H                                       ;endere
 EnderecoBateriaSemiRapido   EQU 10E2H                                       ;endereço onde é guardado o valor da bateria para o carregamento semi-rápido
 EnderecoBateriaRapido   	EQU 10E4H                                       ;endereço onde é guardado o valor da bateria para o carregamento rápido
 
-InicioDisplay 				EQU 0020H
-FimDisplay 					EQU 008FH
+InicioDisplay 				EQU 0020H                                       ;Início do display principal
+FimDisplay 					EQU 008FH                                       ;Fim do display principal
 
 ;endereços de memória relativos aos inputs:
 OK                          EQU 00A0H                                       ;endereço do botão OK
@@ -39,7 +39,7 @@ StackPointer 				EQU 8000H                                       ;endereço da p
 ;                                           DISPLAYS
 ;*****************************************************************************************************************************************
 PLACE 2000H
-Display_InputVerifyCliente:
+Display_InputVerifyCliente:                                                 ;Display do menu para inserir ID e código de segurança
     String "  VERIFICACAO   "
     String "                "
     String "  INTRODUZA ID  "
@@ -49,7 +49,7 @@ Display_InputVerifyCliente:
 	String " OK - continuar "
 
 PLACE 2080H
-Display_VerificacaoSucesso:
+Display_VerificacaoSucesso:                                                 ;Display para informar o utilizador que foi verificado
     String "                "
     String "                "
     String "   AUTORIZADO   "
@@ -59,7 +59,7 @@ Display_VerificacaoSucesso:
 	String " OK - continuar "
 
 PLACE 2100H
-Display_VerificacaoFalhada:
+Display_VerificacaoFalhada:                                                 ;Display para informar o utilizador que não foi verificado
 	String "     ATENCAO    "
     String "                "
     String "                "
@@ -70,7 +70,7 @@ Display_VerificacaoFalhada:
 	String " OK - continuar "
 
 PLACE 2180H
-Display_InsereEnergia:
+Display_InsereEnergia:                                                      ;Display do menu para carregar o posto
     String " CARREGAR POSTO "
     String "Escolha bateria:"
     String "1)- Normal      "
@@ -80,7 +80,7 @@ Display_InsereEnergia:
 	String " OK - continuar "
 
 PLACE 2200H
-Display_InsereEnergiaQuanta:
+Display_InsereEnergiaQuanta:                                                ;Display a perguntar ao utilizador quanta bateria carregar
     String " CARREGAR POSTO "
     String "  Quanto quer   "
     String "   carregar?    "
@@ -90,7 +90,7 @@ Display_InsereEnergiaQuanta:
 	String " OK - continuar "
 
 PLACE 2280H
-Display_NiveisDeEnergia:
+Display_NiveisDeEnergia:                                                    ;Display para informar o utilizador do estado das baterias do posto
     String " ESTADO DO POSTO"
     String "Normal:         "
     String "SemiRapido:     "
@@ -100,7 +100,7 @@ Display_NiveisDeEnergia:
 	String " OK - continuar "
 
 PLACE 2300H
-Display_EscolheCarregamento:
+Display_EscolheCarregamento:                                                ;Display do menu para escolher o tipo de carregamento
 	String " ESCOLHA O TIPO	"
 	String "DE CARREGAMENTO:"
 	String "  1- Normal     "
@@ -110,7 +110,7 @@ Display_EscolheCarregamento:
 	String " OK - continuar "
 
 PLACE 2380H
-Display_OpcaoInvalida:
+Display_OpcaoInvalida:                                                      ;Display para informar o utilizador que escolheu uma opção inválida
 	String "    ATENCAO     "
 	String "                "
 	String "     OPCAO      "
@@ -120,7 +120,7 @@ Display_OpcaoInvalida:
 	String " OK - continuar "
 
 PLACE 2400H
-Display_EscolherTempo:
+Display_EscolherTempo:                                                      ;Display para perguntar ao utilizador por quanto tempo o carro deve carregar
 	String "  CARREGAMENTO  "
 	String "                "
 	String "Por quanto tempo"
@@ -130,17 +130,17 @@ Display_EscolherTempo:
 	String " OK - continuar "
 
 PLACE 2480H
-Display_TempoInvalido:
+Display_TempoInvalido:                                                      ;Display para informar o utilizador que o tempo que ele inseriu é inválido (tem de ser superior a 0)
 	String "     OPCAO      "
 	String "    INVALIDA    "
 	String "                "
-	String "tempo tem de ser"
+	String "Tempo tem de ser"
 	String "   superior a 0 "
 	String "                "
 	String " OK - continuar "
 
 PLACE 2500H
-Display_Debito:
+Display_Debito:                                                             ;Display para informar o utilizador do saldo que terá após o carregamento e quanto dinheiro o carregamento custou-lhe
 	String "  CARREGAMENTO  "
 	String "                "
 	String "      Saldo:    "
@@ -150,7 +150,7 @@ Display_Debito:
 	String " OK - continuar "
 
 PLACE 2580H
-Display_SaldoInsuficiente:
+Display_SaldoInsuficiente:                                                  ;Display para informar o utilizador que não tem saldo suficiente para o carregamento
 	String "     ATENCAO    "
 	String "                "
 	String "     SALDO      "
@@ -160,7 +160,7 @@ Display_SaldoInsuficiente:
 	String " OK - continuar "
 
 PLACE 2600H
-Display_InfoCarregamento:
+Display_InfoCarregamento:                                                   ;Display para informar o utilizador o tipo de carregamento que escolheu e quanto tempo demorará
 	String "  CARREGAMENTO  "
 	String "                "
 	String "      Tipo:     "
@@ -170,7 +170,7 @@ Display_InfoCarregamento:
 	String " OK - continuar "
 
 PLACE 2680H
-Display_CarregamentoConcluido:
+Display_CarregamentoConcluido:                                              ;Display para informar o utilizador que o carregamento terminou
 	String "                "
 	String "                "
 	String "  CARREGAMENTO  "
@@ -179,7 +179,7 @@ Display_CarregamentoConcluido:
 	String "                "
 	String " OK - continuar "
 PLACE 2700H
-Display_Overflow:
+Display_Overflow:                                                           ;Display para informar o utilizador que ao incrementar a bateria pretendida, ocorreu overflow
 	String "     ATENCAO    "
 	String "                "
 	String "     OCORREU    "
@@ -189,17 +189,17 @@ Display_Overflow:
 	String " OK - continuar "
 
 PLACE 2780H
-Display_UltrapassaCargaMaxima:
+Display_UltrapassaCargaMaxima:                                              ;Display para informar o utilizador que o tempo que selecionou é superior ao necessário para carregar por completo o seu carro
 	String "     ATENCAO    "
-	String " O CARREGAMENTO "
-	String "IRA ULTRAPASSAR "
-	String " A CARGA MAXIMA "
-	String "   DA BATERIA   "
-	String "                "
+	String "    O tempo     "
+	String "  selecionado e "
+	String "   superior ao  "
+	String "necessario para "
+	String "carregar bateria"
 	String " OK - continuar "
 	
 PLACE 2800H
-Display_TempoUltrapassa:
+Display_TempoUltrapassa:                                                    ;Display para informar o utilizador que a bateria do carregamento que ele pretendia não é suficiente para o carregamento
 	String "     ATENCAO    "
 	String " NAO HA ENERGIA "
 	String " SUFICIENTE PARA"
@@ -209,7 +209,7 @@ Display_TempoUltrapassa:
 	String " OK - continuar "
 
 PLACE 2880H
-Display_AlterarBaseDeDados:
+Display_AlterarBaseDeDados:                                                 ;Display do menu para alterar a base de dados
 	String " BASE DE DADOS  "
 	String "Pretende fazer  "
 	String "alteracoes na   "
@@ -219,7 +219,7 @@ Display_AlterarBaseDeDados:
 	String " OK - continuar "
 
 PLACE 2900H
-Display_CriarOuAlterar:
+Display_CriarOuAlterar:                                                     ;Display do menu para selecionar entre criar ou alterar um cliente
 	String " BASE DE DADOS  "
 	String "Pretende criar  "
 	String "um cliente ou   "
@@ -229,7 +229,7 @@ Display_CriarOuAlterar:
 	String " OK - continuar "
 
 PLACE 2980H
-Display_QualCliente:
+Display_QualCliente:                                                        ;Display para perguntar ao utilizador a qual cliente alterar os dados
 	String " BASE DE DADOS  "
 	String "Insira o ID e   "
 	String "codigo de seg.  "
@@ -239,7 +239,7 @@ Display_QualCliente:
 	String " OK - continuar "
 
 PLACE 2A00H
-Display_InserirDadosParaAlterar:
+Display_InserirDadosParaAlterar:                                            ;Display para perguntar ao utilizador os novos dados do cliente que vai ser alterado
 	String " BASE DE DADOS  "
 	String "Insira o ID,    "
 	String "codigo de seg., "
@@ -249,7 +249,7 @@ Display_InserirDadosParaAlterar:
 	String " OK - continuar "
 
 PLACE 2A80H
-Display_DadosAlterados:
+Display_DadosAlterados:                                                     ;Display para informar o utilizador que os dados foram alterados com sucesso
 	String " BASE DE DADOS  "
 	String "                "
 	String " DADOS ALTERADOS"
@@ -259,7 +259,7 @@ Display_DadosAlterados:
 	String " OK - continuar "
 
 PLACE 2B00H
-Display_ClienteNaoEstaNaDatabase:
+Display_ClienteNaoEstaNaDatabase:                                           ;Display para informar o utilizador que o cliente que pretendia não está na base de dados
 	String " BASE DE DADOS  "
 	String "                "
 	String "   Cliente nao  "
@@ -269,7 +269,7 @@ Display_ClienteNaoEstaNaDatabase:
 	String " OK - continuar "
 
 PLACE 2B80H
-Display_InserirDadosNovos:
+Display_InserirDadosNovos:                                                  ;Display para perguntar ao utilizador quais dados o novo cliente a ser criado terá
 	String " BASE DE DADOS  "
 	String "Insira o ID,    "
 	String "codigo de seg., "
@@ -279,7 +279,7 @@ Display_InserirDadosNovos:
 	String " OK - continuar "
 
 PLACE 2C00H
-Display_SaldoInvalido:
+Display_SaldoInvalido:                                                      ;Display para informar o utilizador que o saldo que inseriu é inválido
 	String " BASE DE DADOS  "
 	String "                "
 	String " SALDO INVALIDO "
@@ -289,7 +289,7 @@ Display_SaldoInvalido:
 	String " OK - continuar "
 
 PLACE 2C80H
-Display_BateriaInvalida:
+Display_BateriaInvalida:                                                    ;Display para informar o utilizador que a bateria do carro que inseriu é inválida
 	String " BASE DE DADOS  "
 	String "BATERIA DO CARRO" 
 	String "    INVALIDA    "
@@ -299,7 +299,7 @@ Display_BateriaInvalida:
 	String " OK - continuar "
 
 PLACE 2D00H
-Display_NovoClienteCriado:
+Display_NovoClienteCriado:                                                  ;Display para informar o utilizador que o novo cliente foi criado
 	String " BASE DE DADOS  "
 	String "                "
 	String "  NOVO CLIENTE  "
@@ -309,7 +309,7 @@ Display_NovoClienteCriado:
 	String " OK - continuar "
 
 PLACE 2D80H
-Display_IncrementaBateriaInvalido:
+Display_IncrementaBateriaInvalido:                                          ;Display para informar o utilizador que o valor que inseriu para carregar a bateria é inválido
 	String "     ATENCAO    "
 	String "                "
 	String "   VALOR DEVE   "
@@ -319,7 +319,7 @@ Display_IncrementaBateriaInvalido:
 	String " OK - continuar "
 
 PLACE 2E00H
-Display_BateriaCarregada:
+Display_BateriaCarregada:                                                   ;Display para informar o utilizador que a bateria foi carregada
 	String " CARREGAR POSTO "
 	String "                "
 	String "    BATERIA     "
@@ -328,15 +328,26 @@ Display_BateriaCarregada:
 	String "                "
 	String " OK - continuar "
 
+PLACE 2E80H
+Display_ClienteExiste:                                                      ;Display para informar o utilizador que o ID que inseriu é inválido (pois já existe um cliente com dito ID)
+	String " BASE DE DADOS  "
+	String "                "
+	String "   ID INVALIDO  "
+	String "(Ja existe um   "
+	String "  cliente com   "
+	String "    esse ID)    "
+	String " OK - continuar "
+
+
 ;*****************************************************************************************************************************************
 ;                                               MAIN
 ;*****************************************************************************************************************************************
 
 PLACE 0000H
 Inicio:
-    MOV SP, StackPointer                                                   ;mete em SP o endereço do início da pilha 
-    MOV R0,Main
-    JMP R0
+    MOV SP, StackPointer                                                    ;mete em SP o endereço do início da pilha 
+    MOV R0,Main                                                             ;coloca em R0 o endereço da tag Main
+    JMP R0                                                                  ;salta para a tag Main
 
 
 ;*****************************************************************************************************************************************
@@ -391,7 +402,7 @@ Desligado:
                                                                             ;*********************************************************************************************************************
     PUSH R5                                                                 ; Guarda na pilha os registos alterados durante esta rotina
     PUSH R6                                                                 ;*********************************************************************************************************************
-    MOV R10,0
+    MOV R10,0                                                               ;reset do valor de R10 para 0
     MOV R6, Ligar                                                           ;mete no R6 o endereço do botão que liga a máquina
     MOVB R5,[R6]                                                            ;mete em R5 o byte endereçado por R6 (o botão de ligar / desligar)
     CMP R5,0                                                                ;compara R5 com 0
@@ -443,12 +454,8 @@ CriarOuAlterar:                                                             ;a r
     CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
     CMP R0,1                                                                ;compara a opção selecionada pelo utilizador com 1
     JNE AlterarDados                                                        ;se R0 não é igual a 1, o utilizador ou pretende alterar os dados de um cliente existente ou inseriu uma opção inválida, por isso salta-se para a tag AlterarDados
-    MOV R8,Base_Tabela_Dados                                                ;mete-se em R8 o início da base de dados
-    MOV R9,EnderecoTamanho                                                  ;mete-se em R9 o endereço onde está guardado o tamanho da base de dados
-    MOV R10,[R9]                                                            ;mete-se em R10 o tamanho da base de dados (endereçado por R9)
-    MOV R7,Proximo                                                          ;mete-se em R7 o tamanho do salto a ser efetuado para saltar dos dados de um cliente para os dados de outro
-    MUL R10,R7                                                              ;esta multiplicação do tamanho pelo valor Proximo garante que o novo cliente é criado no fim da base de dados
-    ADD R8,R10                                                              ;adiciona-se o valor da multiplicação anterior ao início da base de dados, para gravar-se os dados inseridos no fim da base de dados
+    
+    
     MOV R5, InputID                                                         ;mete em R5 o endereço de onde se lê o ID do novo cliente
     MOV R6, InputCodSeguranca                                               ;mete em R6 o endereço de onde se lê o código de segurança do novo cliente
     MOV R7, InputSaldo                                                      ;mete em R7 o endereço de onde se lê o saldo do novo cliente
@@ -460,6 +467,31 @@ CriarOuAlterar:                                                             ;a r
     MOV R2,[R7]                                                             ;mete em R2 o valor do saldo do novo cliente que o utilizador meteu
     MOV R3,[R4]                                                             ;mete em R3 o valor da bateria do carro do novo cliente que o utilizador meteu
     CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
+    MOV R8, Base_Tabela_Dados                                               ;mete-se em R8 o início da base de dados
+    MOV R6,0                                                                ;mete-se em R3 o índice
+Ciclo_VerificarClienteExiste:                                               ;ciclo em que se percorre a base de dados
+    MOV R5, [R8]                                                            ;R5 tem o valor do ID da tabela de base de dados a verificar
+    CMP R0,R5                                                               ;compara-se o ID inserido pelo utilizador com o ID do cliente a ser verificado atualmente
+    JNE ContinuarTabelaVerificacao                                          ;se os valores forem diferentes, efetua-se este salto para avançar para o próximo cliente, se não estivermos já no último cliente da base de dados. Caso forem iguais, o ID inserido é inválido e informa-se o utilizador
+    MOV R9, Display_ClienteExiste                                           ;Mete no registo 9 o endereço do display a mostrar ao utilizador
+    CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
+    JMP AlterarOuNao                                                        ;efetua-se o salto para o início da rotina
+ContinuarTabelaVerificacao:                                                 ;esta parte avança para verificar os dados do próximo cliente, porque previamente os dados que o utilizador inseriu e os que estão na base de dados não coincidiam
+    ADD R6,1                                                                ;adiciona-se ao índice 1 para indicar que avançamos um cliente
+    MOV R9,EnderecoTamanho                                                  ;mete em R9 o endereço onde encontra-se o tamanho da base de dados
+    MOV R7,[R9]                                                             ;R7 é o número de clientes na base de dados
+    CMP R6,R7                                                               ;compara-se o índice com o tamanho da base de dados
+    JEQ CriarCliente                                                        ;se é igual, chegou-se ao fim da base de dados e efetua-se este salto
+    MOV R4,Proximo                                                          ;se não é igual, mete-se em R2 o valor de Proximo para avançarmos para o próximo cliente a verificar
+    ADD R8,R4                                                               ;avanca a base para o próximo cliente a verificar
+    JMP Ciclo_VerificarClienteExiste                                        ;faz o salto para o ciclo para verificarmos este próximo cliente   
+CriarCliente:   
+    MOV R8,Base_Tabela_Dados                                                ;mete-se em R8 o início da base de dados
+    MOV R9,EnderecoTamanho                                                  ;mete-se em R9 o endereço onde está guardado o tamanho da base de dados
+    MOV R10,[R9]                                                            ;mete-se em R10 o tamanho da base de dados (endereçado por R9)
+    MOV R7,Proximo                                                          ;mete-se em R7 o tamanho do salto a ser efetuado para saltar dos dados de um cliente para os dados de outro
+    MUL R10,R7                                                              ;esta multiplicação do tamanho pelo valor Proximo garante que o novo cliente é criado no fim da base de dados
+    ADD R8,R10                                                              ;adiciona-se o valor da multiplicação anterior ao início da base de dados, para gravar-se os dados inseridos no fim da base de dados
     CMP R2,0                                                                ;compara o valor do saldo com zero
     JLT SaldoInvalido                                                       ;se o saldo que o utilizador inseriu para o novo cliente for negativo, efetua-se este salto e o novo cliente não é criado
     CMP R3,0                                                                ;compara o valor da bateria do carro com zero
@@ -556,7 +588,7 @@ BateriaInvalida:                                                            ;a r
     MOV R9, Display_BateriaInvalida                                         ;Mete no registo 9 o endereço do display a mostrar ao utilizador
     CALL RefreshDisplay                                                     ;Mostra o display metido anteriormente em R9 ao utilizador
     JMP AlterarOuNao                                                        ;volta ao início da rotina
-FimAlterarBaseDeDados:                                                                   ;Fim da rotina, chega aqui se o utilizador já não pretende fazer alterações à base de dados
+FimAlterarBaseDeDados:                                                      ;Fim da rotina, chega aqui se o utilizador já não pretende fazer alterações à base de dados
     POP R8                                                                  ;*********************************************************************************************************************
     POP R7                                                                  ;
     POP R6                                                                  ;
@@ -601,7 +633,7 @@ IncrementaNormal:
     MOV R3, [R5]                                                            ;R3 contém o valor a adicionar à bateria selecionada, se possivel
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
     CMP R3,0                                                                ;compara o valor que o utilizador inseriu com 0
-    JLT IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
+    JLE IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
     ADD R0, R3                                                              ;adicionamos a R0 (bateria normal) o valor que o utilizador inseriu
     CMP R0, 0                                                               ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
@@ -615,7 +647,7 @@ IncrementaSemiRapido:
     MOV R3, [R5]                                                            ;R3 contém o valor a adicionar à bateria selecionada, se possivel
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
     CMP R3,0                                                                ;compara o valor que o utilizador inseriu com 0
-    JLT IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
+    JLE IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
     ADD R1,R3                                                               ;adicionamos a R1 (bateria semirapido) o valor que o utilizador inseriu
     CMP R1,0                                                                ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
@@ -629,7 +661,7 @@ IncrementaRapido:
     MOV R3, [R5]                                                            ;R3 contém o valor a adicionar à bateria selecionada, se possivel
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
     CMP R3,0                                                                ;compara o valor que o utilizador inseriu com 0
-    JLT IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
+    JLE IncrementaBateriaInvalido                                           ;se o valor que o utilizador inseriu é negativo (menor que 0), efetua-se este salto pois o utilizador não pode tirar bateria aqui, só adicionar
     ADD R2,R3                                                               ;adicionamos a R2 (bateria rapido) o valor que o utilizador inseriu
     CMP R2,0                                                                ;comparamos o valor da bateria após a adição com 0, para verificar se ocorreu overflow
     JLT OverflowBateria                                                     ;se ocorrer overflow efetuar este salto para informar o utilizador
@@ -798,29 +830,29 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
-	CMP R3, CustoNormal														;compara o registo 3 com o registo 6
+	CMP R3, CustoNormal														;compara o registo 3 com o valor do custoNormal (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
-	MOV R9, Normal															;coloca no registo 9 o valor de energia de um carregamento Normal/hora
-	MUL R5, R9																;é multiplicado o valor do registo 5 com o valor do registo 9 --> registo 5 com a energia total do carregamento (com o valor do tempo inserido pelo utilizador)
+	MOV R6, Normal															;coloca no registo 6 o valor de energia de um carregamento Normal/hora
+	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento (com o valor do tempo inserido pelo utilizador)
 	CMP R5, R0																;compara o valor do registo 5 com o valor do registo 0 (valor da bateria Normal do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 0, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	JMP FimVerificacoes														;se for inferior ou igual, salta para o tag "FimVerificacoes"
 
 VerificaEscolhaTempoSuperiorSemiRapido:
-	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do registo 7
+	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do custoSemiRapido (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorRapido									;se o valor do registo 3 não for igual ao valor do registo 7, salta para o tag "VerificaEscolhaTempoSuperiorRapido" - ou seja, é verificado se o tipo de carregamento não é semi-rapido
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
-	MOV R9, Semirapido														;coloca no registo 9 o valor da energia de um carregamento SemiRapido/hora
-	MUL R5, R9																;é multiplicado o valor do registo 5 com o valor do registo 9 --> registo 5 com a energia total do carregamento
+	MOV R6, Semirapido														;coloca no registo 69 o valor da energia de um carregamento SemiRapido/hora
+	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R1																;compara o valor do registo 5 com o valor do registo 1 (valor da bateria Semi-Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	JMP FimVerificacoes														;se for inferior ou igual, salta para o tag "FimVerificacoes"
 
 VerificaEscolhaTempoSuperiorRapido:	
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
-	MOV R9, Rapido															;coloca no registo 9 o valor da energia de um carregamento Rapido/hora
-	MUL R5, R9																;é multiplicado o valor do registo 5 com o valor do registo 9 --> registo 5 com a energia total do carregamento
+	MOV R6, Rapido															;coloca no registo 6 o valor da energia de um carregamento Rapido/hora
+	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R2																;compara o valor do registo 5 com o valor do registo 2 (valor da bateria Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	
@@ -1011,10 +1043,10 @@ VerificaOK:
 CicloVerOK:
     MOV R0, OK                                                              ;mete em R0 o endereço de onde ver se o utilizador "carregou" OK
     MOVB R1, [R0]                                                           ;mete em R1 o valor lido do endereço R0
-    CMP R1,1
-    JNE CicloVerOK                                                          ;só quando o utilizador mudar o valor para 1 é que se lê os inputs do utilizador
-    MOV R1,0
-    MOVB[R0],R1
+    CMP R1,1                                                                ;compara R1 com 1
+    JNE CicloVerOK                                                          ;só quando o utilizador mudar o valor para 1 é que se avança o programa
+    MOV R1,0                                                                ;mete-se 0 em R1 para fazer reset do botão OK
+    MOVB[R0],R1                                                             ;reset do botão OK
     POP R1                                                                  ;*********************************************************************************************************************
     POP R0                                                                  ; Retira da pilha os registos guardados no início da rotina
                                                                             ;*********************************************************************************************************************
