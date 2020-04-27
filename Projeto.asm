@@ -396,7 +396,6 @@ Programa:
     CMP R10,-1                                                              ;compara-se o valor em R10 com -1
 	JEQ FimPrograma                                                         ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
     CALL NiveisDeEnergia                                                    ;rotina para indicar se os postos estão operacionais
-    JEQ FimPrograma                                                         ;se são iguais, isto significa que nenhum dos postos tem o nível mínimo de bateria e termina-se o programa
     CALL Verificacao_Cliente                                                ;rotina para efetuar a verificação do cliente
     CMP R10,-1                                                              ;compara-se o valor em R10 com -1
 	JEQ FimPrograma                                                         ;R10 será igual a -1 se o utilizador não foi verificado. Se tal acontecer, salta-se para o fim do programa
@@ -917,7 +916,7 @@ ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
     MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
     ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
-	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do vehiculo do cliente
+	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do veiculo do cliente
 	CMP R3, CustoNormal														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoNormal (1, equivalente à opção)									
 	JEQ	ForneceEnergiaNormal												;se o valor do registo 3 for igual ao do registo 6, salta para o tag "ForneceEnergiaNormal" - ou seja, o carregamento escolhido é o normal
 	CMP R3, CustoSemiRapido													;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoSemiRapido (2, equivalente à opção)
@@ -928,12 +927,12 @@ ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 
 ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	MOV R7, Normal 															;coloca no registo 7 o valor de energia de um carregamento Normal/hora
-	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (20)
 	MOV R8, 100 															;coloca no registo 8 a constante 100
-	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
-	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
+	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
 	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
-	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente														
+	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (20)
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
+	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente														
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP ForneceEnergiaNormal 												;salta para o "tag" ForneceEnergiaNormal"
@@ -941,31 +940,23 @@ ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 
 ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
-	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (60)
 	MOV R8, 100 															;coloca no registo 8 a constante 100
-	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
-	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
+	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
 	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
-	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente	
+	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (60)
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
+	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente	
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP ForneceEnergiaSemiRapido 											;salta para o "tag" ForneceEnergiaSemiRapido"
 
 ForneceEnergiaRapido:														;FORNECE ENERGIA DO TIPO RAPIDO
-	MOV R7, Rapido 														    ;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
-	ADD R6, R7 																;é adicionado à bateria do vehiculo, o valor da energia do carregamento (60)
-	MOV R8, 100 															;coloca no registo 8 a constante 100
 	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
-	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do vehiculo com a constante 100
-	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
-	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente	
-	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
-	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
-    JMP ForneceEnergiaRapido
+	JGE BateriaCarregada 													;Como o carregamento é rápido e este carrega a bateria toda numa hora, saltamos logo para a tag "BateriaCarregada"
 
-BateriaCarregada:															;QUANDO A BATERIA DO VEHICULO ULTRAPASSA OS 100%
+BateriaCarregada:															;QUANDO A BATERIA DO VEICULO ULTRAPASSA OS 100%
 	MOV R6, 100 															;coloca no registo 6 a constante 100
-	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do vehiculo do cliente (coloca a 100)
+	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente (coloca a 100)
 	JMP AtualizaValoresEnergia 												;salta para o tag "AtualizaValoresEnergia"	
 
 AtualizaValoresEnergia:														;VERIFICA SE O TEMPO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
