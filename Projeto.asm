@@ -859,9 +859,65 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
+
+CalculaTempo:																;CALCULA O TEMPO QUE DEMORARÁ A CARREGAR O CARRO
+    MOV R9,R4																;coloca no registo 9 o valor do registo 4 (o tempo escolhido pelo utilizador)
+    MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
+    ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
+	MOV R6, [R5+BateriaCarro] 												;é colocado no registo 6, o valor da bateria do veiculo do cliente
+	CMP R3, CustoNormal														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoNormal (1, equivalente à opção)									
+	JEQ	CalculaTempoNormal												    ;se forem iguais, salta para o tag "CalculaTempoNormal" - ou seja, o carregamento escolhido é o normal
+	CMP R3, CustoSemiRapido													;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoSemiRapido (2, equivalente à opção)
+	JEQ	CalculaTempoSemiRapido 											    ;se forem iguais, salta para o tag "CalculaTempoSemiRapido" - ou seja, o carregamento escolhido é o semi-rapido
+	CMP R3,	CustoRapido														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoRapido (3, equivalente à opção)	
+	JEQ CalculaTempoRapido												    ;se forem iguais, salta para o tag "CalculaTempoRapido" - ou seja, o carregamento escolhido é o rapido
+
+
+CalculaTempoNormal:
+	MOV R7, Normal 															;coloca no registo 7 o valor de energia de um carregamento Normal/hora
+	MOV R8, 100 															;coloca no registo 8 a constante 100
+    SUB R8,R6                                                               ;subtrai a 100 o valor de percentagem da bateria do carro
+Ciclo_CTN:	
+    CMP R8, 0 																;compara o valor do registo 8 com 0
+	JLE VerificaTempo 													    ;se o valor do registo 8 for inferior ou igual a 0, salta para o tag "VerificaTempo"
+	SUB R8,R7 																;é subtraido a 100 o valor da energia do carregamento (20)
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)														
+	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
+	JEQ VerificaTempo 												        ;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
+    JMP Ciclo_CTN 												            ;salta para o "tag" Ciclo_CTN
+	
+
+CalculaTempoSemiRapido:														
+	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento SemiRapido/hora
+	MOV R8, 100 															;coloca no registo 8 a constante 100
+    SUB R8,R6                                                               ;subtrai a 100 o valor de percentagem da bateria do carro
+Ciclo_CTSR:	
+    CMP R8, 0 																;compara o valor do registo 8 com 0
+	JLE VerificaTempo 													    ;se o valor do registo 8 for inferior ou igual a 0, salta para o tag "VerificaTempo"
+	SUB R8,R7 																;é subtraido a 100 o valor da energia do carregamento (60)
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)														
+	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
+	JEQ VerificaTempo 												        ;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
+    JMP Ciclo_CTN 												            ;salta para o "tag" Ciclo_CTSR
+
+CalculaTempoRapido:														
+	MOV R7, Rapido 															;coloca no registo 7 o valor de energia de um carregamento Rapido/hora
+	MOV R8, 100 															;coloca no registo 8 a constante 100
+    SUB R8,R6
+    SUB R8,R6                                                               ;subtrai a 100 o valor de percentagem da bateria do carro
+Ciclo_CTR:	
+    CMP R8, 0 																;compara o valor do registo 8 com 0
+	JLE VerificaTempo 													    ;se o valor do registo 8 for inferior ou igual a 0, salta para o tag "VerificaTempo"
+	SUB R8,R7 																;é subtraido a 100 o valor da energia do carregamento (20)
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)														
+	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
+	JEQ VerificaTempo 												        ;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
+    JMP Ciclo_CTR 												            ;salta para o "tag" Ciclo_CTR
+
+VerificaTempo:                                    
 	CMP R3, CustoNormal														;compara o registo 3 com o valor do custoNormal (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
-	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
+	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo que demorará o carregamento)
 	MOV R6, Normal															;coloca no registo 6 o valor de energia de um carregamento Normal/hora
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento (com o valor do tempo inserido pelo utilizador)
 	CMP R5, R0																;compara o valor do registo 5 com o valor do registo 0 (valor da bateria Normal do posto)
@@ -871,21 +927,22 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
 VerificaEscolhaTempoSuperiorSemiRapido:
 	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do custoSemiRapido (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorRapido									;se o valor do registo 3 não for igual ao valor do registo 7, salta para o tag "VerificaEscolhaTempoSuperiorRapido" - ou seja, é verificado se o tipo de carregamento não é semi-rapido
-	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
-	MOV R6, Semirapido														;coloca no registo 69 o valor da energia de um carregamento SemiRapido/hora
+	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo que demorará o carregamento)
+	MOV R6, Semirapido														;coloca no registo 6 o valor da energia de um carregamento SemiRapido/hora
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R1																;compara o valor do registo 5 com o valor do registo 1 (valor da bateria Semi-Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	JMP FimVerificacoes														;se for inferior ou igual, salta para o tag "FimVerificacoes"
 
 VerificaEscolhaTempoSuperiorRapido:	
-	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo escolhido)
+	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo que demorará o carregamento)
 	MOV R6, Rapido															;coloca no registo 6 o valor da energia de um carregamento Rapido/hora
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R2																;compara o valor do registo 5 com o valor do registo 2 (valor da bateria Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	
 FimVerificacoes:
+    MOV R4,R9                                                               ;move para R4 o valor originalmente metido pelo utilizador, (para futuras verificações)
 	CMP R4, 0																;compara o valor do registo 4 com a constante 0
 	JGT VerificaSaldo														;se o valor do registo 4 for superior a 0, ou seja, o tempo for superior a 0, salta para o tag "VerificaSaldo"
 	MOV R9, Display_TempoInvalido 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
@@ -928,6 +985,7 @@ ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	MOV R7, Normal 															;coloca no registo 7 o valor de energia de um carregamento Normal/hora
 	MOV R8, 100 															;coloca no registo 8 a constante 100
+Ciclo_FEN:
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
 	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
 	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (20)
@@ -935,12 +993,13 @@ ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente														
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
-    JMP ForneceEnergiaNormal 												;salta para o "tag" ForneceEnergiaNormal"
+    JMP Ciclo_FEN 												            ;salta para o "tag" Ciclo_FEN
 	
 
 ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
 	MOV R8, 100 															;coloca no registo 8 a constante 100
+Ciclo_FESR:
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
 	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
 	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (60)
@@ -948,10 +1007,14 @@ ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente	
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
-    JMP ForneceEnergiaSemiRapido 											;salta para o "tag" ForneceEnergiaSemiRapido"
+    JMP Ciclo_FESR 											                ;salta para o "tag" Ciclo_FESR
 
 ForneceEnergiaRapido:														;FORNECE ENERGIA DO TIPO RAPIDO
-	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
+	MOV R7, Rapido   														;coloca no registo 7 o valor de energia de um carregamento Rapido/hora
+	MOV R8, 100 															;coloca no registo 8 a constante 100
+	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
+	JGE BateriaCarregada 													;se o valor do registo 0 for superior ou igual a 100, salta para o tag "BateriaCarregada"
+    SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)
 	JGE BateriaCarregada 													;Como o carregamento é rápido e este carrega a bateria toda numa hora, saltamos logo para a tag "BateriaCarregada"
 
 BateriaCarregada:															;QUANDO A BATERIA DO VEICULO ULTRAPASSA OS 100%
