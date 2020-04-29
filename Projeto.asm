@@ -903,7 +903,7 @@ Ciclo_CTSR:
 	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)														
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ VerificaTempo 												        ;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
-    JMP Ciclo_CTN 												            ;salta para o "tag" Ciclo_CTSR
+    JMP Ciclo_CTSR 												            ;salta para o "tag" Ciclo_CTSR
 
 CalculaTempoRapido:														
 	MOV R7, Rapido 															;coloca no registo 7 o valor de energia de um carregamento Rapido/hora
@@ -997,9 +997,9 @@ ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 Ciclo_FEN:
 	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (20)
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente	
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)		
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
-	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
-	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)													
+	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"									
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP Ciclo_FEN 												            ;salta para o "tag" Ciclo_FEN
@@ -1013,9 +1013,9 @@ ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 Ciclo_FESR:
 	ADD R6, R7 																;é adicionado à bateria do veiculo, o valor da energia do carregamento (20)
 	MOV [R5+BateriaCarro], R6 												;atualiza o valor da bateria do veiculo do cliente	
+	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)	
 	CMP R6, R8 																;compara o valor do registo 6 com o valor do registo 8, ou seja, a bateria do veiculo com a constante 100
-	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"
-	SUB R4,1 																;subtrai 1 ao registo 4 (ao tempo)													
+	JGE BateriaCarregada 													;se o valor do registo 6 for superior ou igual a 100, salta para o tag "BateriaCarregada"									
 	CMP R4,0 																;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP Ciclo_FESR 											                ;salta para o "tag" Ciclo_FESR
