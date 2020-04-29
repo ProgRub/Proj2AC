@@ -348,6 +348,16 @@ Display_CarregarPosto:                                                      ;Dis
 	String "                "
 	String " OK - continuar "
 
+PLACE 2F80H
+Display_BateriaJACarregada:                                                 ;Display para informar o utilizador que o seu carro já se encontra carregado
+	String "     ATENCAO    "
+	String "                "
+	String " O Seu carro ja "
+	String "   se encontra  "
+	String "   carregado!   "
+	String "                "
+	String " OK - continuar "
+
 
 ;*****************************************************************************************************************************************
 ;                                               MAIN
@@ -920,6 +930,9 @@ Ciclo_CTR:
 
 VerificaTempo: 
     MOV R7,R9                                                               ;armazena em R7 o valor em R9 (valor originalmente introduzido pelo utilizador)
+    SUB R7,R4                                                               ;subtrai a R7, valor de tempo originalmente introduzido, R4, para obter o tempo que realmente demorará
+    CMP R7,0                                                                ;compara R7 com 0
+    JEQ BateriaJACarregada                                                  ;se R7=0, então não é preciso carregar a bateria
 	CMP R4,0																;compara o valor do registo 4 com a constante 0
 	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
 	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
@@ -929,9 +942,6 @@ Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA B
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 
 NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
-    SUB R7,R4                                                               ;subtrai a R7, valor de tempo originalmente introduzido, R4, para obter o tempo que realmente demorará
-    CMP R7,0
-    JEQ SaltoAuxiliar
     MOV R4,R7                                                               ;armazena em R4 o valor em R7 (para futuras verificações)                                   
 	CMP R3, CustoNormal														;compara o registo 3 com o valor do custoNormal (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
@@ -990,6 +1000,10 @@ ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 	CMP R3,	CustoRapido														;compara o valor do registo 3 (tipo de carregamento escolhido) com o valor do custoRapido (3, equivalente à opção)	
 	JEQ ForneceEnergiaRapido												;se o valor do registo 3 for igual ao do registo 8, salta para o tag "ForneceEnergiaRapido" - ou seja, o carregamento escolhido é o rapido
 
+BateriaJACarregada:
+    MOV R9, DisplayBateriaJACarregada										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)
+    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9
+    JMP FimCarregamento
 
 ForneceEnergiaNormal:														;FORNECE ENERGIA DO TIPO NORMAL
 	MOV R7, Normal 															;coloca no registo 7 o valor de energia de um carregamento Normal/hora
@@ -1004,8 +1018,6 @@ Ciclo_FEN:
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP Ciclo_FEN 												            ;salta para o "tag" Ciclo_FEN
 	
-SaltoAuxiliar:
-    JMP FimCarregamento
 
 ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
