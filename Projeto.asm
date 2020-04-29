@@ -1001,7 +1001,7 @@ ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 	JEQ ForneceEnergiaRapido												;se o valor do registo 3 for igual ao do registo 8, salta para o tag "ForneceEnergiaRapido" - ou seja, o carregamento escolhido é o rapido
 
 BateriaJACarregada:
-    MOV R9, DisplayBateriaJACarregada										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)
+    MOV R9, Display_BateriaJACarregada										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9
     JMP FimCarregamento
 
