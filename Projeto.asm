@@ -859,9 +859,9 @@ EscolhaCarregamento:														;VERIFICAR O TIPO DE CARREGAMENTO ESCOLHIDO PE
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao custoSemiRapido, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento semi-rapido
 	CMP R3, CustoRapido														;compara o registo 3 com o custoRapido (3, equivalente à opção)
 	JEQ EscolhaTempo														;se o valor do registo 3 for igual ao custoRapido, salta para o tag "EscolhaTempo" - ou seja, escolheu o carregamento rapido
-	MOV R9, Display_OpcaoInvalida 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida) ********************************************************													
-    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 										* ACONTECE SE FOR INSERIDO UM VALOR DIFERENTE DE 1,2,3 *
-	JMP EscolhaCarregamento													;volta para o Display_ inicial (volta a escolher o tipo carregamento)								********************************************************
+	MOV R9, Display_OpcaoInvalida 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_OpcaoInvalida)													
+    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9
+	JMP EscolhaCarregamento													;volta para o Display_ inicial (volta a escolher o tipo carregamento)
 
 EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
 	MOV R9, Display_EscolherTempo 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar
@@ -966,19 +966,19 @@ SemBateriaParaCarregamento:
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 	JMP FimCarregamento														;salta para o tag "FimCarregamento"
 
-VerificaSaldo:	
+VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
     MUL R4, R3																;é multiplicado o valor do registo 4 com o valor do registo 3, ou seja, o tempo pelo custo/hora do carregamento --> registo 4 com o valor do custo do carregamento
     MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
     ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente 
     MOV R6,[R5+Saldo]														;é colocado no registo 6, o valor do saldo do cliente
 	CMP R4, R6																;é comparado o valor do registo 4 com o valor do registo 6, ou seja, o custo do carregamento com o saldo do utilizador
 	JLE ForneceEnergia 														;se o valor do registo 4 (o custo) for inferior ou igual ao do registo 6 (saldo), salta para o tag "ForneceEnergia", ou seja, o utilizador tem saldo suficiente
-	MOV R9, Display_SaldoInsuficiente										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)		*****************************************************
+	MOV R9, Display_SaldoInsuficiente										;mete no registo 9, onde está o endereço do que pretendemos mostrar (Display_SaldoInsuficiente)
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9
-    JMP FimCarregamento														;salta para o tag "FimCarregamento", pois não se carregará o carro 															*****************************************************
+    JMP FimCarregamento														;salta para o tag "FimCarregamento", pois não se carregará o carro 
 	
 	
-ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO															;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
+ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
 	CMP R4,0																;compara o valor do registo 4 com a constante 0
 	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
 	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
