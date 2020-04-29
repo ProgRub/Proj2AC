@@ -931,7 +931,7 @@ Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA B
 NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
     SUB R7,R4                                                               ;subtrai a R7, valor de tempo originalmente introduzido, R4, para obter o tempo que realmente demorará
     CMP R7,0
-    JEQ FimCarregamento
+    JEQ SaltoAuxiliar
     MOV R4,R7                                                               ;armazena em R4 o valor em R7 (para futuras verificações)                                   
 	CMP R3, CustoNormal														;compara o registo 3 com o valor do custoNormal (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
@@ -1004,6 +1004,8 @@ Ciclo_FEN:
 	JEQ AtualizaValoresEnergia 												;se o valor do registo 4 for 0, salta para o tag AtualizaValoresEnergia"
     JMP Ciclo_FEN 												            ;salta para o "tag" Ciclo_FEN
 	
+SaltoAuxiliar:
+    JMP FimCarregamento
 
 ForneceEnergiaSemiRapido:													;FORNECE ENERGIA DO TIPO SEMIRAPIDO
 	MOV R7, Semirapido 														;coloca no registo 7 o valor de energia de um carregamento Semi-Rapido/hora
