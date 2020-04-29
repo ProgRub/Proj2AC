@@ -966,17 +966,8 @@ SemBateriaParaCarregamento:
     CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
 	JMP FimCarregamento														;salta para o tag "FimCarregamento"
 
-VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
-	CMP R4,0																;compara o valor do registo 4 com a constante 0
-	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
-	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
-	
-Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
-	MOV R9, Display_UltrapassaCargaMaxima 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_UltrapassaCargaMaxima)
-    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-
-NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
-	MUL R4, R3																;é multiplicado o valor do registo 4 com o valor do registo 3, ou seja, o tempo pelo custo/hora do carregamento --> registo 4 com o valor do custo do carregamento
+VerificaSaldo:	
+    MUL R4, R3																;é multiplicado o valor do registo 4 com o valor do registo 3, ou seja, o tempo pelo custo/hora do carregamento --> registo 4 com o valor do custo do carregamento
     MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
     ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente 
     MOV R6,[R5+Saldo]														;é colocado no registo 6, o valor do saldo do cliente
@@ -987,7 +978,16 @@ NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO D
     JMP FimCarregamento														;salta para o tag "FimCarregamento", pois não se carregará o carro 															*****************************************************
 	
 	
-ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
+ForneceEnergia:																;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO															;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
+	CMP R4,0																;compara o valor do registo 4 com a constante 0
+	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
+	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
+	
+Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
+	MOV R9, Display_UltrapassaCargaMaxima 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_UltrapassaCargaMaxima)
+    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
+
+NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
     MOV R4,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
 	MOV R9,R7																;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
     MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
