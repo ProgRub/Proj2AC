@@ -859,6 +859,11 @@ EscolhaTempo: 																;VERIFICAR O TEMPO ESCOLHIDO PELO UTILIZADOR
     MOV R5, InputTempo   													;coloca no registo 5 o endereço de onde ler quanto tempo carregar
 	MOV R4, [R5]															;coloca no registo 4 o tempo escolhido pelo utilizador
 	CALLF LimpaPerifericosEntrada                                           ;limpa os endereços de onde se lê os inputs do utilizador
+	CMP R4, 0																;compara o valor do registo 4 com a constante 0
+	JGT CalculaTempo														;se o valor do registo 4 for superior a 0, ou seja, o tempo for superior a 0, salta para o tag "CalculaTempo"
+	MOV R9, Display_TempoInvalido 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
+    CALL RefreshDisplay 													;mostra o display metido anteriormente em R9 ao utilizador
+    JMP EscolhaTempo														;salta para o tag "EscolhaTempo" --> tempo inválido
 
 CalculaTempo:																;CALCULA O TEMPO QUE DEMORARÁ A CARREGAR O CARRO
     MOV R9,R4																;coloca no registo 9 o valor do registo 4 (o tempo escolhido pelo utilizador)
@@ -914,7 +919,17 @@ Ciclo_CTR:
 	JEQ VerificaTempo 												        ;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
     JMP Ciclo_CTR 												            ;salta para o "tag" Ciclo_CTR
 
-VerificaTempo:                                    
+VerificaTempo: 
+    MOV R7,R9                                                               ;armazena em R7 o valor em R9 (valor originalmente introduzido pelo utilizador)
+	CMP R4,0																;compara o valor do registo 4 com a constante 0
+	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
+	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
+	
+Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
+	MOV R9, Display_UltrapassaCargaMaxima 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_UltrapassaCargaMaxima)
+    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
+
+NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)                                   
 	CMP R3, CustoNormal														;compara o registo 3 com o valor do custoNormal (equivalente à opção)
 	JNE VerificaEscolhaTempoSuperiorSemiRapido								;se o valor do registo 3 for diferente do valor do registo 6, salta para o tag "VerificaEscolhaTempoSuperiorSemiRapido" - ou seja, é verificado se o tipo de carregamento não é normal
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo que demorará o carregamento)
@@ -942,12 +957,9 @@ VerificaEscolhaTempoSuperiorRapido:
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
 	
 FimVerificacoes:
-    MOV R4,R9                                                               ;move para R4 o valor originalmente metido pelo utilizador, (para futuras verificações)
-	CMP R4, 0																;compara o valor do registo 4 com a constante 0
-	JGT VerificaSaldo														;se o valor do registo 4 for superior a 0, ou seja, o tempo for superior a 0, salta para o tag "VerificaSaldo"
-	MOV R9, Display_TempoInvalido 											;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_TempoInvalido)
-    CALL RefreshDisplay 													;mostra o display metido anteriormente em R9 ao utilizador
-    JMP EscolhaTempo														;salta para o tag "EscolhaTempo" --> tempo inválido
+    SUB R7,R4                                                               ;subtrai a R7, valor de tempo originalmente introduzido, R4, para obter o tempo que realmente demorará
+    MOV R4,R7                                                               ;armazena em R4 o valor em R7 (para futuras verificações)
+    JMP VerificaSaldo
 
 
 SemBateriaParaCarregamento:
@@ -956,7 +968,6 @@ SemBateriaParaCarregamento:
 	JMP FimCarregamento														;salta para o tag "FimCarregamento"
 
 VerificaSaldo:																;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EFETUAR O CARREGAMENTO
-    MOV R7,R4																;coloca no registo 7 o valor do registo 4 (o tempo escolhido pelo utilizador)
 	MUL R4, R3																;é multiplicado o valor do registo 4 com o valor do registo 3, ou seja, o tempo pelo custo/hora do carregamento --> registo 4 com o valor do custo do carregamento
     MOV R5, Base_Tabela_Dados												;é colocado no registo 5 o valor o endereço do inicio da base de dados
     ADD R5,R10																;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente 
@@ -1024,16 +1035,6 @@ BateriaCarregada:															;QUANDO A BATERIA DO VEICULO ULTRAPASSA OS 100%
 
 AtualizaValoresEnergia:														;VERIFICA SE O TEMPO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
 	MOV R7,R9																;coloca no registo 7 o valor do registo 9 (o tempo escolhido pelo utilizador)
-	CMP R4,0																;compara o valor do registo 4 com a constante 0
-	JNE Excedeu																;se o valor do registo 4 for 0, salta para o tag "Excedeu"
-	JMP NaoExcedeu 															;caso contrário, salta para o tag "NaoExcedeu"
-
-	
-Excedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
-	MOV R9, Display_UltrapassaCargaMaxima 									;mete no registo 9, onde está o endereço do display que pretendemos mostrar (Display_UltrapassaCargaMaxima)
-    CALL RefreshDisplay 													;mostra ao utilizador o display metido anteriormente em R9 
-
-NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
 	SUB R7, R4																;é subtraido ao registo 7 (o tempo inserido) o valor do registo 4 (o valor do tempo que sobrou) para obter o tempo que demorou para carregar o carro
 	MOV R8, R7                                                              ;move-se o registo 7 (tempo que demorou para carregar o carro) para o registo 8 para escrever o valor no display
 	MOV R9, Display_InfoCarregamento 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
