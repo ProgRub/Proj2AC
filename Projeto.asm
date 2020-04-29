@@ -950,7 +950,7 @@ NaoExcedeu:																	;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO D
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento (com o valor do tempo inserido pelo utilizador)
 	CMP R5, R0																;compara o valor do registo 5 com o valor do registo 0 (valor da bateria Normal do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 0, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
-	JMP VerificaSaldo														;se for inferior ou igual, salta para o tag "FimVerificacoes"
+	JMP VerificaSaldo														;salta para o tag "VerificaSaldo"
 
 VerificaEscolhaTempoSuperiorSemiRapido:
 	CMP R3, CustoSemiRapido													;compara o valor do registo 3 com o valor do custoSemiRapido (equivalente à opção)
@@ -960,7 +960,7 @@ VerificaEscolhaTempoSuperiorSemiRapido:
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R1																;compara o valor do registo 5 com o valor do registo 1 (valor da bateria Semi-Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
-	JMP VerificaSaldo														;se for inferior ou igual, salta para o tag "FimVerificacoes"
+	JMP VerificaSaldo														;salta para o tag "VerificaSaldo"
 
 VerificaEscolhaTempoSuperiorRapido:	
 	MOV R5, R4																;coloca no registo 5 o valor do registo 4 (o tempo que demorará o carregamento)
@@ -968,7 +968,7 @@ VerificaEscolhaTempoSuperiorRapido:
 	MUL R5, R6																;é multiplicado o valor do registo 5 com o valor do registo 6 --> registo 5 com a energia total do carregamento
 	CMP R5, R2																;compara o valor do registo 5 com o valor do registo 2 (valor da bateria Rapida do posto)
 	JGT SemBateriaParaCarregamento											;se o valor do registo 5 é superior ao valor do registo 1, salta para o tag "SemBateriaParaCarregamento" - as opções escolhidas pelo utilizador irão descarregar a bateria do posto
-	JMP VerificaSaldo
+	JMP VerificaSaldo														;salta para o tag "VerificaSaldo"
 
 SemBateriaParaCarregamento:
 	MOV R9, Display_TempoUltrapassa 										;mete no registo 9, onde está o endereço do display que pretendemos mostrar
