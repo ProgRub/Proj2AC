@@ -980,13 +980,10 @@ VerificaSaldo:											;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EF
 
 
 ForneceEnergia:											;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
-    CMP R3,3                                            ;verifica se a opção escolhida é a rápida (R3- opção escolhida, 3- opção rápida)
-    JNE NaoERapido                                      ;se não for, salta-se para a tag "NaoERapido"
-    CMP R9,R7                                           ;se for, comparamos o tempo escolhido (R9) com o tempo de fornecimento (R7)
+    CMP R9,R7                                           ;comparamos o tempo escolhido (R9) com o tempo de fornecimento (R7)
     JGT Excedeu                                         ;se R9 é maior, saltar para a tag "Excedeu"
-NaoERapido:	
-    CMP R8,0											;compara o valor do registo 8 (usado no calculo do tempo) com 0
-	JLT Excedeu											;for inferior a 0, saltar para a tag "Excedeu"
+    CMP R8,0                                            ;comparar R8 com 0 (R8 vem de CalculoTempo, se é menor indica que será fornecida bateria a mais)
+    JLT Excedeu                                         ;se R8 é menor a 0, saltar para a tag "Excedeu"
 	JMP NaoExcedeu 										;caso contrário, salta para o tag "NaoExcedeu"
 
 Excedeu:												;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
