@@ -923,7 +923,7 @@ CalculaTempoRapido:
 Ciclo_CTR:
     CMP R8, 0 											;compara o valor do registo 8 com 0
 	JLE VerificaTempo 									;se o valor do registo 8 for inferior ou igual a 0, salta para o tag "VerificaTempo"
-	SUB R8,R7 											;é subtraido a 100 o valor da energia do carregamento (20)
+	SUB R8,R7 											;é subtraido a 100 o valor da energia do carregamento (100)
 	SUB R4,1 											;subtrai 1 ao registo 4 (ao tempo)
 	CMP R4,0 											;compara o valor do registo 4 com a constante 0, ou seja, se o tempo chegou a 0
 	JEQ VerificaTempo 									;se o valor do registo 4 for 0, salta para o tag VerificaTempo"
@@ -980,8 +980,13 @@ VerificaSaldo:											;VERIFICAR SE O UTILIZADOR TEM SALDO SUFICIENTE PARA EF
 
 
 ForneceEnergia:											;VERIFICA O TIPO DE CARREGAMENTO A SER FORNECIDO
-	CMP R4,0											;compara o valor do registo 4 com a constante 0
-	JNE Excedeu											;se o valor do registo 4 for 0, salta para o tag "Excedeu"
+    CMP R3,3                                            ;verifica se a opção escolhida é a rápida (R3- opção escolhida, 3- opção rápida)
+    JNE NaoERapido                                      ;se não for, salta-se para a tag "NaoERapido"
+    CMP R9,R7                                           ;se for, comparamos o tempo escolhido (R9) com o tempo de fornecimento (R7)
+    JGT Excedeu                                         ;se R9 é maior, saltar para a tag "Excedeu"
+NaoERapido:	
+    CMP R8,0											;compara o valor do registo 8 (usado no calculo do tempo) com 0
+	JLT Excedeu											;for inferior a 0, saltar para a tag "Excedeu"
 	JMP NaoExcedeu 										;caso contrário, salta para o tag "NaoExcedeu"
 
 Excedeu:												;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
@@ -989,8 +994,8 @@ Excedeu:												;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERI
     CALL RefreshDisplay 								;mostra ao utilizador o display metido anteriormente em R9
 
 NaoExcedeu:												;SE O TEMPO NÃO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA (não foi necessário o tempo todo inserido pelo utilizador)
-    MOV R4,R7											;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
-	MOV R9,R7											;coloca no registo 4 o valor do registo 7 (o tempo escolhido pelo utilizador)
+	MOV R9,R7											;coloca no registo 9 o valor do registo 7 (o tempo de fornecimento)
+	MOV R4,R7											;coloca no registo 4 o valor do registo 7 (o tempo de fornecimento)
     MOV R5, Base_Tabela_Dados							;é colocado no registo 5 o valor o endereço do inicio da base de dados
     ADD R5,R10											;é adicionado ao registo 5 o valor do registo 10, ou seja, o indice do cliente
 	MOV R6, [R5+BateriaCarro] 							;é colocado no registo 6, o valor da bateria do veiculo do cliente
@@ -1043,8 +1048,7 @@ BateriaCarregada:										;QUANDO A BATERIA DO VEICULO ULTRAPASSA OS 100%
 
 AtualizaValoresEnergia:									;VERIFICA SE O TEMPO CHEGOU A 0 NO FIM DO CARREGAMENTO DA BATERIA
 	MOV R7,R9											;coloca no registo 7 o valor do registo 9 (o tempo escolhido pelo utilizador)
-	SUB R7, R4											;é subtraido ao registo 7 (o tempo inserido) o valor do registo 4 (o valor do tempo que sobrou) para obter o tempo que demorou para carregar o carro
-	MOV R8, R7                                          ;move-se o registo 7 (tempo que demorou para carregar o carro) para o registo 8 para escrever o valor no display
+    MOV R8, R7                                          ;move-se o registo 7 (tempo que demorou para carregar o carro) para o registo 8 para escrever o valor no display
 	MOV R9, Display_InfoCarregamento 					;mete no registo 9, onde está o endereço do display que pretendemos mostrar
     CALL RefreshDisplay 								;mostra ao utilizador o display metido anteriormente em R9
     MOV R9,89                                           ;mete no registo 9 o número de bytes a adicionar ao início do display para escrever o valor no lugar certo
