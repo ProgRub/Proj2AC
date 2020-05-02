@@ -406,6 +406,8 @@ Programa:
     CMP R10,-1                                         ;compara-se o valor em R10 com -1
 	JEQ FimPrograma                                    ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
     CALL NiveisDeEnergia                               ;rotina para indicar se os postos estão operacionais
+    CMP R10,-1                                         ;compara-se o valor em R10 com -1
+	JEQ FimPrograma                                    ;R10 será igual a -1 se o posto estiver desligado. Se tal acontecer, salta-se para o fim do programa
     CALL Verificacao_Cliente                           ;rotina para efetuar a verificação do cliente
     CMP R10,-1                                         ;compara-se o valor em R10 com -1
 	JEQ FimPrograma                                    ;R10 será igual a -1 se o utilizador não foi verificado. Se tal acontecer, salta-se para o fim do programa
